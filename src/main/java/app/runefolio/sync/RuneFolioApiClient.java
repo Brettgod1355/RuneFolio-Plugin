@@ -3,19 +3,22 @@ package app.runefolio.sync;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 final class RuneFolioApiClient
 {
     private static final String API_BASE = "https://runefolio.app/api";
     private static final int PROTOCOL_VERSION = 1;
-    static final String CLIENT_VERSION = "0.3.15";
+    static final String CLIENT_VERSION = "0.3.16";
 
     private RuneFolioApiClient()
     {
@@ -132,6 +135,79 @@ final class RuneFolioApiClient
             response.has("requestFullSync") && response.get("requestFullSync").getAsBoolean(),
             retryableRejectedCount
         );
+    }
+
+    static void uploadScreenshot(
+        String connectionToken,
+        String characterName,
+        UUID eventId,
+        String category,
+        String caption,
+        String occurredAt,
+        byte[] jpeg
+    ) throws IOException
+    {
+        String boundary = "RuneFolio-" + UUID.randomUUID();
+        ByteArrayOutputStream body = new ByteArrayOutputStream(jpeg.length + 2048);
+        writeField(body, boundary, "eventId", eventId.toString());
+        writeField(body, boundary, "characterName", characterName);
+        writeField(body, boundary, "category", category);
+        writeField(body, boundary, "caption", caption);
+        writeField(body, boundary, "occurredAt", occurredAt);
+        writeAscii(body, "--" + boundary + "\r\n");
+        writeAscii(body, "Content-Disposition: form-data; name=\"file\"; filename=\"runefolio.jpg\"\r\n");
+        writeAscii(body, "Content-Type: image/jpeg\r\n\r\n");
+        body.write(jpeg);
+        writeAscii(body, "\r\n--" + boundary + "--\r\n");
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(API_BASE + "/plugin-screenshots").openConnection();
+        try
+        {
+            connection.setRequestMethod("POST");
+            connection.setConnectTimeout(10_000);
+            connection.setReadTimeout(20_000);
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + connectionToken);
+            byte[] payload = body.toByteArray();
+            connection.setFixedLengthStreamingMode(payload.length);
+            try (OutputStream output = connection.getOutputStream())
+            {
+                output.write(payload);
+            }
+
+            int status = connection.getResponseCode();
+            InputStream stream = status >= 200 && status < 300
+                ? connection.getInputStream()
+                : connection.getErrorStream();
+            JsonObject json = readJsonResponse(stream);
+            if (status < 200 || status >= 300)
+            {
+                String message = json.has("message")
+                    ? json.get("message").getAsString()
+                    : (json.has("error") ? json.get("error").getAsString() : "RuneFolio rejected the screenshot.");
+                throw new IOException(message);
+            }
+        }
+        finally
+        {
+            connection.disconnect();
+        }
+    }
+
+    private static void writeField(ByteArrayOutputStream output, String boundary, String name, String value)
+        throws IOException
+    {
+        writeAscii(output, "--" + boundary + "\r\n");
+        writeAscii(output, "Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n");
+        output.write(value.getBytes(StandardCharsets.UTF_8));
+        writeAscii(output, "\r\n");
+    }
+
+    private static void writeAscii(ByteArrayOutputStream output, String value) throws IOException
+    {
+        output.write(value.getBytes(StandardCharsets.US_ASCII));
     }
 
     private static void addStrings(JsonObject response, String key, List<String> destination)

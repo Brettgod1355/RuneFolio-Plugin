@@ -3,7 +3,9 @@ package app.runefolio.sync;
 import com.google.inject.Provides;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import java.awt.Image;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,6 +42,7 @@ import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.ScriptID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -50,6 +54,7 @@ import net.runelite.client.plugins.loottracker.LootReceived;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.DrawManager;
 import net.runelite.client.ui.NavigationButton;
 
 @Slf4j
@@ -72,6 +77,19 @@ public class RuneFolioPlugin extends Plugin
     private static final int COLLECTION_LOG_INIT_SCRIPT = 2240;
     private static final int COLLECTION_SYNC_COOLDOWN_TICKS = 50;
     private static final String COLLECTION_LOG_TEXT = "New item added to your collection log: ";
+    private static final int SCREENSHOT_MAX_BYTES = 3 * 1024 * 1024;
+    private static final Pattern LEVEL_UP_PATTERN = Pattern.compile(
+        ".*Your ([a-zA-Z]+) (?:level is|are)? now (\\d+)\\."
+    );
+    private static final Pattern QUEST_COMPLETION_PATTERN = Pattern.compile(
+        ".*(?:completed|been|rebuilt|freed|defeated|saved).*",
+        Pattern.CASE_INSENSITIVE
+    );
+    private static final List<String> PET_MESSAGES = List.of(
+        "You have a funny feeling like you're being followed",
+        "You feel something weird sneaking into your backpack",
+        "You have a funny feeling like you would have been followed"
+    );
     private static final Pattern COMBAT_ACHIEVEMENT_PATTERN = Pattern.compile(
         "Congratulations, you've completed an? (?<tier>\\w+) combat task: @.+?@(?<task>.+?)</col>"
             + "(?: \\((?<points>\\d+) points?\\))?\\.?"
@@ -108,8 +126,12 @@ public class RuneFolioPlugin extends Plugin
     @Inject
     private ItemManager itemManager;
 
+    @Inject
+    private DrawManager drawManager;
+
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
     private final ScheduledExecutorService syncExecutor = Executors.newSingleThreadScheduledExecutor();
+    private final ExecutorService screenshotExecutor = Executors.newSingleThreadExecutor();
     private final AtomicBoolean uploadInFlight = new AtomicBoolean();
     private NavigationButton navigationButton;
     private boolean navigationButtonAdded;
@@ -143,6 +165,7 @@ public class RuneFolioPlugin extends Plugin
     private boolean questProgressRefreshPending;
     private boolean diaryProgressRefreshPending;
     private boolean combatProgressRefreshPending;
+    private boolean interfaceScreenshotPending;
 
     @Provides
     RuneFolioConfig provideConfig(ConfigManager manager)
@@ -232,6 +255,7 @@ public class RuneFolioPlugin extends Plugin
         }
         navigationButton = null;
         connectionExecutor.shutdownNow();
+        screenshotExecutor.shutdownNow();
         syncExecutor.shutdown();
         try
         {
@@ -1264,6 +1288,8 @@ public class RuneFolioPlugin extends Plugin
             return;
         }
 
+        capturePendingInterfaceScreenshot();
+
         finishCollectionButtonSyncIfReady();
         enqueuePendingProgressSnapshots();
 
@@ -1329,6 +1355,7 @@ public class RuneFolioPlugin extends Plugin
         JsonArray items = new JsonArray();
         long totalGeValue = 0L;
         long totalHaValue = 0L;
+        String firstUntradeableItem = null;
         for (ItemStack stack : event.getItems())
         {
             int quantity = stack.getQuantity();
@@ -1339,6 +1366,10 @@ public class RuneFolioPlugin extends Plugin
 
             int itemId = itemManager.canonicalize(stack.getId());
             String itemName = itemManager.getItemComposition(itemId).getName();
+            if (firstUntradeableItem == null && !itemManager.getItemComposition(itemId).isTradeable())
+            {
+                firstUntradeableItem = itemName;
+            }
             int unitGeValue = Math.max(0, itemManager.getItemPrice(itemId));
             int unitHaValue = Math.max(0, itemManager.getItemComposition(itemId).getHaPrice());
             long itemGeValue = safeLootValue(quantity, unitGeValue);
@@ -1376,6 +1407,17 @@ public class RuneFolioPlugin extends Plugin
             totalGeValue,
             totalHaValue
         ));
+
+        String safeSourceName = sourceName == null || sourceName.isBlank() ? "Unknown loot source" : sourceName;
+        if (config.uploadScreenshots() && config.screenshotValuableDrops()
+            && totalGeValue >= Math.max(0, config.screenshotValuableDropThreshold()))
+        {
+            requestScreenshot("high_value_drop", safeSourceName + " drop worth " + totalGeValue + " gp");
+        }
+        else if (config.uploadScreenshots() && config.screenshotUntradeableDrops() && firstUntradeableItem != null)
+        {
+            requestScreenshot("untradeable_drop", firstUntradeableItem + " from " + safeSourceName);
+        }
     }
 
     private static long safeLootValue(int quantity, int unitValue)
@@ -1419,12 +1461,20 @@ public class RuneFolioPlugin extends Plugin
                 {
                     syncExecutor.submit(this::flushQueue);
                 }
+                if (config.uploadScreenshots() && config.screenshotCollectionLogUnlocks())
+                {
+                    requestScreenshot("collection_log", "Collection Log: " + itemName);
+                }
             }
         }
 
         if (isDiaryTaskCompletionMessage(plainMessage))
         {
             diaryProgressRefreshPending = true;
+            if (config.uploadScreenshots() && config.screenshotDiaryCompletions())
+            {
+                requestScreenshot("diary_task", plainMessage);
+            }
         }
 
         Matcher combatAchievement = COMBAT_ACHIEVEMENT_PATTERN.matcher(rawMessage);
@@ -1440,6 +1490,16 @@ public class RuneFolioPlugin extends Plugin
             ));
 
             combatProgressRefreshPending = true;
+            if (config.uploadScreenshots() && config.screenshotCombatAchievements())
+            {
+                requestScreenshot("combat_achievement", "Combat Achievement: " + Text.removeTags(combatAchievement.group("task")).trim());
+            }
+        }
+
+        if (config.uploadScreenshots() && config.screenshotPets()
+            && PET_MESSAGES.stream().anyMatch(plainMessage::contains))
+        {
+            requestScreenshot("pet", "New pet received");
         }
     }
 
@@ -1451,6 +1511,171 @@ public class RuneFolioPlugin extends Plugin
         {
             questProgressRefreshPending = true;
         }
+
+        if (config.uploadScreenshots()
+            && ((config.screenshotLevelUps()
+                && (event.getGroupId() == InterfaceID.LEVELUP_DISPLAY || event.getGroupId() == InterfaceID.OBJECTBOX))
+                || (config.screenshotQuestCompletions() && event.getGroupId() == InterfaceID.QUESTSCROLL)))
+        {
+            interfaceScreenshotPending = true;
+        }
+    }
+
+    private void capturePendingInterfaceScreenshot()
+    {
+        if (!interfaceScreenshotPending || !config.uploadScreenshots())
+        {
+            return;
+        }
+        interfaceScreenshotPending = false;
+
+        if (config.screenshotLevelUps())
+        {
+            Widget levelText = client.getWidget(InterfaceID.LevelupDisplay.TEXT2);
+            if (levelText == null)
+            {
+                levelText = client.getWidget(InterfaceID.Objectbox.TEXT);
+            }
+            if (levelText != null)
+            {
+                String text = Text.removeTags(levelText.getText());
+                Matcher match = LEVEL_UP_PATTERN.matcher(text);
+                if (match.matches())
+                {
+                    requestScreenshot("level_up", match.group(1) + " level " + match.group(2));
+                    return;
+                }
+            }
+        }
+
+        if (config.screenshotQuestCompletions())
+        {
+            Widget questTitle = client.getWidget(InterfaceID.Questscroll.QUEST_TITLE);
+            if (questTitle != null)
+            {
+                String text = Text.removeTags(questTitle.getText()).trim();
+                if (QUEST_COMPLETION_PATTERN.matcher(text).matches())
+                {
+                    requestScreenshot("quest_completion", text);
+                }
+            }
+        }
+    }
+
+    private void requestScreenshot(String category, String caption)
+    {
+        if (!config.uploadScreenshots() || client.getGameState() != GameState.LOGGED_IN)
+        {
+            return;
+        }
+        String playerName = currentPlayerName();
+        String savedToken = isAccountMode() ? accountConnectionToken : connectionToken;
+        if (playerName == null || savedToken == null || savedToken.isBlank())
+        {
+            return;
+        }
+
+        UUID eventId = UUID.randomUUID();
+        String occurredAt = Instant.now().toString();
+        boolean chatHidden = hideScreenshotWidget(config.hideChatInScreenshots(), InterfaceID.Chatbox.CHATAREA);
+        boolean privateMessagesHidden = hideScreenshotWidget(config.hideChatInScreenshots(), InterfaceID.PmChat.CONTAINER);
+        drawManager.requestNextFrameListener(frame ->
+        {
+            restoreScreenshotWidget(chatHidden, InterfaceID.Chatbox.CHATAREA);
+            restoreScreenshotWidget(privateMessagesHidden, InterfaceID.PmChat.CONTAINER);
+            uploadScreenshotAsync(savedToken, playerName, eventId, category, caption, occurredAt, frame);
+        });
+    }
+
+    private boolean hideScreenshotWidget(boolean shouldHide, int componentId)
+    {
+        if (!shouldHide)
+        {
+            return false;
+        }
+        Widget widget = client.getWidget(componentId);
+        if (widget == null || widget.isHidden())
+        {
+            return false;
+        }
+        widget.setHidden(true);
+        return true;
+    }
+
+    private void restoreScreenshotWidget(boolean shouldRestore, int componentId)
+    {
+        if (!shouldRestore)
+        {
+            return;
+        }
+        clientThread.invokeLater(() ->
+        {
+            Widget widget = client.getWidget(componentId);
+            if (widget != null)
+            {
+                widget.setHidden(false);
+            }
+        });
+    }
+
+    private void uploadScreenshotAsync(
+        String token,
+        String playerName,
+        UUID eventId,
+        String category,
+        String caption,
+        String occurredAt,
+        Image frame
+    )
+    {
+        screenshotExecutor.submit(() ->
+        {
+            try
+            {
+                byte[] jpeg = RuneFolioScreenshotEncoder.encode(frame);
+                if (jpeg.length > SCREENSHOT_MAX_BYTES)
+                {
+                    log.warn("RuneFolio screenshot was too large to upload: {} bytes", jpeg.length);
+                    return;
+                }
+                long[] retryDelays = {0L, 1_000L, 3_000L};
+                for (int attempt = 0; attempt < retryDelays.length; attempt++)
+                {
+                    if (retryDelays[attempt] > 0)
+                    {
+                        Thread.sleep(retryDelays[attempt]);
+                    }
+                    try
+                    {
+                        RuneFolioApiClient.uploadScreenshot(
+                            token,
+                            playerName,
+                            eventId,
+                            category,
+                            caption,
+                            occurredAt,
+                            jpeg
+                        );
+                        return;
+                    }
+                    catch (java.io.IOException exception)
+                    {
+                        if (attempt == retryDelays.length - 1)
+                        {
+                            log.warn("RuneFolio screenshot upload failed after retries", exception);
+                        }
+                    }
+                }
+            }
+            catch (InterruptedException exception)
+            {
+                Thread.currentThread().interrupt();
+            }
+            catch (java.io.IOException exception)
+            {
+                log.warn("RuneFolio could not compress a screenshot", exception);
+            }
+        });
     }
 
     static boolean isDiaryTaskCompletionMessage(String message)
