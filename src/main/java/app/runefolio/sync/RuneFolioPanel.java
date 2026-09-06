@@ -1,0 +1,515 @@
+package app.runefolio.sync;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FlowLayout;
+import java.awt.Insets;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.function.Consumer;
+import javax.inject.Singleton;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.PluginPanel;
+
+@Slf4j
+@Singleton
+class RuneFolioPanel extends PluginPanel
+{
+    private static final String RUNE_FOLIO_URL = "https://runefolio.app";
+    private static final Color GOLD = new Color(217, 184, 97);
+    private static final Color PRIMARY_TEXT = new Color(232, 228, 216);
+    private static final Color MUTED_TEXT = new Color(190, 184, 166);
+    private static final Color SUCCESS_TEXT = new Color(131, 194, 113);
+    private static final Color ERROR_TEXT = new Color(230, 119, 107);
+    private static final int CONTENT_WIDTH = 330;
+    private static final DateTimeFormatter SYNC_TIME_FORMAT =
+        DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
+
+    private final JLabel characterValue = new JLabel("Log in to RuneLite");
+    private final JTextArea statusValue = new JTextArea();
+    private final JTextField codeField = new JTextField();
+    private final JTextArea temporaryModeNotice = new JTextArea();
+    private final JPanel accountDetails = new JPanel();
+    private final JPanel temporaryDetails = new JPanel();
+    private final JButton accountSectionButton = new JButton();
+    private final JButton accountSectionChevron = new JButton();
+    private final JButton temporarySectionButton = new JButton();
+    private final JButton temporarySectionChevron = new JButton();
+    private final JButton temporaryConnectButton = new JButton("Connect character");
+    private final JButton accountConnectButton = new JButton("Log in to RuneFolio");
+    private final JButton accountDisconnectButton = new JButton("Disconnect account");
+    private final JButton characterSetupButton = new JButton("Add to RuneFolio");
+    private final JButton syncNowButton = new JButton("Sync now");
+    private final JLabel lastSyncValue = metricValue("Never");
+    private final JLabel pendingEventsValue = metricValue("0");
+    private Consumer<String> temporaryConnectAction;
+    private Runnable accountConnectAction;
+    private Runnable accountDisconnectAction;
+    private Runnable characterSetupAction;
+    private Runnable manualSyncAction;
+    private boolean accountConnected;
+    private boolean accountExpanded = true;
+    private boolean temporaryExpanded;
+    private boolean temporaryConnecting;
+
+    RuneFolioPanel()
+    {
+        super(false);
+        setLayout(new BorderLayout());
+        setBackground(ColorScheme.DARK_GRAY_COLOR);
+
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(ColorScheme.DARK_GRAY_COLOR);
+        content.setBorder(BorderFactory.createEmptyBorder(14, 12, 14, 12));
+
+        JPanel brand = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        brand.setOpaque(false);
+        brand.setAlignmentX(LEFT_ALIGNMENT);
+        JLabel brandIcon = new JLabel(new ImageIcon(RuneFolioBrand.createIcon(28)));
+        brandIcon.setToolTipText("RuneFolio");
+        brand.add(brandIcon);
+
+        JLabel title = new JLabel("RuneFolio");
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
+        title.setForeground(GOLD);
+        brand.add(title);
+
+        JLabel version = new JLabel("v" + RuneFolioApiClient.CLIENT_VERSION);
+        version.setFont(version.getFont().deriveFont(Font.PLAIN, 11f));
+        version.setForeground(MUTED_TEXT);
+        brand.add(version);
+        content.add(brand);
+
+        JLabel subtitle = new JLabel("Private alpha · Sync client");
+        subtitle.setForeground(MUTED_TEXT);
+        subtitle.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
+        content.add(subtitle);
+        content.add(Box.createRigidArea(new Dimension(0, 14)));
+
+        content.add(createSectionHeader(
+            "RUNEFOLIO ACCOUNT",
+            accountSectionButton,
+            accountSectionChevron,
+            () -> setAccountExpanded(!accountExpanded)
+        ));
+
+        configureDetailsPanel(accountDetails);
+        JTextArea accountNotice = new JTextArea(
+            "Recommended. Connect once in your browser to sync every character on your RuneFolio account."
+        );
+        configureWrappedText(accountNotice, MUTED_TEXT, 72);
+        accountNotice.setBorder(BorderFactory.createEmptyBorder(5, 0, 8, 0));
+        accountDetails.add(accountNotice);
+
+        accountConnectButton.setAlignmentX(LEFT_ALIGNMENT);
+        accountConnectButton.addActionListener(event ->
+        {
+            if (accountConnectAction != null)
+            {
+                accountConnectAction.run();
+            }
+        });
+        accountDetails.add(accountConnectButton);
+
+        accountDisconnectButton.setAlignmentX(LEFT_ALIGNMENT);
+        accountDisconnectButton.setVisible(false);
+        accountDisconnectButton.addActionListener(event ->
+        {
+            if (accountDisconnectAction != null)
+            {
+                accountDisconnectAction.run();
+            }
+        });
+        accountDetails.add(accountDisconnectButton);
+        content.add(accountDetails);
+        content.add(Box.createRigidArea(new Dimension(0, 16)));
+
+        content.add(sectionLabel("RUNESCAPE CHARACTER"));
+        characterValue.setForeground(PRIMARY_TEXT);
+        characterValue.setBorder(BorderFactory.createEmptyBorder(5, 0, 16, 0));
+        content.add(characterValue);
+
+        content.add(sectionLabel("CONNECTION STATUS"));
+        configureWrappedText(statusValue, PRIMARY_TEXT, 100);
+        statusValue.setBorder(BorderFactory.createEmptyBorder(6, 0, 16, 0));
+        content.add(statusValue);
+        setStatus("Log in to RuneFolio, or use a temporary code for one character.");
+
+        characterSetupButton.setAlignmentX(LEFT_ALIGNMENT);
+        characterSetupButton.setVisible(false);
+        characterSetupButton.addActionListener(event ->
+        {
+            if (characterSetupAction != null)
+            {
+                characterSetupAction.run();
+            }
+        });
+        content.add(characterSetupButton);
+
+        content.add(sectionLabel("SYNC ACTIVITY"));
+        JPanel syncActivity = new JPanel();
+        syncActivity.setLayout(new BoxLayout(syncActivity, BoxLayout.Y_AXIS));
+        syncActivity.setOpaque(false);
+        syncActivity.setAlignmentX(LEFT_ALIGNMENT);
+        syncActivity.setMaximumSize(new Dimension(CONTENT_WIDTH, 80));
+        syncActivity.add(createMetricRow("Last successful sync", lastSyncValue));
+        syncActivity.add(createMetricRow("Pending events", pendingEventsValue));
+        syncActivity.setBorder(BorderFactory.createEmptyBorder(5, 0, 8, 0));
+        content.add(syncActivity);
+
+        syncNowButton.setAlignmentX(LEFT_ALIGNMENT);
+        syncNowButton.addActionListener(event ->
+        {
+            if (manualSyncAction != null)
+            {
+                manualSyncAction.run();
+            }
+        });
+        content.add(syncNowButton);
+        content.add(Box.createRigidArea(new Dimension(0, 8)));
+
+        JButton openRuneFolio = new JButton("Open RuneFolio");
+        openRuneFolio.setAlignmentX(LEFT_ALIGNMENT);
+        openRuneFolio.addActionListener(event -> openBrowser(RUNE_FOLIO_URL));
+        content.add(openRuneFolio);
+        content.add(Box.createRigidArea(new Dimension(0, 16)));
+
+        content.add(createSectionHeader(
+            "TEMPORARY CODE",
+            temporarySectionButton,
+            temporarySectionChevron,
+            () -> setTemporaryExpanded(!temporaryExpanded)
+        ));
+
+        configureDetailsPanel(temporaryDetails);
+        configureWrappedText(temporaryModeNotice, MUTED_TEXT, 66);
+        temporaryModeNotice.setText(
+            "Disconnect the RuneFolio account above to use a temporary code. You can stay signed in on the RuneFolio website."
+        );
+        temporaryModeNotice.setBorder(BorderFactory.createEmptyBorder(5, 0, 8, 0));
+        temporaryModeNotice.setVisible(false);
+        temporaryDetails.add(temporaryModeNotice);
+
+        codeField.setMaximumSize(new Dimension(CONTENT_WIDTH, 30));
+        codeField.setAlignmentX(LEFT_ALIGNMENT);
+        codeField.setBackground(new Color(31, 31, 31));
+        codeField.setForeground(PRIMARY_TEXT);
+        codeField.setCaretColor(GOLD);
+        codeField.setSelectionColor(new Color(100, 79, 36));
+        codeField.setSelectedTextColor(Color.WHITE);
+        codeField.setFont(new Font(Font.MONOSPACED, Font.BOLD, 13));
+        codeField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(125, 125, 125)),
+            BorderFactory.createEmptyBorder(4, 6, 4, 6)
+        ));
+        codeField.setToolTipText("Paste the one-time RF-XXXX code from RuneFolio settings");
+        temporaryDetails.add(codeField);
+        temporaryDetails.add(Box.createRigidArea(new Dimension(0, 8)));
+
+        temporaryConnectButton.setAlignmentX(LEFT_ALIGNMENT);
+        temporaryConnectButton.addActionListener(event -> submitCode());
+        temporaryDetails.add(temporaryConnectButton);
+        temporaryDetails.add(Box.createRigidArea(new Dimension(0, 12)));
+
+        JTextArea notice = new JTextArea(
+            "Temporary codes are designed for shared computers. Each connects one character, and you can revoke access online from RuneFolio settings."
+        );
+        configureWrappedText(notice, MUTED_TEXT, 100);
+        temporaryDetails.add(notice);
+        content.add(temporaryDetails);
+
+        setAccountExpanded(true);
+        setTemporaryExpanded(false);
+        add(content, BorderLayout.NORTH);
+    }
+
+    void setTemporaryConnectAction(Consumer<String> action)
+    {
+        temporaryConnectAction = action;
+    }
+
+    void setAccountConnectAction(Runnable action)
+    {
+        accountConnectAction = action;
+    }
+
+    void setAccountDisconnectAction(Runnable action)
+    {
+        accountDisconnectAction = action;
+    }
+
+    void setCharacterSetupAction(Runnable action)
+    {
+        characterSetupAction = action;
+    }
+
+    void setManualSyncAction(Runnable action)
+    {
+        manualSyncAction = action;
+    }
+
+    void setSyncState(long lastSuccessfulSyncAtMillis, int pendingEvents)
+    {
+        lastSyncValue.setText(lastSuccessfulSyncAtMillis > 0
+            ? SYNC_TIME_FORMAT.format(Instant.ofEpochMilli(lastSuccessfulSyncAtMillis))
+            : "Never");
+        pendingEventsValue.setText(Integer.toString(Math.max(0, pendingEvents)));
+        revalidate();
+        repaint();
+    }
+
+    void showCharacterSetup()
+    {
+        characterSetupButton.setVisible(true);
+        revalidate();
+        repaint();
+    }
+
+    void hideCharacterSetup()
+    {
+        characterSetupButton.setVisible(false);
+        revalidate();
+        repaint();
+    }
+
+    void setAccountConnected(boolean connected)
+    {
+        boolean connectionChanged = accountConnected != connected;
+        accountConnected = connected;
+        accountConnectButton.setVisible(!connected);
+        accountDisconnectButton.setVisible(connected);
+        temporaryModeNotice.setVisible(connected);
+        codeField.setEnabled(!connected && !temporaryConnecting);
+        temporaryConnectButton.setEnabled(!connected && !temporaryConnecting);
+
+        if (connectionChanged)
+        {
+            setAccountExpanded(!connected);
+        }
+        else
+        {
+            revalidate();
+            repaint();
+        }
+    }
+
+    void setAccountConnecting(boolean connecting)
+    {
+        accountConnectButton.setEnabled(!connecting);
+        accountConnectButton.setText(connecting ? "Waiting for browser..." : "Log in to RuneFolio");
+        accountDisconnectButton.setEnabled(!connecting);
+    }
+
+    void setCharacterName(String characterName)
+    {
+        characterValue.setText(characterName == null || characterName.isBlank() ? "Log in to RuneLite" : characterName);
+    }
+
+    void setStatus(String status)
+    {
+        String safeStatus = status == null ? "" : status
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;");
+        String statusLower = safeStatus.toLowerCase();
+        statusValue.setForeground((statusLower.startsWith("connected") || statusLower.contains("sync sent"))
+            ? SUCCESS_TEXT
+            : (statusLower.contains("failed") || statusLower.contains("revoked") || statusLower.contains("expired")
+                || statusLower.contains("mismatch") || statusLower.contains("not connected")
+                || statusLower.contains("already connected to another runefolio account")
+                ? ERROR_TEXT
+                : PRIMARY_TEXT));
+        statusValue.setText(safeStatus);
+        statusValue.revalidate();
+        statusValue.repaint();
+    }
+
+    void setConnecting(boolean connecting)
+    {
+        temporaryConnecting = connecting;
+        temporaryConnectButton.setEnabled(!connecting && !accountConnected);
+        codeField.setEnabled(!connecting && !accountConnected);
+        temporaryConnectButton.setText(connecting ? "Connecting..." : "Connect character");
+    }
+
+    void clearCode()
+    {
+        codeField.setText("");
+    }
+
+    void openBrowser(String url)
+    {
+        if (!Desktop.isDesktopSupported())
+        {
+            setStatus("Could not open a browser. Open runefolio.app in your browser.");
+            return;
+        }
+
+        try
+        {
+            Desktop.getDesktop().browse(new URI(url));
+        }
+        catch (IOException | URISyntaxException exception)
+        {
+            log.warn("Unable to open RuneFolio.", exception);
+            setStatus("Could not open the browser. Open runefolio.app and try again.");
+        }
+    }
+
+    private void setAccountExpanded(boolean expanded)
+    {
+        accountExpanded = expanded;
+        accountDetails.setVisible(expanded);
+        accountSectionChevron.setText(expanded ? "\u25bc" : "\u25b6");
+        accountSectionChevron.setToolTipText(expanded ? "Collapse RuneFolio account" : "Expand RuneFolio account");
+        revalidate();
+        repaint();
+    }
+
+    private void setTemporaryExpanded(boolean expanded)
+    {
+        temporaryExpanded = expanded;
+        temporaryDetails.setVisible(expanded);
+        temporarySectionChevron.setText(expanded ? "\u25bc" : "\u25b6");
+        temporarySectionChevron.setToolTipText(expanded ? "Collapse temporary code" : "Expand temporary code");
+        revalidate();
+        repaint();
+    }
+
+    private void configureDetailsPanel(JPanel details)
+    {
+        details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
+        details.setOpaque(false);
+        details.setAlignmentX(LEFT_ALIGNMENT);
+        details.setMaximumSize(new Dimension(CONTENT_WIDTH, Integer.MAX_VALUE));
+    }
+
+    private JPanel createMetricRow(String labelText, JLabel value)
+    {
+        return createMetricRow(labelText, value, 21);
+    }
+
+    private JPanel createMetricRow(String labelText, JLabel value, int height)
+    {
+        JPanel row = new JPanel(new BorderLayout(8, 0));
+        row.setOpaque(false);
+        row.setAlignmentX(LEFT_ALIGNMENT);
+        row.setMaximumSize(new Dimension(CONTENT_WIDTH, height));
+        JLabel label = new JLabel(labelText);
+        label.setForeground(MUTED_TEXT);
+        row.add(label, BorderLayout.WEST);
+        row.add(value, BorderLayout.EAST);
+        return row;
+    }
+
+    private static JLabel metricValue(String text)
+    {
+        JLabel label = new JLabel(text);
+        label.setForeground(PRIMARY_TEXT);
+        label.setHorizontalAlignment(SwingConstants.RIGHT);
+        return label;
+    }
+
+    private JPanel createSectionHeader(
+        String title,
+        JButton titleButton,
+        JButton chevronButton,
+        Runnable toggleAction
+    )
+    {
+        JPanel header = new JPanel(new BorderLayout(6, 0));
+        header.setBackground(new Color(46, 46, 46));
+        header.setBorder(BorderFactory.createLineBorder(new Color(76, 76, 76)));
+        header.setAlignmentX(LEFT_ALIGNMENT);
+        header.setMaximumSize(new Dimension(CONTENT_WIDTH, 32));
+        header.setPreferredSize(new Dimension(CONTENT_WIDTH, 32));
+
+        configureSectionToggle(titleButton);
+        titleButton.setText(title);
+        titleButton.addActionListener(event -> toggleAction.run());
+
+        Dimension chevronSize = new Dimension(30, 30);
+        chevronButton.setPreferredSize(chevronSize);
+        chevronButton.setMinimumSize(chevronSize);
+        chevronButton.setMaximumSize(chevronSize);
+        chevronButton.setFont(chevronButton.getFont().deriveFont(Font.BOLD, 16f));
+        chevronButton.setForeground(GOLD);
+        chevronButton.setBackground(new Color(72, 62, 39));
+        chevronButton.setBorder(BorderFactory.createLineBorder(new Color(139, 113, 55)));
+        chevronButton.setMargin(new Insets(0, 0, 0, 0));
+        chevronButton.setContentAreaFilled(true);
+        chevronButton.setOpaque(true);
+        chevronButton.setFocusPainted(false);
+        chevronButton.addActionListener(event -> toggleAction.run());
+
+        header.add(titleButton, BorderLayout.CENTER);
+        header.add(chevronButton, BorderLayout.EAST);
+        return header;
+    }
+
+    private void configureSectionToggle(JButton button)
+    {
+        button.setFont(button.getFont().deriveFont(Font.BOLD, 11f));
+        button.setForeground(GOLD);
+        button.setHorizontalAlignment(SwingConstants.LEFT);
+        button.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 4));
+        button.setMargin(new Insets(0, 0, 0, 0));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+    }
+
+    private void submitCode()
+    {
+        String code = codeField.getText().trim();
+        if (code.isEmpty())
+        {
+            setStatus("Paste a temporary code from RuneFolio settings first.");
+            return;
+        }
+        if (temporaryConnectAction != null)
+        {
+            temporaryConnectAction.accept(code);
+        }
+    }
+
+    private void configureWrappedText(JTextArea textArea, Color color, int maximumHeight)
+    {
+        textArea.setEditable(false);
+        textArea.setFocusable(false);
+        textArea.setOpaque(false);
+        textArea.setForeground(color);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setColumns(25);
+        textArea.setMaximumSize(new Dimension(CONTENT_WIDTH, maximumHeight));
+        textArea.setAlignmentX(LEFT_ALIGNMENT);
+    }
+
+    private JLabel sectionLabel(String text)
+    {
+        JLabel label = new JLabel(text);
+        label.setFont(label.getFont().deriveFont(Font.BOLD, 11f));
+        label.setForeground(GOLD);
+        return label;
+    }
+}

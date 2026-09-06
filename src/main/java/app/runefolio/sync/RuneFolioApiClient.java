@@ -1,0 +1,379 @@
+package app.runefolio.sync;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+final class RuneFolioApiClient
+{
+    private static final String API_BASE = "https://runefolio.app/api";
+    private static final int PROTOCOL_VERSION = 1;
+    static final String CLIENT_VERSION = "0.3.15";
+
+    private RuneFolioApiClient()
+    {
+    }
+
+    static AccountLoginRequest startAccountLogin() throws IOException
+    {
+        JsonObject body = new JsonObject();
+        body.addProperty("deviceLabel", "RuneLite on this computer");
+        JsonObject response = post("/plugin-auth/start", body, null);
+        return new AccountLoginRequest(
+            response.get("requestId").getAsString(),
+            response.get("pollToken").getAsString(),
+            response.get("verificationUrl").getAsString()
+        );
+    }
+
+    static AccountPollResult pollAccountLogin(String requestId, String pollToken) throws IOException
+    {
+        JsonObject body = new JsonObject();
+        body.addProperty("requestId", requestId);
+        body.addProperty("pollToken", pollToken);
+        JsonObject response = post("/plugin-auth/poll", body, null);
+        String status = response.has("status") ? response.get("status").getAsString() : "pending";
+        String token = response.has("connectionToken") ? response.get("connectionToken").getAsString() : null;
+        return new AccountPollResult(status, token);
+    }
+
+    static AccountHeartbeatResult accountHeartbeat(String connectionToken, String characterName) throws IOException
+    {
+        JsonObject body = new JsonObject();
+        if (characterName != null && !characterName.isBlank())
+        {
+            body.addProperty("characterName", characterName);
+        }
+        JsonObject response = post("/plugin-account/heartbeat", body, connectionToken);
+        boolean characterConnected = !response.has("characterConnected")
+            || response.get("characterConnected").isJsonNull()
+            || response.get("characterConnected").getAsBoolean();
+        String setupUrl = response.has("setupUrl") && !response.get("setupUrl").isJsonNull()
+            ? response.get("setupUrl").getAsString()
+            : null;
+        return new AccountHeartbeatResult(characterConnected, setupUrl);
+    }
+
+    static void disconnectAccount(String connectionToken) throws IOException
+    {
+        post("/plugin-account/disconnect", new JsonObject(), connectionToken);
+    }
+
+    static ConnectionResult exchange(String temporaryCode, String characterName, String connectionLabel) throws IOException
+    {
+        JsonObject body = new JsonObject();
+        body.addProperty("code", temporaryCode);
+        body.addProperty("characterName", characterName);
+        body.addProperty("connectionLabel", connectionLabel);
+
+        JsonObject response = post("/plugin-links/exchange", body, null);
+        JsonObject character = response.getAsJsonObject("character");
+        return new ConnectionResult(
+            response.get("connectionToken").getAsString(),
+            character.get("name").getAsString()
+        );
+    }
+
+    static ConnectionResult heartbeat(String connectionToken) throws IOException
+    {
+        JsonObject response = post("/plugin-links/heartbeat", new JsonObject(), connectionToken);
+        JsonObject character = response.getAsJsonObject("character");
+        return new ConnectionResult(connectionToken, character.get("name").getAsString());
+    }
+
+    static BatchSyncResult syncEvents(
+        String connectionToken,
+        List<RuneFolioSyncEvent> events
+    ) throws IOException
+    {
+        JsonObject body = new JsonObject();
+        body.addProperty("protocolVersion", PROTOCOL_VERSION);
+        body.addProperty("clientVersion", CLIENT_VERSION);
+
+        JsonArray eventArray = new JsonArray();
+        for (RuneFolioSyncEvent event : events)
+        {
+            eventArray.add(event.toJson());
+        }
+        body.add("events", eventArray);
+
+        JsonObject response = post("/plugin-sync", body, connectionToken);
+        List<String> successful = new ArrayList<>();
+        addStrings(response, "acceptedEventIds", successful);
+        addStrings(response, "duplicateEventIds", successful);
+        List<String> acknowledged = new ArrayList<>(successful);
+        addStrings(response, "discardedEventIds", acknowledged);
+        int retryableRejectedCount = 0;
+        if (response.has("rejectedEvents") && response.get("rejectedEvents").isJsonArray())
+        {
+            for (com.google.gson.JsonElement element : response.getAsJsonArray("rejectedEvents"))
+            {
+                if (element.isJsonObject())
+                {
+                    JsonObject rejected = element.getAsJsonObject();
+                    if (!rejected.has("retryable") || rejected.get("retryable").getAsBoolean())
+                    {
+                        retryableRejectedCount++;
+                    }
+                }
+            }
+        }
+        return new BatchSyncResult(
+            acknowledged,
+            successful,
+            response.has("revoke") && response.get("revoke").getAsBoolean(),
+            response.has("requestFullSync") && response.get("requestFullSync").getAsBoolean(),
+            retryableRejectedCount
+        );
+    }
+
+    private static void addStrings(JsonObject response, String key, List<String> destination)
+    {
+        if (!response.has(key) || !response.get(key).isJsonArray())
+        {
+            return;
+        }
+        for (com.google.gson.JsonElement element : response.getAsJsonArray(key))
+        {
+            if (element.isJsonPrimitive())
+            {
+                destination.add(element.getAsString());
+            }
+        }
+    }
+
+    private static JsonObject post(String path, JsonObject body, String connectionToken) throws IOException
+    {
+        HttpURLConnection connection = (HttpURLConnection) new URL(API_BASE + path).openConnection();
+        try
+        {
+            connection.setRequestMethod("POST");
+            connection.setConnectTimeout(10_000);
+            connection.setReadTimeout(10_000);
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+            if (connectionToken != null)
+            {
+                connection.setRequestProperty("Authorization", "Bearer " + connectionToken);
+            }
+
+            byte[] payload = body.toString().getBytes(StandardCharsets.UTF_8);
+            connection.getOutputStream().write(payload);
+
+            int status = connection.getResponseCode();
+            InputStream stream = status >= 200 && status < 300
+                ? connection.getInputStream()
+                : connection.getErrorStream();
+            JsonObject json = readJsonResponse(stream);
+
+            if (status < 200 || status >= 300)
+            {
+                String message = json.has("message")
+                    ? json.get("message").getAsString()
+                    : (json.has("error") ? json.get("error").getAsString() : "RuneFolio rejected the connection.");
+                throw new IOException(message);
+            }
+
+            return json;
+        }
+        finally
+        {
+            connection.disconnect();
+        }
+    }
+
+    private static JsonObject readJsonResponse(InputStream stream) throws IOException
+    {
+        String response = stream == null ? "" : new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+        try
+        {
+            return response.isBlank() ? new JsonObject() : new JsonParser().parse(response).getAsJsonObject();
+        }
+        catch (RuntimeException exception)
+        {
+            throw new IOException("RuneFolio returned an unreadable response.", exception);
+        }
+    }
+
+    static final class SkillSnapshot
+    {
+        private final String name;
+        private final int level;
+        private final int experience;
+
+        SkillSnapshot(String name, int level, int experience)
+        {
+            this.name = name;
+            this.level = level;
+            this.experience = experience;
+        }
+
+        String getName()
+        {
+            return name;
+        }
+
+        int getLevel()
+        {
+            return level;
+        }
+
+        int getExperience()
+        {
+            return experience;
+        }
+    }
+
+    static final class ConnectionResult
+    {
+        private final String connectionToken;
+        private final String characterName;
+
+        ConnectionResult(String connectionToken, String characterName)
+        {
+            this.connectionToken = connectionToken;
+            this.characterName = characterName;
+        }
+
+        String getConnectionToken()
+        {
+            return connectionToken;
+        }
+
+        String getCharacterName()
+        {
+            return characterName;
+        }
+
+    }
+
+    static final class AccountHeartbeatResult
+    {
+        private final boolean characterConnected;
+        private final String setupUrl;
+
+        AccountHeartbeatResult(boolean characterConnected, String setupUrl)
+        {
+            this.characterConnected = characterConnected;
+            this.setupUrl = setupUrl;
+        }
+
+        boolean isCharacterConnected()
+        {
+            return characterConnected;
+        }
+
+        String getSetupUrl()
+        {
+            return setupUrl;
+        }
+    }
+
+    static final class AccountLoginRequest
+    {
+        private final String requestId;
+        private final String pollToken;
+        private final String verificationUrl;
+
+        AccountLoginRequest(String requestId, String pollToken, String verificationUrl)
+        {
+            this.requestId = requestId;
+            this.pollToken = pollToken;
+            this.verificationUrl = verificationUrl;
+        }
+
+        String getRequestId()
+        {
+            return requestId;
+        }
+
+        String getPollToken()
+        {
+            return pollToken;
+        }
+
+        String getVerificationUrl()
+        {
+            return verificationUrl;
+        }
+    }
+
+    static final class AccountPollResult
+    {
+        private final String status;
+        private final String connectionToken;
+
+        AccountPollResult(String status, String connectionToken)
+        {
+            this.status = status;
+            this.connectionToken = connectionToken;
+        }
+
+        boolean isApproved()
+        {
+            return "approved".equals(status) && connectionToken != null && !connectionToken.isBlank();
+        }
+
+        String getConnectionToken()
+        {
+            return connectionToken;
+        }
+    }
+
+    static final class BatchSyncResult
+    {
+        private final List<String> acknowledgedEventIds;
+        private final List<String> successfulEventIds;
+        private final boolean revoke;
+        private final boolean requestFullSync;
+        private final int retryableRejectedCount;
+
+        BatchSyncResult(
+            List<String> acknowledgedEventIds,
+            List<String> successfulEventIds,
+            boolean revoke,
+            boolean requestFullSync,
+            int retryableRejectedCount
+        )
+        {
+            this.acknowledgedEventIds = acknowledgedEventIds;
+            this.successfulEventIds = successfulEventIds;
+            this.revoke = revoke;
+            this.requestFullSync = requestFullSync;
+            this.retryableRejectedCount = retryableRejectedCount;
+        }
+
+        List<String> getAcknowledgedEventIds()
+        {
+            return acknowledgedEventIds;
+        }
+
+        List<String> getSuccessfulEventIds()
+        {
+            return successfulEventIds;
+        }
+
+        boolean shouldRevoke()
+        {
+            return revoke;
+        }
+
+        boolean shouldRequestFullSync()
+        {
+            return requestFullSync;
+        }
+
+        int getRetryableRejectedCount()
+        {
+            return retryableRejectedCount;
+        }
+    }
+}
