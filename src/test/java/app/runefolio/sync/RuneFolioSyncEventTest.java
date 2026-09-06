@@ -17,11 +17,11 @@ public class RuneFolioSyncEventTest
             new RuneFolioApiClient.SkillSnapshot("Defence", 70, 737_627)
         );
 
-        RuneFolioSyncEvent original = RuneFolioSyncEvent.skillSnapshot("Brett God", "manual", skills);
+        RuneFolioSyncEvent original = RuneFolioSyncEvent.skillSnapshot("Example Main", "manual", skills);
         RuneFolioSyncEvent restored = RuneFolioSyncEvent.fromJson(original.toJson());
 
         Assert.assertEquals(original.getId(), restored.getId());
-        Assert.assertEquals("Brett God", restored.getCharacterName());
+        Assert.assertEquals("Example Main", restored.getCharacterName());
         Assert.assertTrue(restored.supersedes(original));
     }
 
@@ -31,10 +31,10 @@ public class RuneFolioSyncEventTest
         List<RuneFolioApiClient.SkillSnapshot> skills = Arrays.asList(
             new RuneFolioApiClient.SkillSnapshot("Attack", 1, 0)
         );
-        RuneFolioSyncEvent brett = RuneFolioSyncEvent.skillSnapshot("Brett God", "periodic", skills);
-        RuneFolioSyncEvent alt = RuneFolioSyncEvent.skillSnapshot("Brett Alt", "periodic", skills);
+        RuneFolioSyncEvent main = RuneFolioSyncEvent.skillSnapshot("Example Main", "periodic", skills);
+        RuneFolioSyncEvent alt = RuneFolioSyncEvent.skillSnapshot("Example Alt", "periodic", skills);
 
-        Assert.assertFalse(brett.supersedes(alt));
+        Assert.assertFalse(main.supersedes(alt));
     }
 
     @Test
@@ -46,13 +46,13 @@ public class RuneFolioSyncEventTest
         raids.addProperty("category", "Raids");
 
         RuneFolioSyncEvent firstBosses = RuneFolioSyncEvent.progressSnapshot(
-            RuneFolioSyncEvent.COLLECTION_CATEGORY_TYPE, "Brett God", "interface", bosses
+            RuneFolioSyncEvent.COLLECTION_CATEGORY_TYPE, "Example Main", "interface", bosses
         );
         RuneFolioSyncEvent newerBosses = RuneFolioSyncEvent.progressSnapshot(
-            RuneFolioSyncEvent.COLLECTION_CATEGORY_TYPE, "Brett God", "interface", bosses
+            RuneFolioSyncEvent.COLLECTION_CATEGORY_TYPE, "Example Main", "interface", bosses
         );
         RuneFolioSyncEvent newerRaids = RuneFolioSyncEvent.progressSnapshot(
-            RuneFolioSyncEvent.COLLECTION_CATEGORY_TYPE, "Brett God", "interface", raids
+            RuneFolioSyncEvent.COLLECTION_CATEGORY_TYPE, "Example Main", "interface", raids
         );
 
         Assert.assertTrue(newerBosses.supersedes(firstBosses));
@@ -62,8 +62,8 @@ public class RuneFolioSyncEventTest
     @Test
     public void unlockEventsNeverSupersedeEachOther()
     {
-        RuneFolioSyncEvent first = RuneFolioSyncEvent.collectionLogUnlock("Brett God", "Pet chaos elemental");
-        RuneFolioSyncEvent second = RuneFolioSyncEvent.collectionLogUnlock("Brett God", "Pet chaos elemental");
+        RuneFolioSyncEvent first = RuneFolioSyncEvent.collectionLogUnlock("Example Main", "Pet chaos elemental");
+        RuneFolioSyncEvent second = RuneFolioSyncEvent.collectionLogUnlock("Example Main", "Pet chaos elemental");
 
         Assert.assertFalse(second.supersedes(first));
     }
@@ -83,10 +83,10 @@ public class RuneFolioSyncEventTest
         items.add(coins);
 
         RuneFolioSyncEvent first = RuneFolioSyncEvent.lootDrop(
-            "Brett God", "Abyssal demon", "npc", 124, 1, items, 1250, 1250
+            "Example Main", "Abyssal demon", "npc", 124, 1, items, 1250, 1250
         );
         RuneFolioSyncEvent second = RuneFolioSyncEvent.lootDrop(
-            "Brett God", "Abyssal demon", "npc", 124, 1, items, 1250, 1250
+            "Example Main", "Abyssal demon", "npc", 124, 1, items, 1250, 1250
         );
         RuneFolioSyncEvent restored = RuneFolioSyncEvent.fromJson(first.toJson());
 
