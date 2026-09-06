@@ -31,9 +31,9 @@ public class RuneFolioSyncQueueTest
     {
         MemoryStorage storage = new MemoryStorage();
         RuneFolioSyncQueue queue = new RuneFolioSyncQueue(storage);
-        RuneFolioSyncEvent first = RuneFolioSyncEvent.collectionLogUnlock("Brett God", "Abyssal whip");
-        RuneFolioSyncEvent second = RuneFolioSyncEvent.collectionLogUnlock("Brett God", "Jar of souls");
-        RuneFolioSyncEvent third = RuneFolioSyncEvent.collectionLogUnlock("Brett God", "Pet kraken");
+        RuneFolioSyncEvent first = RuneFolioSyncEvent.collectionLogUnlock("Example Main", "Abyssal whip");
+        RuneFolioSyncEvent second = RuneFolioSyncEvent.collectionLogUnlock("Example Main", "Jar of souls");
+        RuneFolioSyncEvent third = RuneFolioSyncEvent.collectionLogUnlock("Example Main", "Pet kraken");
 
         Assert.assertTrue(queue.enqueue(first));
         Assert.assertTrue(queue.enqueue(second));
@@ -58,7 +58,7 @@ public class RuneFolioSyncQueueTest
     {
         MemoryStorage storage = new MemoryStorage();
         RuneFolioSyncQueue queue = new RuneFolioSyncQueue(storage);
-        RuneFolioSyncEvent event = RuneFolioSyncEvent.collectionLogUnlock("Brett God", "Dragon pickaxe");
+        RuneFolioSyncEvent event = RuneFolioSyncEvent.collectionLogUnlock("Example Main", "Dragon pickaxe");
 
         Assert.assertTrue(queue.enqueue(event));
         queue.acknowledge(Collections.emptyList());
@@ -80,10 +80,10 @@ public class RuneFolioSyncQueueTest
         items.add(item);
 
         Assert.assertTrue(queue.enqueue(RuneFolioSyncEvent.lootDrop(
-            "Brett God", "Goblin", "npc", 2, 1, items, 10, 10
+            "Example Main", "Goblin", "npc", 2, 1, items, 10, 10
         )));
         Assert.assertTrue(queue.enqueue(RuneFolioSyncEvent.lootDrop(
-            "Brett God", "Goblin", "npc", 2, 1, items, 10, 10
+            "Example Main", "Goblin", "npc", 2, 1, items, 10, 10
         )));
 
         Assert.assertEquals(2, queue.size());
