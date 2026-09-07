@@ -34,6 +34,10 @@ Older RuneFolio skill endpoints remain available so previous private-alpha build
 
 The build targets Java 11 for RuneLite compatibility and follows RuneLite's standard external-plugin structure.
 
+## Automatic character names
+
+After a connected character has been observed once, RuneFolio can recognize a later in-game name change and keep its existing history. The plugin sends a SHA-256-derived identifier from RuneLite’s local account hash with authorized heartbeats and events. The raw account hash is never stored or sent. RuneFolio additionally scopes its stored digest to the owner. This identifier is correlation evidence, not proof of ownership or a login credential. An active authorized connection and a prior matching name are required; name conflicts and archived characters are never merged automatically. Changing owners requires a fresh authorized connection.
+
 ## Privacy and compliance guardrails
 
 - The plugin never asks for or stores Jagex or RuneScape credentials.
@@ -55,3 +59,4 @@ The build targets Java 11 for RuneLite compatibility and follows RuneLite's stan
 5. Bank and wealth snapshots
 6. Minigame totals
 7. Optional post-event screenshots — **implemented**
+

@@ -140,6 +140,7 @@ public class RuneFolioPlugin extends Plugin
     private volatile String activeConnectionConfigKey;
     private volatile boolean activeConnectionIsLegacy;
     private volatile String lastKnownPlayerName;
+    private volatile String activeIdentityKey;
     private final java.util.concurrent.atomic.AtomicLong characterSession = new java.util.concurrent.atomic.AtomicLong();
     private volatile List<RuneFolioApiClient.SkillSnapshot> lastKnownSkills = new ArrayList<>();
     private volatile JsonObject lastKnownQuestState;
@@ -164,6 +165,7 @@ public class RuneFolioPlugin extends Plugin
     private boolean diaryProgressRefreshPending;
     private boolean combatProgressRefreshPending;
     private boolean interfaceScreenshotPending;
+    private long nextManifestRefreshMillis;
     private final RuneFolioPetTracker petTracker = new RuneFolioPetTracker();
     private final Set<String> knownPetNames = new HashSet<>();
 
@@ -224,6 +226,20 @@ public class RuneFolioPlugin extends Plugin
         );
 
         log.info("RuneFolio Sync started");
+        syncExecutor.scheduleAtFixedRate(() -> {
+            if ((!isAccountMode() && connectionToken == null) || System.currentTimeMillis() < nextManifestRefreshMillis) return;
+            nextManifestRefreshMillis = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
+            try
+            {
+                RuneFolioCollectorManifest manifest = RuneFolioCollectorManifest.fetch();
+                if (manifest != null)
+                {
+                    clientThread.invokeLater(() -> RuneFolioCollectorManifest.install(manifest));
+                    nextManifestRefreshMillis = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1);
+                }
+            }
+            catch (java.io.IOException unavailable) { log.debug("Collector manifest unavailable; retaining current catalog"); }
+        }, 1, 5, TimeUnit.MINUTES);
     }
 
     @Override
@@ -519,7 +535,8 @@ public class RuneFolioPlugin extends Plugin
                     panel.setConnecting(false);
                     panel.setCharacterName(playerName);
                     showConnectionStatus(playerName, result.getCharacterName());
-                    requestFullSync("login");
+                    loginSyncPending = true;
+                    verifySavedConnection();
                 });
             }
             catch (Exception exception)
@@ -551,6 +568,8 @@ public class RuneFolioPlugin extends Plugin
         String configKey = activeConnectionConfigKey;
         boolean legacyToken = activeConnectionIsLegacy;
         long session = characterSession.get();
+        String identityKey = activeIdentityKey;
+        String previousName = previousIdentityName(identityKey, playerName);
         if (savedToken == null || savedToken.isBlank() || playerName == null || playerName.isBlank())
         {
             return;
@@ -560,7 +579,7 @@ public class RuneFolioPlugin extends Plugin
         {
             try
             {
-                RuneFolioApiClient.ConnectionResult result = RuneFolioApiClient.heartbeat(savedToken);
+                RuneFolioApiClient.ConnectionResult result = RuneFolioApiClient.heartbeat(savedToken, playerName, identityKey, previousName);
                 if (session != characterSession.get() || !savedToken.equals(connectionToken))
                 {
                     return;
@@ -588,6 +607,7 @@ public class RuneFolioPlugin extends Plugin
                     return;
                 }
 
+                rememberIdentity(identityKey, linkedCharacter, savedToken);
                 connectedCharacterName = linkedCharacter;
                 if (legacyToken)
                 {
@@ -626,6 +646,8 @@ public class RuneFolioPlugin extends Plugin
         String savedToken = accountConnectionToken;
         String playerName = lastKnownPlayerName;
         long session = characterSession.get();
+        String identityKey = activeIdentityKey;
+        String previousName = previousIdentityName(identityKey, playerName);
         if (savedToken == null || savedToken.isBlank())
         {
             return;
@@ -636,7 +658,7 @@ public class RuneFolioPlugin extends Plugin
             try
             {
                 RuneFolioApiClient.AccountHeartbeatResult heartbeat =
-                    RuneFolioApiClient.accountHeartbeat(savedToken, playerName);
+                    RuneFolioApiClient.accountHeartbeat(savedToken, playerName, identityKey, previousName);
                 boolean characterConnected = heartbeat.isCharacterConnected();
                 if (session != characterSession.get() || !savedToken.equals(accountConnectionToken))
                 {
@@ -653,6 +675,7 @@ public class RuneFolioPlugin extends Plugin
 
                 if (playerName != null && !playerName.isBlank())
                 {
+                    rememberIdentity(identityKey, playerName, null);
                     connectedCharacterName = playerName;
                 }
                 boolean needsFirstSync = playerName != null
@@ -791,6 +814,8 @@ public class RuneFolioPlugin extends Plugin
     {
         long session = characterSession.get();
         String token = accountConnectionToken;
+        String identityKey = activeIdentityKey;
+        String previousName = previousIdentityName(identityKey, playerName);
         syncExecutor.schedule(() ->
         {
             if (!isAccountMode()
@@ -803,13 +828,14 @@ public class RuneFolioPlugin extends Plugin
             try
             {
                 RuneFolioApiClient.AccountHeartbeatResult heartbeat =
-                    RuneFolioApiClient.accountHeartbeat(token, playerName);
+                    RuneFolioApiClient.accountHeartbeat(token, playerName, identityKey, previousName);
                 if (session != characterSession.get() || !java.util.Objects.equals(token, accountConnectionToken))
                 {
                     return;
                 }
                 if (heartbeat.isCharacterConnected())
                 {
+                    rememberIdentity(identityKey, playerName, null);
                     setupPollCharacter = null;
                     pendingCharacterSetupName = null;
                     pendingCharacterSetupUrl = null;
@@ -891,7 +917,6 @@ public class RuneFolioPlugin extends Plugin
             connectionToken = null;
             activeConnectionConfigKey = null;
             activeConnectionIsLegacy = false;
-            connectedCharacterName = playerName;
             loginSyncPending = true;
             panel.setStatus("Checking your RuneFolio account connection...");
             verifyAccountConnection();
@@ -901,6 +926,10 @@ public class RuneFolioPlugin extends Plugin
         String configKey = connectionTokenKey(playerName);
         String savedToken = configManager.getConfiguration(CONFIG_GROUP, configKey);
         boolean legacyToken = false;
+        if ((savedToken == null || savedToken.isBlank()) && activeIdentityKey != null)
+        {
+            savedToken = configManager.getConfiguration(CONFIG_GROUP, "identityToken." + activeIdentityKey);
+        }
 
         if (savedToken == null || savedToken.isBlank())
         {
@@ -977,7 +1006,7 @@ public class RuneFolioPlugin extends Plugin
             lastKnownCombatState = combatState.deepCopy();
 
             String linkedCharacter = connectedCharacterName;
-            if (!accountMode && (linkedCharacter == null || !namesMatch(playerName, linkedCharacter)))
+            if (linkedCharacter == null || !namesMatch(playerName, linkedCharacter))
             {
                 SwingUtilities.invokeLater(() -> showConnectionStatus(playerName, linkedCharacter));
                 return;
@@ -997,7 +1026,7 @@ public class RuneFolioPlugin extends Plugin
             boolean queued = true;
             for (RuneFolioSyncEvent event : events)
             {
-                queued &= syncQueue.enqueue(event);
+                queued &= enqueueIdentifiedEvent(event);
             }
             if (!queued)
             {
@@ -1053,10 +1082,10 @@ public class RuneFolioPlugin extends Plugin
             return;
         }
 
-        boolean queued = syncQueue.enqueue(RuneFolioSyncEvent.skillSnapshot(playerName, trigger, skills));
+        boolean queued = enqueueIdentifiedEvent(RuneFolioSyncEvent.skillSnapshot(playerName, trigger, skills));
         if (lastKnownQuestState != null)
         {
-            queued |= syncQueue.enqueue(RuneFolioSyncEvent.progressSnapshot(
+            queued |= enqueueIdentifiedEvent(RuneFolioSyncEvent.progressSnapshot(
                 RuneFolioSyncEvent.QUEST_SNAPSHOT_TYPE,
                 playerName,
                 trigger,
@@ -1065,7 +1094,7 @@ public class RuneFolioPlugin extends Plugin
         }
         if (lastKnownDiaryState != null)
         {
-            queued |= syncQueue.enqueue(RuneFolioSyncEvent.progressSnapshot(
+            queued |= enqueueIdentifiedEvent(RuneFolioSyncEvent.progressSnapshot(
                 RuneFolioSyncEvent.DIARY_SNAPSHOT_TYPE,
                 playerName,
                 trigger,
@@ -1074,7 +1103,7 @@ public class RuneFolioPlugin extends Plugin
         }
         if (lastKnownCombatState != null)
         {
-            queued |= syncQueue.enqueue(RuneFolioSyncEvent.progressSnapshot(
+            queued |= enqueueIdentifiedEvent(RuneFolioSyncEvent.progressSnapshot(
                 RuneFolioSyncEvent.COMBAT_SNAPSHOT_TYPE,
                 playerName,
                 trigger,
@@ -1109,9 +1138,11 @@ public class RuneFolioPlugin extends Plugin
 
         try
         {
+            String filterIdentity = savedToken.equals(connectionToken) ? activeIdentityKey : null;
             List<RuneFolioSyncEvent> events = syncQueue.snapshot(
                 SYNC_BATCH_SIZE,
-                event -> characterFilter == null || namesMatch(characterFilter, event.getCharacterName())
+                event -> characterFilter == null || (filterIdentity != null && filterIdentity.equals(event.getIdentityKey()))
+                    || (event.getIdentityKey() == null && namesMatch(characterFilter, event.getCharacterName()))
             );
             if (events.isEmpty())
             {
@@ -1306,13 +1337,16 @@ public class RuneFolioPlugin extends Plugin
         }
 
         String observedPlayer = currentPlayerName();
+        String observedIdentity = RuneFolioNameChange.identityKey(client.getAccountHash());
         if (lastKnownPlayerName != null && observedPlayer != null
-            && !namesMatch(lastKnownPlayerName, observedPlayer))
+            && (!namesMatch(lastKnownPlayerName, observedPlayer)
+                || !java.util.Objects.equals(activeIdentityKey, observedIdentity)))
         {
             deactivateCurrentCharacter();
             connectionLookupPending = true;
         }
 
+        activeIdentityKey = observedIdentity;
         capturePendingInterfaceScreenshot();
         String petCaption = petTracker.pollCaption(client.getTickCount());
         if (petCaption != null && config.screenshotPets()) requestScreenshot("pet", petCaption);
@@ -1601,12 +1635,14 @@ public class RuneFolioPlugin extends Plugin
         }
         String playerName = currentPlayerName();
         String savedToken = isAccountMode() ? accountConnectionToken : connectionToken;
-        if (playerName == null || savedToken == null || savedToken.isBlank())
+        if (playerName == null || savedToken == null || savedToken.isBlank()
+            || !namesMatch(playerName, connectedCharacterName))
         {
             return;
         }
 
         UUID eventId = UUID.randomUUID();
+        String identityKey = activeIdentityKey;
         long session = characterSession.get();
         String occurredAt = Instant.now().toString();
         boolean chatHidden = hideScreenshotWidget(config.hideChatInScreenshots(), InterfaceID.Chatbox.CHATAREA);
@@ -1620,7 +1656,7 @@ public class RuneFolioPlugin extends Plugin
                 if (session == characterSession.get() && canCollectCurrentWorld()
                     && namesMatch(playerName, currentPlayerName()))
                 {
-                    uploadScreenshotAsync(savedToken, playerName, eventId, category, caption, occurredAt, frame);
+                    uploadScreenshotAsync(savedToken, playerName, eventId, identityKey, category, caption, occurredAt, frame);
                 }
             });
         });
@@ -1661,6 +1697,7 @@ public class RuneFolioPlugin extends Plugin
         String token,
         String playerName,
         UUID eventId,
+        String identityKey,
         String category,
         String caption,
         String occurredAt,
@@ -1690,6 +1727,7 @@ public class RuneFolioPlugin extends Plugin
                             token,
                             playerName,
                             eventId,
+                            identityKey,
                             category,
                             caption,
                             occurredAt,
@@ -1884,7 +1922,7 @@ public class RuneFolioPlugin extends Plugin
             return;
         }
         if (savedToken == null || savedToken.isBlank()
-            || (!accountMode && !namesMatch(playerName, connectedCharacterName)))
+            || !namesMatch(playerName, connectedCharacterName))
         {
             addRuneFolioChatMessage("<col=d67966>Connect this character to RuneFolio before updating.</col>");
             return;
@@ -2049,6 +2087,27 @@ public class RuneFolioPlugin extends Plugin
         );
     }
 
+    private boolean enqueueIdentifiedEvent(RuneFolioSyncEvent event)
+    {
+        if (namesMatch(event.getCharacterName(), lastKnownPlayerName)) event.withIdentityKey(activeIdentityKey);
+        return syncQueue.enqueue(event);
+    }
+
+    private String previousIdentityName(String key, String fallback)
+    {
+        if (key == null) return fallback;
+        String saved = configManager.getConfiguration(CONFIG_GROUP, "identityName." + key);
+        return saved == null || saved.isBlank() ? fallback : saved;
+    }
+
+    private void rememberIdentity(String key, String name, String temporaryToken)
+    {
+        if (key == null) return;
+        configManager.setConfiguration(CONFIG_GROUP, "identityName." + key, name);
+        if (temporaryToken != null)
+            configManager.setConfiguration(CONFIG_GROUP, "identityToken." + key, temporaryToken);
+    }
+
     private boolean enqueueLiveEvent(RuneFolioSyncEvent event)
     {
         if (!canCollectCurrentWorld())
@@ -2060,12 +2119,12 @@ public class RuneFolioPlugin extends Plugin
         String playerName = event.getCharacterName();
         if (savedToken == null || savedToken.isBlank()
             || (accountMode && namesMatch(playerName, pendingCharacterSetupName))
-            || (!accountMode && !namesMatch(playerName, connectedCharacterName)))
+            || !namesMatch(playerName, connectedCharacterName))
         {
             return false;
         }
 
-        if (!syncQueue.enqueue(event))
+        if (!enqueueIdentifiedEvent(event))
         {
             SwingUtilities.invokeLater(() ->
                 panel.setStatus("The local sync queue is full. RuneFolio kept the existing events.")
@@ -2174,6 +2233,7 @@ public class RuneFolioPlugin extends Plugin
         setupPollCharacter = null;
         SwingUtilities.invokeLater(panel::hideCharacterSetup);
         lastKnownPlayerName = null;
+        activeIdentityKey = null;
         lastKnownSkills = new ArrayList<>();
         lastKnownQuestState = null;
         lastKnownDiaryState = null;
@@ -2293,3 +2353,4 @@ public class RuneFolioPlugin extends Plugin
     }
 
 }
+
