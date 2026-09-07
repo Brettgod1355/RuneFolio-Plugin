@@ -164,6 +164,7 @@ public class RuneFolioPlugin extends Plugin
     private boolean diaryProgressRefreshPending;
     private boolean combatProgressRefreshPending;
     private boolean interfaceScreenshotPending;
+    private long nextManifestRefreshMillis;
     private final RuneFolioPetTracker petTracker = new RuneFolioPetTracker();
     private final Set<String> knownPetNames = new HashSet<>();
 
@@ -224,6 +225,20 @@ public class RuneFolioPlugin extends Plugin
         );
 
         log.info("RuneFolio Sync started");
+        syncExecutor.scheduleAtFixedRate(() -> {
+            if ((!isAccountMode() && connectionToken == null) || System.currentTimeMillis() < nextManifestRefreshMillis) return;
+            nextManifestRefreshMillis = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
+            try
+            {
+                RuneFolioCollectorManifest manifest = RuneFolioCollectorManifest.fetch();
+                if (manifest != null)
+                {
+                    clientThread.invokeLater(() -> RuneFolioCollectorManifest.install(manifest));
+                    nextManifestRefreshMillis = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1);
+                }
+            }
+            catch (java.io.IOException unavailable) { log.debug("Collector manifest unavailable; retaining current catalog"); }
+        }, 1, 5, TimeUnit.MINUTES);
     }
 
     @Override
