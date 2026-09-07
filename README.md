@@ -60,6 +60,14 @@ After a connected character has been observed once, RuneFolio can recognize a la
 2. Quests, diary tiers, combat achievements, and Collection Log — **implemented**
 3. Loot history — **implemented**
 4. Completed boss activity — **implemented**
-5. Bank and wealth snapshots
+5. Bank and wealth snapshots — **implemented, opt-in**
 6. Minigame totals
 7. Optional post-event screenshots — **implemented**
+
+## Independent bank valuation (0.3.25)
+
+Bank capture uses RuneFolio's own collector and RuneLite's item-price API. RuneLite's Bank plugin may be disabled. Opening an ordinary bank observes its full container, not just a selected tab/search or the rounded header. Bank, inventory and equipment are separate containers; combined wealth includes all three and excludes other storage. Coins and platinum tokens count at face value in the alchemy estimate. A fresh snapshot from 0.3.25 is required for corrected currency values; retained older observations are unchanged.
+
+## Copyright and credits
+
+See [copyright and reuse](COPYRIGHT.md) and [third-party notices](THIRD_PARTY_NOTICES.md). These preserve third-party rights and do not choose a project-wide license for RuneFolio. The JAR includes these notices under `META-INF/`.

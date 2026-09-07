@@ -118,10 +118,19 @@ final class RuneFolioBankCollector
             value.addProperty("itemName", canonical.getName());
             value.addProperty("quantity", item.getQuantity());
             value.addProperty("geValue", value(item.getQuantity(), Math.max(0, itemManager.getItemPrice(id))));
-            value.addProperty("haValue", value(item.getQuantity(), Math.max(0, canonical.getHaPrice())));
+            value.addProperty("haValue", value(item.getQuantity(), alchemyUnitValue(id, canonical.getHaPrice())));
             values.add(value);
         }
         return values;
+    }
+
+    // Currency is counted at face value, not as an item to cast High Alchemy on.
+    // This is RuneFolio's implementation; it does not read the Bank plugin's title or state.
+    static int alchemyUnitValue(int itemId, int itemAlchemyValue)
+    {
+        if (itemId == net.runelite.api.gameval.ItemID.COINS) return 1;
+        if (itemId == net.runelite.api.gameval.ItemID.PLATINUM) return 1000;
+        return Math.max(0, itemAlchemyValue);
     }
 
     static long value(int quantity, int price)
