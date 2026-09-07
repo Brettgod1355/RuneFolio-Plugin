@@ -71,3 +71,7 @@ Bank capture uses RuneFolio's own collector and RuneLite's item-price API. RuneL
 ## Copyright and credits
 
 See [copyright and reuse](COPYRIGHT.md) and [third-party notices](THIRD_PARTY_NOTICES.md). These preserve third-party rights and do not choose a project-wide license for RuneFolio. The JAR includes these notices under `META-INF/`.
+
+## Diary capture formatting (0.3.26)
+
+Completed diary rows preserve word boundaries across line breaks and support leading color formatting. Met requirements alone never count as a completed task. Rebuild/restart the plugin, manually reopen affected diary areas, and sync to refresh cached observations. The website also recovers unambiguous joined-word observations from older builds and retains bounded unmatched task names for future diagnosis; it does not infer individual completions from aggregate counts.

@@ -81,6 +81,61 @@ public class RuneFolioDiaryTaskParserTest
     }
 
     @Test
+    public void preservesWrappedWordsAndQuestRequirements()
+    {
+        RuneFolioDiaryTaskParser.Area area = RuneFolioDiaryTaskParser.areaFromTitle("Achievement Diary - Ardougne");
+        JsonObject state = RuneFolioDiaryTaskParser.parse(area, Arrays.asList(
+            "Easy", "Medium", "Hard",
+            "<str>Have a zookeeper put you in Ardougne Zoo's monkey<br>cage."
+                + "(<col=0000ff><str>Started Monkey Madness I</str></col>)</str>",
+            "Elite"
+        ));
+        Assert.assertNotNull(state);
+        Assert.assertEquals("Have a zookeeper put you in Ardougne Zoo's monkey cage.(Started Monkey Madness I)",
+            state.getAsJsonArray("tiers").get(2).getAsJsonObject()
+                .getAsJsonArray("completedTaskNames").get(0).getAsString());
+    }
+
+    @Test
+    public void handlesFormattingInEveryTierWithoutTreatingRequirementsAsTaskCompletion()
+    {
+        RuneFolioDiaryTaskParser.Area area = RuneFolioDiaryTaskParser.areaFromTitle("Ardougne Tasks");
+        for (String heading : Arrays.asList("Easy", "Medium", "Hard", "Elite"))
+        {
+            for (String breakTag : Arrays.asList("<br>", "<br/>", "<BR />"))
+            {
+                java.util.List<String> lines = new java.util.ArrayList<>();
+                for (String tier : Arrays.asList("Easy", "Medium", "Hard", "Elite"))
+                {
+                    lines.add(tier);
+                    if (heading.equals(tier))
+                    {
+                        lines.add("<col=00ff00><str=ff0000>1. A completed" + breakTag + "task.</str></col>");
+                        lines.add("An unfinished task.(<col=0000ff><str>Started Example Quest</str></col>)");
+                        lines.add("Another unfinished task.(<str>50 Magic</str>)");
+                    }
+                }
+                JsonObject state = RuneFolioDiaryTaskParser.parse(area, lines);
+                Assert.assertNotNull(state);
+                for (int index = 0; index < 4; index++)
+                {
+                    JsonObject tier = state.getAsJsonArray("tiers").get(index).getAsJsonObject();
+                    JsonArray completed = tier.getAsJsonArray("completedTaskNames");
+                    if (heading.equalsIgnoreCase(tier.get("tier").getAsString()))
+                    {
+                        Assert.assertEquals(1, completed.size());
+                        Assert.assertEquals("A completed task.", completed.get(0).getAsString());
+                    }
+                    else
+                    {
+                        Assert.assertEquals(0, completed.size());
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     public void rejectsAnIncompleteInterfaceCapture()
     {
         RuneFolioDiaryTaskParser.Area area = RuneFolioDiaryTaskParser.areaFromTitle("Varrock Tasks");
