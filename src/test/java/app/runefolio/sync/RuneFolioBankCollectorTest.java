@@ -3,6 +3,13 @@ import com.google.gson.JsonObject;
 import org.junit.Assert;
 import org.junit.Test;
 public class RuneFolioBankCollectorTest {
+ @Test public void alchemyEstimateCountsCurrencyAtFaceValue() {
+  Assert.assertEquals(1,RuneFolioBankCollector.alchemyUnitValue(net.runelite.api.gameval.ItemID.COINS,0));
+  Assert.assertEquals(1000,RuneFolioBankCollector.alchemyUnitValue(net.runelite.api.gameval.ItemID.PLATINUM,0));
+  Assert.assertEquals(120,RuneFolioBankCollector.alchemyUnitValue(100,120));
+  Assert.assertEquals(0,RuneFolioBankCollector.alchemyUnitValue(100,-1));
+  Assert.assertEquals(5000,RuneFolioBankCollector.value(5,RuneFolioBankCollector.alchemyUnitValue(net.runelite.api.gameval.ItemID.PLATINUM,0)));
+ }
  @SuppressWarnings("unchecked")
  private static <T> T fake(Class<T> type, java.lang.reflect.InvocationHandler handler) {
   return (T)java.lang.reflect.Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, handler);
