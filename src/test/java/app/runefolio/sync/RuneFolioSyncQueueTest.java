@@ -9,6 +9,25 @@ import org.junit.Test;
 
 public class RuneFolioSyncQueueTest
 {
+    @Test public void oversizedReplacementPreservesPreviouslyQueuedSnapshot()
+    {
+        MemoryStorage storage = new MemoryStorage();
+        RuneFolioSyncQueue queue = new RuneFolioSyncQueue(storage);
+        RuneFolioSyncEvent first = RuneFolioSyncEvent.historyEvent("bank.snapshot", "Example", new JsonObject());
+        Assert.assertTrue(queue.enqueue(first));
+        JsonObject huge = new JsonObject(); huge.addProperty("value", "x".repeat(600_000));
+        Assert.assertFalse(queue.enqueue(RuneFolioSyncEvent.historyEvent("bank.snapshot", "Example", huge)));
+        Assert.assertEquals(first.getId(), new RuneFolioSyncQueue(storage).snapshot(50, event -> true).get(0).getId());
+    }
+    @Test public void uploadBatchesStayBelowOneMegabyte()
+    {
+        MemoryStorage storage = new MemoryStorage();
+        RuneFolioSyncQueue queue = new RuneFolioSyncQueue(storage);
+        JsonObject payload = new JsonObject(); payload.addProperty("value", "x".repeat(300_000));
+        for (int i=0;i<5;i++) Assert.assertTrue(queue.enqueue(RuneFolioSyncEvent.historyEvent("bank.snapshot", "Example"+i, payload)));
+        Assert.assertEquals(3, queue.snapshot(50, event -> true).size());
+        Assert.assertEquals(5, queue.size());
+    }
     private static final class MemoryStorage implements RuneFolioSyncQueue.Storage
     {
         private String value;

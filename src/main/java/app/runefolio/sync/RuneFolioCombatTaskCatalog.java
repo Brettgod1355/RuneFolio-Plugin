@@ -21,7 +21,7 @@ final class RuneFolioCombatTaskCatalog
     static JsonArray completedTaskKeys(Client client)
     {
         JsonArray completed = new JsonArray();
-        for (int taskIndex = 0; taskIndex < TASK_COUNT; taskIndex++)
+        for (int taskIndex = 0; taskIndex < trackedTaskCount(); taskIndex++)
         {
             if (isCompleted(client, taskIndex))
             {
@@ -34,7 +34,7 @@ final class RuneFolioCombatTaskCatalog
     static JsonArray taskStates(Client client)
     {
         JsonArray states = new JsonArray();
-        for (int taskIndex = 0; taskIndex < TASK_COUNT; taskIndex++)
+        for (int taskIndex = 0; taskIndex < trackedTaskCount(); taskIndex++)
         {
             JsonObject state = new JsonObject();
             state.addProperty("key", taskKey(taskIndex));
@@ -46,7 +46,7 @@ final class RuneFolioCombatTaskCatalog
 
     static int trackedTaskCount()
     {
-        return TASK_COUNT;
+        return RuneFolioCollectorManifest.combatTaskCount(TASK_COUNT);
     }
 
     private static boolean isCompleted(Client client, int taskIndex)

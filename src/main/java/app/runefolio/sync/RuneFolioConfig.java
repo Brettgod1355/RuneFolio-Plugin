@@ -10,7 +10,7 @@ import net.runelite.client.config.Range;
 public interface RuneFolioConfig extends Config
 {
     @ConfigItem(keyName = "syncBankWealth", name = "Sync bank and wealth",
-        description = "Send bank, inventory and equipment item IDs, quantities and estimated values to RuneFolio while your bank is open. Opt-in.", position = 4)
+        description = "Opt-in: send bank, inventory and equipment items and estimated values while your bank is open. Pending snapshots are saved locally for retries.", position = 4)
     default boolean syncBankWealth() { return false; }
 
     @ConfigSection(

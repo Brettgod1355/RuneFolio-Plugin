@@ -1,5 +1,9 @@
 # RuneFolio Sync
 
+Optional bank/wealth capture (0.3.24): disabled by default. When enabled, opening the ordinary bank sends bank, inventory and equipment item IDs, names, quantities and estimated GE/high-alchemy values to RuneFolio. It does not inspect unopened storage. The server keeps the latest item list and compact daily wealth estimates. Values are estimates, not a complete account valuation.
+
+Pending events are persisted through RuneLite configuration for retries, with a 1,000-event / 4 MiB serialized-event budget for new queue writes and bounded upload batches. A newer bank observation can replace a pending observation for the same character and UTC day; different days are retained. Successful acknowledgements remove queued events. Turning capture off prevents new captures; it does not delete already queued events or server history. Diary caches and RuneFolio connection/name bindings also use RuneLite configuration. Connection tokens are sensitive: do not share configuration files. Screenshots currently retry in memory, not in the persistent event queue.
+
 Private-alpha RuneLite plugin that securely syncs an Old School RuneScape character with [RuneFolio](https://runefolio.app).
 
 ## Current milestone
@@ -33,6 +37,10 @@ Older RuneFolio skill endpoints remain available so previous private-alpha build
 4. In the Gradle tool window, run the `run` task.
 
 The build targets Java 11 for RuneLite compatibility and follows RuneLite's standard external-plugin structure.
+
+## Automatic character names
+
+After a connected character has been observed once, RuneFolio can recognize a later in-game name change and keep its existing history. The plugin sends a SHA-256-derived identifier from RuneLite’s local account hash with authorized heartbeats and events. The raw account hash is never stored or sent. RuneFolio additionally scopes its stored digest to the owner. This identifier is correlation evidence, not proof of ownership or a login credential. An active authorized connection and a prior matching name are required; name conflicts and archived characters are never merged automatically. Changing owners requires a fresh authorized connection.
 
 ## Privacy and compliance guardrails
 

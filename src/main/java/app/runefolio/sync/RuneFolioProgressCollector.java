@@ -131,7 +131,7 @@ final class RuneFolioProgressCollector
 
     static int supplementalQuestCount()
     {
-        return SUPPLEMENTAL_QUESTS.size();
+        return RuneFolioCollectorManifest.supplementalCount(SUPPLEMENTAL_QUESTS.size());
     }
 
     static int trackedDiaryTierCount()
@@ -147,7 +147,7 @@ final class RuneFolioProgressCollector
         for (Quest quest : Quest.values())
         {
             String questState = quest.getState(client).name().toLowerCase(Locale.ROOT);
-            boolean countsTowardQuestCape = !SUPPLEMENTAL_QUESTS.contains(quest);
+            boolean countsTowardQuestCape = !RuneFolioCollectorManifest.isSupplemental(quest, SUPPLEMENTAL_QUESTS.contains(quest));
             JsonObject entry = new JsonObject();
             entry.addProperty("key", quest.name().toLowerCase(Locale.ROOT));
             entry.addProperty("name", quest.getName());
@@ -169,7 +169,7 @@ final class RuneFolioProgressCollector
         state.addProperty("questPoints", client.getVarpValue(VarPlayer.QUEST_POINTS));
         state.addProperty("mainQuestCompleted", mainQuestCompleted);
         state.addProperty("mainQuestTotal", mainQuestTotal);
-        state.addProperty("supplementalQuestEntries", SUPPLEMENTAL_QUESTS.size());
+        state.addProperty("supplementalQuestEntries", supplementalQuestCount());
         return state;
     }
 

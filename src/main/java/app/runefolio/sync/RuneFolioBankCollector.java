@@ -32,6 +32,7 @@ final class RuneFolioBankCollector
     private int changedTick = -1;
     private int lastSentTick = -100;
     private JsonObject lastSent;
+    private String lastSentDay;
 
     void startUp(Predicate<JsonObject> publish)
     {
@@ -68,7 +69,8 @@ final class RuneFolioBankCollector
         ItemContainer bank = client.getItemContainer(InventoryID.BANK);
         ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
         ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
-        if (bank == null || inventory == null || equipment == null || bank.getItems().length == 0) return;
+        if (bank == null || inventory == null || equipment == null) return;
+        if (bank.getItems().length > 1200 || inventory.getItems().length > 28 || equipment.getItems().length > 14) return;
         JsonObject state = new JsonObject();
         state.add("bank", items(bank));
         state.add("inventory", items(inventory));
@@ -85,10 +87,12 @@ final class RuneFolioBankCollector
         }
         state.addProperty("totalGeValue", ge);
         state.addProperty("totalHaValue", ha);
-        if (state.equals(lastSent)) { changedTick = -1; return; }
+        String day = java.time.LocalDate.now(java.time.ZoneOffset.UTC).toString();
+        if (state.equals(lastSent) && day.equals(lastSentDay)) { changedTick = -1; return; }
         if (publish != null && publish.test(state))
         {
             lastSent = state.deepCopy();
+            lastSentDay = day;
             lastSentTick = client.getTickCount();
             changedTick = -1;
         }
@@ -135,5 +139,5 @@ final class RuneFolioBankCollector
         if (event.getGameState() != GameState.LOGGED_IN) reset();
     }
     @Subscribe public void onRuneScapeProfileChanged(RuneScapeProfileChanged event) { reset(); }
-    private void reset() { bankObserved = false; changedTick = -1; lastSentTick = -100; lastSent = null; }
+    private void reset() { bankObserved = false; changedTick = -1; lastSentTick = -100; lastSent = null; lastSentDay = null; }
 }

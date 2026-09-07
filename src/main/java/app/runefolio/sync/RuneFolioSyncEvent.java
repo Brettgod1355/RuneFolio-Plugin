@@ -33,6 +33,7 @@ final class RuneFolioSyncEvent
     private final String occurredAt;
     private final String characterName;
     private final JsonObject payload;
+    private String identityKey;
 
     private RuneFolioSyncEvent(
         String id,
@@ -155,12 +156,6 @@ final class RuneFolioSyncEvent
         );
     }
 
-    static RuneFolioSyncEvent historyEvent(String type, String characterName, JsonObject payload)
-    {
-        if (!"bank.snapshot".equals(type)) throw new IllegalArgumentException("Unsupported history event");
-        return create(type, characterName, payload.deepCopy());
-    }
-
     static RuneFolioSyncEvent fromJson(JsonObject json)
     {
         String id = requiredString(json, "id");
@@ -175,7 +170,9 @@ final class RuneFolioSyncEvent
         {
             throw new IllegalArgumentException("Invalid queued RuneFolio event.");
         }
-        return new RuneFolioSyncEvent(id, type, version, occurredAt, characterName, payload.getAsJsonObject());
+        RuneFolioSyncEvent event = new RuneFolioSyncEvent(id, type, version, occurredAt, characterName, payload.getAsJsonObject());
+        if (json.has("identityKey")) event.withIdentityKey(requiredString(json, "identityKey"));
+        return event;
     }
 
     JsonObject toJson()
@@ -186,12 +183,18 @@ final class RuneFolioSyncEvent
         json.addProperty("version", version);
         json.addProperty("occurredAt", occurredAt);
         json.addProperty("characterName", characterName);
+        if (identityKey != null) json.addProperty("identityKey", identityKey);
         json.add("payload", payload.deepCopy());
         return json;
     }
 
     boolean supersedes(RuneFolioSyncEvent other)
     {
+        if (!java.util.Objects.equals(identityKey, other.identityKey)) return false;
+        if ("bank.snapshot".equals(type))
+            return type.equals(other.type) && normalise(characterName).equals(normalise(other.characterName))
+                && occurredAt.substring(0, 10).equals(other.occurredAt.substring(0, 10))
+                && Instant.parse(occurredAt).compareTo(Instant.parse(other.occurredAt)) >= 0;
         if (!SUPERSEDING_SNAPSHOT_TYPES.contains(type))
         {
             return false;
@@ -210,6 +213,24 @@ final class RuneFolioSyncEvent
     String getId()
     {
         return id;
+    }
+
+    static RuneFolioSyncEvent historyEvent(String type, String characterName, JsonObject payload)
+    {
+        if (!"bank.snapshot".equals(type)) throw new IllegalArgumentException("Unsupported history event");
+        return create(type, characterName, payload.deepCopy());
+    }
+
+    RuneFolioSyncEvent withIdentityKey(String key)
+    {
+        if (key != null && !key.matches("[a-f0-9]{64}")) throw new IllegalArgumentException("Invalid identity key");
+        identityKey = key;
+        return this;
+    }
+
+    String getIdentityKey()
+    {
+        return identityKey;
     }
 
     String getCharacterName()
