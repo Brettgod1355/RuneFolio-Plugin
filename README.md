@@ -9,6 +9,7 @@ Version 0.3 includes:
 - Browser-based RuneFolio account login.
 - Optional temporary, character-specific connection codes.
 - Automatic skill, quest, diary-tier, and combat-achievement snapshots on login, every 10 minutes, and on logout.
+- Completed Achievement Diary task names from diary areas opened in game; RuneFolio owns the current OSRS Wiki task catalog and ignores unrelated interface text.
 - Full individual combat-task completion flags, plus named combat-task and Collection Log unlock events as they happen.
 - Collection Log category snapshots whenever the player opens or changes a category in the log.
 - Automatic loot history from RuneLite's enabled native Loot Tracker, preserving each reward's source, items, quantities, and values.

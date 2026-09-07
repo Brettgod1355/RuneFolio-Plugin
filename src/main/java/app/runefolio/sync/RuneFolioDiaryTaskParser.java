@@ -5,9 +5,11 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.runelite.api.widgets.Widget;
@@ -77,12 +79,13 @@ final class RuneFolioDiaryTaskParser
             return null;
         }
 
-        Map<String, JsonArray> tasksByTier = new LinkedHashMap<>();
+        Map<String, JsonArray> completedTasksByTier = new LinkedHashMap<>();
         for (String tier : TIER_ORDER)
         {
-            tasksByTier.put(tier, new JsonArray());
+            completedTasksByTier.put(tier, new JsonArray());
         }
 
+        Set<String> seenTiers = new HashSet<>();
         String currentTier = null;
         for (String rawLine : rawLines)
         {
@@ -95,33 +98,25 @@ final class RuneFolioDiaryTaskParser
             if (tier != null)
             {
                 currentTier = tier;
+                seenTiers.add(tier);
                 continue;
             }
-            if (currentTier == null)
+            if (currentTier == null || !rawLine.trim().startsWith("<str>"))
             {
                 continue;
             }
 
             Matcher matcher = NUMBERED_TASK_PATTERN.matcher(plainLine);
             String taskName = matcher.matches() ? matcher.group(2).trim() : plainLine;
-            if (taskName.isEmpty())
+            if (!taskName.isEmpty())
             {
-                continue;
+                completedTasksByTier.get(currentTier).add(taskName);
             }
-            JsonArray tierTasks = tasksByTier.get(currentTier);
-            JsonObject task = new JsonObject();
-            task.addProperty("index", tierTasks.size() + 1);
-            task.addProperty("name", taskName);
-            task.addProperty("completed", rawLine.trim().startsWith("<str>"));
-            tierTasks.add(task);
         }
 
-        for (String tier : TIER_ORDER)
+        if (seenTiers.size() != TIER_ORDER.size())
         {
-            if (tasksByTier.get(tier).size() == 0)
-            {
-                return null;
-            }
+            return null;
         }
 
         JsonArray tiers = new JsonArray();
@@ -129,7 +124,7 @@ final class RuneFolioDiaryTaskParser
         {
             JsonObject tierState = new JsonObject();
             tierState.addProperty("tier", tier);
-            tierState.add("tasks", tasksByTier.get(tier));
+            tierState.add("completedTaskNames", completedTasksByTier.get(tier));
             tiers.add(tierState);
         }
 
