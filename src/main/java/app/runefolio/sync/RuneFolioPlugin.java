@@ -43,6 +43,7 @@ import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.ScriptID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.gameval.VarClientID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
 import net.runelite.client.callback.ClientThread;
@@ -86,11 +87,6 @@ public class RuneFolioPlugin extends Plugin
     private static final Pattern QUEST_COMPLETION_PATTERN = Pattern.compile(
         ".*(?:completed|been|rebuilt|freed|defeated|saved).*",
         Pattern.CASE_INSENSITIVE
-    );
-    private static final List<String> PET_MESSAGES = List.of(
-        "You have a funny feeling like you're being followed",
-        "You feel something weird sneaking into your backpack",
-        "You have a funny feeling like you would have been followed"
     );
     private static final Pattern COMBAT_ACHIEVEMENT_PATTERN = Pattern.compile(
         "Congratulations, you've completed an? (?<tier>\\w+) combat task: @.+?@(?<task>.+?)</col>"
@@ -168,6 +164,8 @@ public class RuneFolioPlugin extends Plugin
     private boolean diaryProgressRefreshPending;
     private boolean combatProgressRefreshPending;
     private boolean interfaceScreenshotPending;
+    private final RuneFolioPetTracker petTracker = new RuneFolioPetTracker();
+    private final Set<String> knownPetNames = new HashSet<>();
 
     @Provides
     RuneFolioConfig provideConfig(ConfigManager manager)
@@ -1316,6 +1314,8 @@ public class RuneFolioPlugin extends Plugin
         }
 
         capturePendingInterfaceScreenshot();
+        String petCaption = petTracker.pollCaption(client.getTickCount());
+        if (petCaption != null && config.screenshotPets()) requestScreenshot("pet", petCaption);
 
         finishCollectionButtonSyncIfReady();
         enqueuePendingProgressSnapshots();
@@ -1484,6 +1484,10 @@ public class RuneFolioPlugin extends Plugin
 
         String rawMessage = event.getMessage();
         String plainMessage = Text.removeTags(rawMessage);
+        if (config.uploadScreenshots() && config.screenshotPets())
+        {
+            petTracker.message(plainMessage, client.getTickCount(), petNames());
+        }
         if (plainMessage.startsWith(COLLECTION_LOG_TEXT))
         {
             String itemName = plainMessage.substring(COLLECTION_LOG_TEXT.length()).trim();
@@ -1528,11 +1532,6 @@ public class RuneFolioPlugin extends Plugin
             }
         }
 
-        if (config.uploadScreenshots() && config.screenshotPets()
-            && PET_MESSAGES.stream().anyMatch(plainMessage::contains))
-        {
-            requestScreenshot("pet", "New pet received");
-        }
     }
 
     @Subscribe
@@ -1841,6 +1840,18 @@ public class RuneFolioPlugin extends Plugin
     @Subscribe
     public void onScriptPostFired(ScriptPostFired event)
     {
+        if (event.getScriptId() == ScriptID.NOTIFICATION_DELAY && canCollectCurrentWorld()
+            && config.uploadScreenshots() && config.screenshotPets()
+            && "Collection log".equalsIgnoreCase(client.getVarcStrValue(VarClientID.NOTIFICATION_TITLE)))
+        {
+            String message = client.getVarcStrValue(VarClientID.NOTIFICATION_MAIN);
+            if (message != null)
+            {
+                String text = Text.removeTags(message).trim();
+                if (text.startsWith("New item:"))
+                    petTracker.observeName(text.substring("New item:".length()).trim(), client.getTickCount(), petNames());
+            }
+        }
         if (event.getScriptId() != ScriptID.COLLECTION_DRAW_LIST
             || client.getGameState() != GameState.LOGGED_IN)
         {
@@ -2177,6 +2188,7 @@ public class RuneFolioPlugin extends Plugin
 
     void resetTransientCharacterState()
     {
+        petTracker.reset();
         characterSession.incrementAndGet();
         collectionButtonSyncRequested = false;
         collectionButtonItems.clear();
@@ -2225,6 +2237,20 @@ public class RuneFolioPlugin extends Plugin
     {
         Player player = client.getLocalPlayer();
         return player == null ? null : player.getName();
+    }
+
+    private Set<String> petNames()
+    {
+        if (knownPetNames.isEmpty())
+        {
+            // Canonical All Pets Collection Log IDs, synchronized with the website catalog.
+            for (int id : new int[] {13262, 22746, 13178, 13247, 11995, 12651, 12816, 12644, 12643, 12645, 13225, 12650, 12646, 21748, 21291, 12647, 12653, 12655, 12649, 12652, 13181, 21273, 12648, 13177, 13179, 21992, 20693, 12921, 20851, 22473, 19730, 12703, 13320, 13321, 13322, 13324, 20659, 20661, 20663, 20665, 21509, 13071, 23495, 23760, 23757, 24491, 25348, 25602, 26348, 26901, 27352, 27590, 28246, 28250, 28248, 28252, 28801, 28960, 28962, 29836, 30152, 30154, 30622, 30888, 31130, 31283, 31285, 33124, 33642, 34040, 34042})
+            {
+                String name = itemManager.getItemComposition(id).getName();
+                if (name != null && !name.isBlank()) knownPetNames.add(name);
+            }
+        }
+        return knownPetNames;
     }
 
     private boolean canCollectCurrentWorld()

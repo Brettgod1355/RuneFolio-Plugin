@@ -28,7 +28,7 @@ dependencies {
 }
 
 group = "app.runefolio"
-version = "0.3.20"
+version = "0.3.21"
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
