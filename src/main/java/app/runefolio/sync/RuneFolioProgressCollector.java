@@ -278,6 +278,12 @@ final class RuneFolioProgressCollector
 
     static JsonObject collectionLogCategory(Client client, ItemManager itemManager)
     {
+        // A POH Adventure Log displays the host's items, not the local player's.
+        if (client.getVarbitValue(VarbitID.COLLECTION_POH_HOST_BOOK_OPEN) != 0)
+        {
+            return null;
+        }
+
         Widget header = client.getWidget(InterfaceID.Collection.HEADER_TEXT);
         Widget items = client.getWidget(InterfaceID.Collection.ITEMS_CONTENTS);
         if (header == null || items == null || header.getChildren() == null || items.getChildren() == null
