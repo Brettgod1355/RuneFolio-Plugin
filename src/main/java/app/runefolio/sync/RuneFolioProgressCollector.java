@@ -3,6 +3,7 @@ package app.runefolio.sync;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 import net.runelite.api.Client;
@@ -16,6 +17,8 @@ import net.runelite.client.util.Text;
 
 final class RuneFolioProgressCollector
 {
+    private static final int DIARY_COMPLETION_INFO_SCRIPT = 2200;
+    private static final String[] DIARY_TIER_NAMES = {"easy", "medium", "hard", "elite"};
     // RuneLite's generated VarbitID names omit the three legacy Karamja completion
     // varbits, but the public API still exposes them in net.runelite.api.Varbits.
     private static final int KARAMJA_DIARY_EASY_COMPLETE = 3578;
@@ -106,6 +109,22 @@ final class RuneFolioProgressCollector
         new DiaryTier("wilderness", "elite", VarbitID.WILDERNESS_DIARY_ELITE_COMPLETE)
     };
 
+    private static final DiaryArea[] DIARY_AREAS = new DiaryArea[]
+    {
+        new DiaryArea("ardougne", 1),
+        new DiaryArea("desert", 5),
+        new DiaryArea("falador", 2),
+        new DiaryArea("fremennik", 3),
+        new DiaryArea("kandarin", 4),
+        new DiaryArea("karamja", 0),
+        new DiaryArea("kourend_kebos", 11),
+        new DiaryArea("lumbridge_draynor", 6),
+        new DiaryArea("morytania", 7),
+        new DiaryArea("varrock", 8),
+        new DiaryArea("western_provinces", 10),
+        new DiaryArea("wilderness", 9)
+    };
+
     private RuneFolioProgressCollector()
     {
     }
@@ -156,7 +175,7 @@ final class RuneFolioProgressCollector
 
     static JsonObject diaries(Client client, JsonArray taskAreas)
     {
-        JsonArray completedTiers = new JsonArray();
+        Set<String> completedTierKeys = new LinkedHashSet<>();
         for (DiaryTier diaryTier : DIARY_TIERS)
         {
             if ("karamja".equals(diaryTier.area) && !"elite".equals(diaryTier.tier))
@@ -165,16 +184,78 @@ final class RuneFolioProgressCollector
             }
             if (client.getVarbitValue(diaryTier.varbit) > 0)
             {
-                completedTiers.add(diaryTier.area + "." + diaryTier.tier);
+                completedTierKeys.add(diaryTier.area + "." + diaryTier.tier);
             }
+        }
+
+        JsonArray tierTaskCounts = collectDiaryTierTaskCounts(client, completedTierKeys);
+        JsonArray completedTiers = new JsonArray();
+        for (String completedTierKey : completedTierKeys)
+        {
+            completedTiers.add(completedTierKey);
         }
 
         JsonObject state = new JsonObject();
         state.add("completedTiers", completedTiers);
+        state.add("tierTaskCounts", tierTaskCounts);
         state.addProperty("trackedTierCount", DIARY_TIERS.length);
-        state.addProperty("coverage", "all 48 tier states plus completed task names from diary areas opened in game");
+        state.addProperty("coverage", "all 48 tier task counts plus completed task names from diary areas opened in game");
         state.add("taskAreas", taskAreas == null ? new JsonArray() : taskAreas.deepCopy());
         return state;
+    }
+
+    private static JsonArray collectDiaryTierTaskCounts(Client client, Set<String> completedTierKeys)
+    {
+        JsonArray areas = new JsonArray();
+        for (DiaryArea diaryArea : DIARY_AREAS)
+        {
+            client.runScript(DIARY_COMPLETION_INFO_SCRIPT, diaryArea.id);
+            if (client.getIntStackSize() < 12)
+            {
+                continue;
+            }
+
+            JsonObject area = diaryTierTaskCounts(diaryArea.area, client.getIntStack());
+            if (area == null)
+            {
+                continue;
+            }
+            for (com.google.gson.JsonElement element : area.getAsJsonArray("tiers"))
+            {
+                JsonObject tier = element.getAsJsonObject();
+                if (tier.get("totalCount").getAsInt() > 0
+                    && tier.get("completedCount").getAsInt() >= tier.get("totalCount").getAsInt())
+                {
+                    completedTierKeys.add(diaryArea.area + "." + tier.get("tier").getAsString());
+                }
+            }
+            areas.add(area);
+        }
+        return areas;
+    }
+
+    static JsonObject diaryTierTaskCounts(String areaName, int[] stack)
+    {
+        if (areaName == null || areaName.isBlank() || stack == null || stack.length < 12)
+        {
+            return null;
+        }
+
+        JsonArray tiers = new JsonArray();
+        for (int tierIndex = 0; tierIndex < DIARY_TIER_NAMES.length; tierIndex++)
+        {
+            int stackIndex = tierIndex * 3;
+            JsonObject tier = new JsonObject();
+            tier.addProperty("tier", DIARY_TIER_NAMES[tierIndex]);
+            tier.addProperty("completedCount", Math.max(0, stack[stackIndex]));
+            tier.addProperty("totalCount", Math.max(0, stack[stackIndex + 1]));
+            tiers.add(tier);
+        }
+
+        JsonObject area = new JsonObject();
+        area.addProperty("area", areaName);
+        area.add("tiers", tiers);
+        return area;
     }
 
     static JsonObject combatAchievements(Client client)
@@ -257,6 +338,18 @@ final class RuneFolioProgressCollector
             this.area = area;
             this.tier = tier;
             this.varbit = varbit;
+        }
+    }
+
+    private static final class DiaryArea
+    {
+        private final String area;
+        private final int id;
+
+        private DiaryArea(String area, int id)
+        {
+            this.area = area;
+            this.id = id;
         }
     }
 }
