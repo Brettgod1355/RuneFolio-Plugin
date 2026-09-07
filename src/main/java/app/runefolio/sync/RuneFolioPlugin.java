@@ -120,6 +120,7 @@ public class RuneFolioPlugin extends Plugin
 
     @Inject
     private RuneFolioDiaryTaskTracker diaryTaskTracker;
+    @Inject private RuneFolioBankCollector bankCollector;
 
     @Inject
     private ItemManager itemManager;
@@ -188,6 +189,10 @@ public class RuneFolioPlugin extends Plugin
         refreshNavigationButton();
         collectionLogButton.startUp(this::requestCollectionLogSyncFromButton);
         diaryTaskTracker.startUp(this::requestDiaryTaskSync);
+        bankCollector.startUp(state -> {
+            String name = currentPlayerName();
+            return name != null && enqueueLiveEvent(RuneFolioSyncEvent.historyEvent("bank.snapshot", name, state));
+        });
         panel.setTemporaryConnectAction(this::connectTemporaryCode);
         panel.setAccountConnectAction(this::connectRuneFolioAccount);
         panel.setAccountDisconnectAction(this::disconnectRuneFolioAccount);
@@ -254,6 +259,7 @@ public class RuneFolioPlugin extends Plugin
         String savedToken = accountMode ? accountConnectionToken : connectionToken;
         enqueueKnownSnapshots("shutdown");
         diaryTaskTracker.shutDown();
+        bankCollector.shutDown();
         if (savedToken != null && !savedToken.isBlank())
         {
             syncExecutor.submit(() -> flushQueueWithToken(
@@ -2353,4 +2359,3 @@ public class RuneFolioPlugin extends Plugin
     }
 
 }
-

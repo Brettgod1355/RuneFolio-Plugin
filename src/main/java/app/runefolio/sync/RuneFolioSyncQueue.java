@@ -18,6 +18,8 @@ final class RuneFolioSyncQueue
     private static final String CONFIG_GROUP = "runefolio";
     private static final String CONFIG_KEY = "syncQueue.v1";
     private static final int MAX_EVENTS = 1_000;
+    private static final int MAX_QUEUE_BYTES = 4 * 1024 * 1024;
+    private static final int MAX_BATCH_BYTES = 1024 * 1024;
 
     interface Storage
     {
@@ -55,15 +57,19 @@ final class RuneFolioSyncQueue
 
     synchronized boolean enqueue(RuneFolioSyncEvent event)
     {
-        events.values().removeIf(event::supersedes);
-        if (events.size() >= MAX_EVENTS)
+        Map<String, RuneFolioSyncEvent> candidate = new LinkedHashMap<>(events);
+        candidate.values().removeIf(event::supersedes);
+        candidate.put(event.getId(), event);
+        if (candidate.size() > MAX_EVENTS || byteSize(event) > MAX_BATCH_BYTES / 2
+            || candidate.values().stream().mapToLong(RuneFolioSyncQueue::byteSize).sum() > MAX_QUEUE_BYTES)
         {
             log.warn("RuneFolio sync queue is full; refusing to discard an existing event");
             persist();
             return false;
         }
 
-        events.put(event.getId(), event);
+        events.clear();
+        events.putAll(candidate);
         persist();
         return true;
     }
@@ -71,11 +77,15 @@ final class RuneFolioSyncQueue
     synchronized List<RuneFolioSyncEvent> snapshot(int limit, Predicate<RuneFolioSyncEvent> filter)
     {
         List<RuneFolioSyncEvent> result = new ArrayList<>();
+        long bytes = 0;
         for (RuneFolioSyncEvent event : events.values())
         {
             if (filter.test(event))
             {
+                int size = byteSize(event);
+                if (bytes + size > MAX_BATCH_BYTES) break;
                 result.add(event);
+                bytes += size;
                 if (result.size() >= limit)
                 {
                     break;
@@ -136,5 +146,10 @@ final class RuneFolioSyncQueue
         JsonArray array = new JsonArray();
         events.values().forEach(event -> array.add(event.toJson()));
         storage.set(array.toString());
+    }
+
+    private static int byteSize(RuneFolioSyncEvent event)
+    {
+        return event.toJson().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length + 1;
     }
 }

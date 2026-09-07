@@ -18,7 +18,7 @@ final class RuneFolioApiClient
 {
     private static final String API_BASE = "https://runefolio.app/api";
     private static final int PROTOCOL_VERSION = 1;
-    static final String CLIENT_VERSION = "0.3.23";
+    static final String CLIENT_VERSION = "0.3.24";
 
     private RuneFolioApiClient()
     {
@@ -468,4 +468,3 @@ final class RuneFolioApiClient
         }
     }
 }
-
