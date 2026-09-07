@@ -1241,6 +1241,11 @@ public class RuneFolioPlugin extends Plugin
         Exception exception
     )
     {
+        if (!accountMode && !savedToken.equals(connectionToken))
+        {
+            // A failed upload for the previous character must not revoke the new connection.
+            return;
+        }
         log.warn("RuneFolio skill sync failed", exception);
         String message = safeMessage(exception);
         String lowerMessage = message.toLowerCase();
