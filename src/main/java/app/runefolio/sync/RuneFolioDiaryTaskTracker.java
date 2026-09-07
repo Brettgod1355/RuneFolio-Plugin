@@ -143,7 +143,8 @@ final class RuneFolioDiaryTaskTracker
 
     private void setupForOpenDiary()
     {
-        if (client.getGameState() != GameState.LOGGED_IN || capturedForOpenDiary)
+        if (client.getGameState() != GameState.LOGGED_IN
+            || !RuneFolioWorldPolicy.supports(client.getWorldType()) || capturedForOpenDiary)
         {
             return;
         }

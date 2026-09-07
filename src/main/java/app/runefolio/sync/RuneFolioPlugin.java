@@ -944,7 +944,7 @@ public class RuneFolioPlugin extends Plugin
 
         clientThread.invokeLater(() ->
         {
-            if (session != characterSession.get() || client.getGameState() != GameState.LOGGED_IN
+            if (session != characterSession.get() || !canCollectCurrentWorld()
                 || !savedToken.equals(accountMode ? accountConnectionToken : connectionToken))
             {
                 return;
@@ -1297,7 +1297,7 @@ public class RuneFolioPlugin extends Plugin
     @Subscribe
     public void onGameTick(GameTick event)
     {
-        if (client.getGameState() != GameState.LOGGED_IN)
+        if (!canCollectCurrentWorld())
         {
             return;
         }
@@ -1343,7 +1343,7 @@ public class RuneFolioPlugin extends Plugin
     @Subscribe
     public void onStatChanged(StatChanged event)
     {
-        if (client.getGameState() != GameState.LOGGED_IN
+        if (!canCollectCurrentWorld()
             || !namesMatch(lastKnownPlayerName, currentPlayerName()))
         {
             return;
@@ -1367,7 +1367,7 @@ public class RuneFolioPlugin extends Plugin
     @Subscribe
     public void onLootReceived(LootReceived event)
     {
-        if (!config.syncLootDrops() || client.getGameState() != GameState.LOGGED_IN
+        if (!config.syncLootDrops() || !canCollectCurrentWorld()
             || event.getItems() == null || event.getItems().isEmpty())
         {
             return;
@@ -1466,7 +1466,7 @@ public class RuneFolioPlugin extends Plugin
     @Subscribe
     public void onChatMessage(ChatMessage event)
     {
-        if (event.getType() != ChatMessageType.GAMEMESSAGE || client.getGameState() != GameState.LOGGED_IN)
+        if (event.getType() != ChatMessageType.GAMEMESSAGE || !canCollectCurrentWorld())
         {
             return;
         }
@@ -1591,7 +1591,7 @@ public class RuneFolioPlugin extends Plugin
 
     private void requestScreenshot(String category, String caption)
     {
-        if (!config.uploadScreenshots() || client.getGameState() != GameState.LOGGED_IN)
+        if (!config.uploadScreenshots() || !canCollectCurrentWorld())
         {
             return;
         }
@@ -1613,7 +1613,7 @@ public class RuneFolioPlugin extends Plugin
             restoreScreenshotWidget(privateMessagesHidden, InterfaceID.PmChat.CONTAINER);
             clientThread.invokeLater(() ->
             {
-                if (session == characterSession.get() && client.getGameState() == GameState.LOGGED_IN
+                if (session == characterSession.get() && canCollectCurrentWorld()
                     && namesMatch(playerName, currentPlayerName()))
                 {
                     uploadScreenshotAsync(savedToken, playerName, eventId, category, caption, occurredAt, frame);
@@ -2035,6 +2035,10 @@ public class RuneFolioPlugin extends Plugin
 
     private boolean enqueueLiveEvent(RuneFolioSyncEvent event)
     {
+        if (!canCollectCurrentWorld())
+        {
+            return false;
+        }
         boolean accountMode = isAccountMode();
         String savedToken = accountMode ? accountConnectionToken : connectionToken;
         String playerName = event.getCharacterName();
@@ -2216,6 +2220,12 @@ public class RuneFolioPlugin extends Plugin
     {
         Player player = client.getLocalPlayer();
         return player == null ? null : player.getName();
+    }
+
+    private boolean canCollectCurrentWorld()
+    {
+        return client.getGameState() == GameState.LOGGED_IN
+            && RuneFolioWorldPolicy.supports(client.getWorldType());
     }
 
     private void refreshSyncPanel()
