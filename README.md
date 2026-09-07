@@ -70,7 +70,7 @@ Bank capture uses RuneFolio's own collector and RuneLite's item-price API. RuneL
 
 ## Copyright and credits
 
-See [copyright and reuse](COPYRIGHT.md) and [third-party notices](THIRD_PARTY_NOTICES.md). These preserve third-party rights and do not choose a project-wide license for RuneFolio. The JAR includes these notices under `META-INF/`.
+Original RuneFolio source code is licensed under [BSD-2-Clause](LICENSE). Reuse and modifications, including commercial use, are permitted with the required notices retained. See [copyright and reuse](COPYRIGHT.md) and [third-party notices](THIRD_PARTY_NOTICES.md) for scope and upstream credits. The JAR includes the license and both notices under `META-INF/`.
 
 ## Individual diary completion (0.3.27)
 

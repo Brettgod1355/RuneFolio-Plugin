@@ -31,14 +31,14 @@ group = "app.runefolio"
 version = "0.3.27"
 
 tasks.named("jar") {
-    from(["COPYRIGHT.md", "THIRD_PARTY_NOTICES.md"]) { into "META-INF" }
+    from(["LICENSE", "COPYRIGHT.md", "THIRD_PARTY_NOTICES.md"]) { into "META-INF" }
 }
 
 tasks.register("verifyDistributionNotices") {
     dependsOn tasks.named("jar")
     doLast {
         def archive = zipTree(tasks.named("jar").get().archiveFile.get().asFile)
-        ["COPYRIGHT.md", "THIRD_PARTY_NOTICES.md"].each { name ->
+        ["LICENSE", "COPYRIGHT.md", "THIRD_PARTY_NOTICES.md"].each { name ->
             def notice = archive.matching { include "META-INF/${name}" }.singleFile
             if (notice.getText("UTF-8") != file(name).getText("UTF-8")) {
                 throw new GradleException("Distribution notice differs: ${name}")
