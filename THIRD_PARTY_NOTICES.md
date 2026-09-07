@@ -318,17 +318,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Both source-file headers and this document retain the applicable notices. This document is shipped inside the plugin JAR at `META-INF/THIRD_PARTY_NOTICES.md`; BSD source and binary redistribution obligations apply to the adapted portions.
 
-## RuneProfile — collector references and retrospective audit
+## RuneProfile — adapted button definitions, collector references and retrospective audit
 
 Upstream: https://github.com/ReinhardtR/runeprofile-plugin
 Revision: `2da51cd7a8dcf6a5ed0e827a2df2bb985d0e0550` (Plugin Hub reference reviewed 2026-09-07).
 
-References: `src/main/java/com/runeprofile/data/AchievementDiary.java`, `src/main/java/com/runeprofile/autosync/PlayerDataService.java`, and `src/main/java/com/runeprofile/autosync/CollectionLogWidgetSubscriber.java`.
+References: `src/main/java/com/runeprofile/data/AchievementDiary.java`, `src/main/java/com/runeprofile/autosync/PlayerDataService.java`, and `src/main/java/com/runeprofile/autosync/CollectionLogWidgetSubscriber.java`, and `src/main/java/com/runeprofile/ui/ManualUpdateButtonManager.java`.
 Local related implementations: `RuneFolioProgressCollector.java`, `RuneFolioCombatTaskCatalog.java`, `RuneFolioCollectorManifest.java`, `RuneFolioPlugin.java` and `RuneFolioCollectionLogButton.java` under `src/main/java/app/runefolio/sync/`.
 
 RuneProfile informed the diary script 2200 area IDs/stack layout and the POH Collection Log ownership guard. RuneFolio implements bounded JSON snapshots, compiled bitmap allowlists, retries and character isolation differently; it does not bundle RuneProfile classes. Other shared RuneLite API patterns (quest enumeration, CA varp reading, collection widgets and navigation) do not alone establish copied source. Retain this credit and full license for the reference-derived collector work, including any adapted portions whose exact historical origin is uncertain.
 
-A targeted comparison of current RuneFolio sources against all Java files at the above RuneProfile revision found only generic exact-line overlaps, with a manual collector comparison identifying the behavior references above. This is not proof that every historical version was independently authored, nor an audit of RuneProfile's separate website or all assets/dependencies. RuneProfile contains file-specific third-party notices in its model exporter and utilities; those files were inspected, not imported into RuneFolio. Recheck their particular notices before any future reuse.
+A targeted comparison covered all 67 Java files at the above RuneProfile revision. Exact long-line scanning found generic API overlaps; a comment/import-stripped 35-token comparison additionally identified matching active/inactive nine-sprite button definitions in RuneFolioCollectionLogButton.java and ManualUpdateButtonManager.java. These definitions are treated as adapted material, with RuneProfile copyright/license added to the local source. RuneFolio uses a separate button with different layout, collision visibility and sync callback handling; it does not import the upstream replacement-search/button manager. The manual collector comparison identified the behavior references above. This is not proof that every historical version was independently authored, nor an audit of RuneProfile's separate website or all assets/dependencies. RuneProfile contains file-specific third-party notices in its model exporter and utilities; those files were inspected, not imported into RuneFolio. Recheck their particular notices before any future reuse.
 
 ### RuneProfile license
 
