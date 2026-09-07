@@ -31,7 +31,7 @@ group = "app.runefolio"
 version = "0.3.25"
 
 tasks.named("jar") {
-    from("COPYRIGHT.md", "THIRD_PARTY_NOTICES.md") { into "META-INF" }
+    from(["COPYRIGHT.md", "THIRD_PARTY_NOTICES.md"]) { into "META-INF" }
 }
 
 tasks.register("verifyDistributionNotices") {
