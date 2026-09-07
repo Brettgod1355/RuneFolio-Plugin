@@ -8,4 +8,3 @@
 - Plugin behavior must comply with the current Jagex Third-Party Client Guidelines and RuneLite Plugin Hub requirements.
 - Keep collection passive and consent-based. Do not automate gameplay or navigation, expose hidden information, provide prohibited combat assistance, modify protected click zones, or collect Jagex credentials.
 - If compliance is unclear, pause that feature and seek clarification instead of claiming official approval.
-- Maintain the manual verification checklist in README.md with each shipped behavior change. Add stable test IDs, concrete steps, expected results, and version requirements. Keep unconfirmed items unchecked; CI does not constitute manual confirmation. Mark an item complete only after the maintainer reports it working, recording the date/version when known. Keep unfinished features out of the released testing list.
