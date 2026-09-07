@@ -19,6 +19,8 @@ final class RuneFolioDiaryTaskParser
 {
     private static final List<String> TIER_ORDER = Arrays.asList("easy", "medium", "hard", "elite");
     private static final Pattern NUMBERED_TASK_PATTERN = Pattern.compile("^(\\d+)\\s*[.):~-]\\s*(.+)$");
+    private static final Pattern COMPLETED_ROW_PREFIX = Pattern.compile(
+        "^(?:\\s|</?col(?:=[0-9a-f]+)?>)*<str(?:=[0-9a-f]+)?>", Pattern.CASE_INSENSITIVE);
     private static final Map<String, Area> AREAS_BY_TITLE = new LinkedHashMap<>();
 
     static
@@ -101,7 +103,7 @@ final class RuneFolioDiaryTaskParser
                 seenTiers.add(tier);
                 continue;
             }
-            if (currentTier == null || !rawLine.trim().startsWith("<str>"))
+            if (currentTier == null || !COMPLETED_ROW_PREFIX.matcher(rawLine).find())
             {
                 continue;
             }
@@ -152,7 +154,7 @@ final class RuneFolioDiaryTaskParser
 
     private static String clean(String value)
     {
-        return Text.removeTags(value == null ? "" : value)
+        return Text.removeTags((value == null ? "" : value).replaceAll("(?i)<br\\s*/?>", " "))
             .replace('\u00a0', ' ')
             .replaceAll("\\s+", " ")
             .trim();
