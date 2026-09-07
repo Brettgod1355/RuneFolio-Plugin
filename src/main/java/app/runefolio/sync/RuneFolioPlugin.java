@@ -1002,10 +1002,7 @@ public class RuneFolioPlugin extends Plugin
             lastKnownPlayerName = playerName;
             lastKnownSkills = new ArrayList<>(skills);
             JsonObject questState = RuneFolioProgressCollector.quests(client);
-            JsonObject diaryState = RuneFolioProgressCollector.diaries(
-                client,
-                diaryTaskTracker.taskAreasForCurrentCharacter()
-            );
+            JsonObject diaryState = RuneFolioProgressCollector.diaries(client);
             JsonObject combatState = RuneFolioProgressCollector.combatAchievements(client);
             lastKnownQuestState = questState.deepCopy();
             lastKnownDiaryState = diaryState.deepCopy();
@@ -1795,10 +1792,7 @@ public class RuneFolioPlugin extends Plugin
         if (diaryProgressRefreshPending)
         {
             diaryProgressRefreshPending = false;
-            JsonObject diaryState = RuneFolioProgressCollector.diaries(
-                client,
-                diaryTaskTracker.taskAreasForCurrentCharacter()
-            );
+            JsonObject diaryState = RuneFolioProgressCollector.diaries(client);
             lastKnownDiaryState = diaryState.deepCopy();
             queued |= enqueueLiveEvent(RuneFolioSyncEvent.progressSnapshot(
                 RuneFolioSyncEvent.DIARY_SNAPSHOT_TYPE,
@@ -1967,7 +1961,7 @@ public class RuneFolioPlugin extends Plugin
         client.runScript(COLLECTION_LOG_INIT_SCRIPT);
     }
 
-    private boolean requestDiaryTaskSync(String areaName, JsonArray taskAreas)
+    private boolean requestDiaryTaskSync()
     {
         String playerName = currentPlayerName();
         if (playerName == null || playerName.isBlank())
@@ -1975,7 +1969,7 @@ public class RuneFolioPlugin extends Plugin
             return false;
         }
 
-        JsonObject diaryState = RuneFolioProgressCollector.diaries(client, taskAreas);
+        JsonObject diaryState = RuneFolioProgressCollector.diaries(client);
         lastKnownDiaryState = diaryState.deepCopy();
         RuneFolioSyncEvent event = RuneFolioSyncEvent.progressSnapshot(
             RuneFolioSyncEvent.DIARY_SNAPSHOT_TYPE,

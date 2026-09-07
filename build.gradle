@@ -28,7 +28,7 @@ dependencies {
 }
 
 group = "app.runefolio"
-version = "0.3.26"
+version = "0.3.27"
 
 tasks.named("jar") {
     from(["COPYRIGHT.md", "THIRD_PARTY_NOTICES.md"]) { into "META-INF" }
