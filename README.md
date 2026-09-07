@@ -2,7 +2,7 @@
 
 Optional bank/wealth capture (0.3.24): disabled by default. When enabled, opening the ordinary bank sends bank, inventory and equipment item IDs, names, quantities and estimated GE/high-alchemy values to RuneFolio. It does not inspect unopened storage. The server keeps the latest item list and compact daily wealth estimates. Values are estimates, not a complete account valuation.
 
-Pending events are persisted through RuneLite configuration for retries, with a 1,000-event / 4 MiB serialized-event budget for new queue writes and bounded upload batches. A newer bank observation can replace a pending observation for the same character and UTC day; different days are retained. Successful acknowledgements remove queued events. Turning capture off prevents new captures; it does not delete already queued events or server history. Diary caches and RuneFolio connection/name bindings also use RuneLite configuration. Connection tokens are sensitive: do not share configuration files. Screenshots currently retry in memory, not in the persistent event queue.
+Pending events are persisted through RuneLite configuration for retries, with a 1,000-event / 4 MiB serialized-event budget for new queue writes and bounded upload batches. A newer bank observation can replace a pending observation for the same character and UTC day; different days are retained. Successful acknowledgements remove queued events. Turning capture off prevents new captures; it does not delete already queued events or server history. Legacy diary caches (no longer read for task detection) and RuneFolio connection/name bindings also use RuneLite configuration. Connection tokens are sensitive: do not share configuration files. Screenshots currently retry in memory, not in the persistent event queue.
 
 Private-alpha RuneLite plugin that securely syncs an Old School RuneScape character with [RuneFolio](https://runefolio.app).
 
@@ -13,7 +13,7 @@ Version 0.3 includes:
 - Browser-based RuneFolio account login.
 - Optional temporary, character-specific connection codes.
 - Automatic skill, quest, all-area diary task-count, and combat-achievement snapshots on login, every 10 minutes, and on logout.
-- Completed Achievement Diary task names are collected silently from diary areas opened in game; RuneFolio owns the current OSRS Wiki task catalog and ignores unrelated interface text.
+- Individual Achievement Diary completions use game flags mapped to all 492 catalog tasks; no diary window needs to be opened.
 - Full individual combat-task completion flags, plus named combat-task and Collection Log unlock events as they happen.
 - Collection Log category snapshots whenever the player opens or changes a category in the log.
 - Automatic loot history from RuneLite's enabled native Loot Tracker, preserving each reward's source, items, quantities, and values.
@@ -72,6 +72,8 @@ Bank capture uses RuneFolio's own collector and RuneLite's item-price API. RuneL
 
 See [copyright and reuse](COPYRIGHT.md) and [third-party notices](THIRD_PARTY_NOTICES.md). These preserve third-party rights and do not choose a project-wide license for RuneFolio. The JAR includes these notices under `META-INF/`.
 
-## Diary capture formatting (0.3.26)
+## Individual diary completion (0.3.27)
 
-Completed diary rows preserve word boundaries across line breaks and support leading color formatting. Met requirements alone never count as a completed task. Rebuild/restart the plugin, manually reopen affected diary areas, and sync to refresh cached observations. The website also recovers unambiguous joined-word observations from older builds and retains bounded unmatched task names for future diagnosis; it does not infer individual completions from aggregate counts.
+Individual diary tasks use game completion flags for all 492 catalog tasks, synchronized on login, task changes and Sync now. No diary window needs to be opened. Area identities are withheld if the flag results disagree with the game's tier counters. Requires the matching website task-index support. Rebuild/restart the plugin before testing; website deployments do not update an installed client.
+
+Quest Helper mapping attribution and RuneProfile collector-reference credit, with full BSD notices, are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and distributed in the JAR. Older clients' text observations remain supported by the website.
