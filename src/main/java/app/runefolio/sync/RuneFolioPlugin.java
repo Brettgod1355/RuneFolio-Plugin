@@ -38,6 +38,7 @@ import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.StatChanged;
+import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.ScriptID;
 import net.runelite.api.gameval.InterfaceID;
@@ -1868,6 +1869,11 @@ public class RuneFolioPlugin extends Plugin
         {
             return;
         }
+        if (client.getVarbitValue(VarbitID.COLLECTION_POH_HOST_BOOK_OPEN) != 0)
+        {
+            cancelCollectionButtonSync("RuneFolio cannot sync another player's Collection Log.");
+            return;
+        }
         if (lastCollectionTransmitTick < 0)
         {
             if (lastCollectionButtonClickTick + 10 < client.getTickCount())
@@ -1936,6 +1942,17 @@ public class RuneFolioPlugin extends Plugin
         lastCollectionTransmitTick = -1;
         collectionButtonItems.clear();
         addRuneFolioChatMessage("<col=d67966>" + message + "</col>");
+    }
+
+    @Subscribe
+    public void onVarbitChanged(VarbitChanged event)
+    {
+        // Cancel immediately: returning to our own book must not resume a stale capture.
+        if (collectionButtonSyncRequested
+            && client.getVarbitValue(VarbitID.COLLECTION_POH_HOST_BOOK_OPEN) != 0)
+        {
+            cancelCollectionButtonSync("RuneFolio cannot sync another player's Collection Log.");
+        }
     }
 
     private void addRuneFolioChatMessage(String message)
