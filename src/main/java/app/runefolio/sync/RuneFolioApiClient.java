@@ -18,7 +18,7 @@ final class RuneFolioApiClient
 {
     private static final String API_BASE = "https://runefolio.app/api";
     private static final int PROTOCOL_VERSION = 1;
-    static final String CLIENT_VERSION = "0.3.22";
+    static final String CLIENT_VERSION = "0.3.23";
 
     private RuneFolioApiClient()
     {
@@ -47,13 +47,14 @@ final class RuneFolioApiClient
         return new AccountPollResult(status, token);
     }
 
-    static AccountHeartbeatResult accountHeartbeat(String connectionToken, String characterName) throws IOException
+    static AccountHeartbeatResult accountHeartbeat(String connectionToken, String characterName, String identityKey, String previousName) throws IOException
     {
         JsonObject body = new JsonObject();
         if (characterName != null && !characterName.isBlank())
         {
             body.addProperty("characterName", characterName);
         }
+        addIdentity(body, identityKey, previousName);
         JsonObject response = post("/plugin-account/heartbeat", body, connectionToken);
         boolean characterConnected = !response.has("characterConnected")
             || response.get("characterConnected").isJsonNull()
@@ -84,11 +85,23 @@ final class RuneFolioApiClient
         );
     }
 
-    static ConnectionResult heartbeat(String connectionToken) throws IOException
+    static ConnectionResult heartbeat(String connectionToken, String characterName, String identityKey, String previousName) throws IOException
     {
-        JsonObject response = post("/plugin-links/heartbeat", new JsonObject(), connectionToken);
+        JsonObject body = new JsonObject();
+        body.addProperty("characterName", characterName);
+        addIdentity(body, identityKey, previousName);
+        JsonObject response = post("/plugin-links/heartbeat", body, connectionToken);
         JsonObject character = response.getAsJsonObject("character");
         return new ConnectionResult(connectionToken, character.get("name").getAsString());
+    }
+
+    private static void addIdentity(JsonObject body, String identityKey, String previousName)
+    {
+        if (identityKey != null)
+        {
+            body.addProperty("identityKey", identityKey);
+            body.addProperty("previousName", previousName);
+        }
     }
 
     static BatchSyncResult syncEvents(
@@ -141,6 +154,7 @@ final class RuneFolioApiClient
         String connectionToken,
         String characterName,
         UUID eventId,
+        String identityKey,
         String category,
         String caption,
         String occurredAt,
@@ -151,6 +165,7 @@ final class RuneFolioApiClient
         ByteArrayOutputStream body = new ByteArrayOutputStream(jpeg.length + 2048);
         writeField(body, boundary, "eventId", eventId.toString());
         writeField(body, boundary, "characterName", characterName);
+        if (identityKey != null) writeField(body, boundary, "identityKey", identityKey);
         writeField(body, boundary, "category", category);
         writeField(body, boundary, "caption", caption);
         writeField(body, boundary, "occurredAt", occurredAt);
@@ -453,3 +468,4 @@ final class RuneFolioApiClient
         }
     }
 }
+

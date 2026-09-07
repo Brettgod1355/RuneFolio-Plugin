@@ -28,7 +28,7 @@ dependencies {
 }
 
 group = "app.runefolio"
-version = "0.3.22"
+version = "0.3.23"
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
@@ -42,3 +42,4 @@ tasks.register("run", JavaExec) {
     jvmArgs "-ea"
     args "--developer-mode", "--debug"
 }
+
