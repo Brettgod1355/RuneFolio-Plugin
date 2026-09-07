@@ -1,7 +1,6 @@
 package app.runefolio.sync;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.EnumSet;
 import java.util.Locale;
@@ -170,94 +169,12 @@ final class RuneFolioProgressCollector
             }
         }
 
-        boolean karamjaCompletionValidated = false;
-        if (taskAreas != null)
-        {
-            for (JsonElement rawArea : taskAreas)
-            {
-                if (!rawArea.isJsonObject())
-                {
-                    continue;
-                }
-                JsonObject area = rawArea.getAsJsonObject();
-                String areaKey = string(area, "area");
-                JsonArray tiers = array(area, "tiers");
-                if ("karamja".equals(areaKey))
-                {
-                    karamjaCompletionValidated = tiers != null && tiers.size() == 4;
-                }
-                if (tiers == null)
-                {
-                    continue;
-                }
-                for (JsonElement rawTier : tiers)
-                {
-                    if (!rawTier.isJsonObject())
-                    {
-                        continue;
-                    }
-                    JsonObject tier = rawTier.getAsJsonObject();
-                    String tierKey = string(tier, "tier");
-                    JsonArray tasks = array(tier, "tasks");
-                    if (areaKey == null || tierKey == null || tasks == null || tasks.size() == 0)
-                    {
-                        continue;
-                    }
-                    if (allTasksCompleted(tasks))
-                    {
-                        addUnique(completedTiers, areaKey + "." + tierKey);
-                    }
-                }
-            }
-        }
-
         JsonObject state = new JsonObject();
         state.add("completedTiers", completedTiers);
         state.addProperty("trackedTierCount", DIARY_TIERS.length);
-        state.addProperty("coverage", "all 48 tier states plus every task from diary areas opened in game");
-        state.addProperty("karamjaCompletionValidated", karamjaCompletionValidated);
+        state.addProperty("coverage", "all 48 tier states plus completed task names from diary areas opened in game");
         state.add("taskAreas", taskAreas == null ? new JsonArray() : taskAreas.deepCopy());
         return state;
-    }
-
-    private static boolean allTasksCompleted(JsonArray tasks)
-    {
-        for (JsonElement rawTask : tasks)
-        {
-            if (!rawTask.isJsonObject()
-                || !rawTask.getAsJsonObject().has("completed")
-                || !rawTask.getAsJsonObject().get("completed").getAsBoolean())
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static String string(JsonObject object, String key)
-    {
-        return object.has(key) && object.get(key).isJsonPrimitive()
-            ? object.get(key).getAsString()
-            : null;
-    }
-
-    private static JsonArray array(JsonObject object, String key)
-    {
-        return object.has(key) && object.get(key).isJsonArray()
-            ? object.getAsJsonArray(key)
-            : null;
-    }
-
-    private static void addUnique(JsonArray values, String value)
-    {
-        for (JsonElement existing : values)
-        {
-            if (existing.isJsonPrimitive() && value.equals(existing.getAsString()))
-            {
-                return;
-            }
-        }
-        values.add(value);
     }
 
     static JsonObject combatAchievements(Client client)

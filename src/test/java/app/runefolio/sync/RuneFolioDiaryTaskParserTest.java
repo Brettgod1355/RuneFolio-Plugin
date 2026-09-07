@@ -9,7 +9,7 @@ import org.junit.Test;
 public class RuneFolioDiaryTaskParserTest
 {
     @Test
-    public void parsesEveryTierAndPreservesFullTaskNames()
+    public void sendsOnlyCompletedTaskNamesFromEveryTier()
     {
         RuneFolioDiaryTaskParser.Area area = RuneFolioDiaryTaskParser.areaFromTitle("Karamja Area Tasks");
         JsonObject state = RuneFolioDiaryTaskParser.parse(area, Arrays.asList(
@@ -17,6 +17,7 @@ public class RuneFolioDiaryTaskParserTest
             "Easy Tasks",
             "<str>Pick five bananas from the plantation located east of the volcano.</str>",
             "Use the rope swing to travel to the small island north-west of Karamja.",
+            "Requirements: 99 imaginary levels",
             "Medium Tasks",
             "<str>Complete a medium task without truncating its name.</str>",
             "Hard Tasks",
@@ -29,30 +30,30 @@ public class RuneFolioDiaryTaskParserTest
         Assert.assertEquals("karamja", state.get("area").getAsString());
         JsonArray tiers = state.getAsJsonArray("tiers");
         Assert.assertEquals(4, tiers.size());
-        JsonArray easyTasks = tiers.get(0).getAsJsonObject().getAsJsonArray("tasks");
-        Assert.assertEquals(2, easyTasks.size());
-        Assert.assertTrue(easyTasks.get(0).getAsJsonObject().get("completed").getAsBoolean());
-        Assert.assertFalse(easyTasks.get(1).getAsJsonObject().get("completed").getAsBoolean());
+
+        JsonArray easyTasks = tiers.get(0).getAsJsonObject().getAsJsonArray("completedTaskNames");
+        Assert.assertEquals(1, easyTasks.size());
         Assert.assertEquals(
-            "Use the rope swing to travel to the small island north-west of Karamja.",
-            easyTasks.get(1).getAsJsonObject().get("name").getAsString()
+            "Pick five bananas from the plantation located east of the volcano.",
+            easyTasks.get(0).getAsString()
         );
+        Assert.assertEquals(0, tiers.get(2).getAsJsonObject().getAsJsonArray("completedTaskNames").size());
     }
 
     @Test
-    public void stillAcceptsNumberedTaskRows()
+    public void stripsNumbersFromCompletedTaskRows()
     {
         RuneFolioDiaryTaskParser.Area area = RuneFolioDiaryTaskParser.areaFromTitle("Ardougne Area Tasks");
         JsonObject state = RuneFolioDiaryTaskParser.parse(area, Arrays.asList(
-            "Easy", "1. An easy task", "Medium", "1. A medium task",
-            "Hard", "1. A hard task", "Elite", "1. An elite task"
+            "Easy", "<str>1. An easy task</str>", "Medium", "<str>1. A medium task</str>",
+            "Hard", "<str>1. A hard task</str>", "Elite", "<str>1. An elite task</str>"
         ));
 
         Assert.assertNotNull(state);
         Assert.assertEquals(
             "An easy task",
             state.getAsJsonArray("tiers").get(0).getAsJsonObject()
-                .getAsJsonArray("tasks").get(0).getAsJsonObject().get("name").getAsString()
+                .getAsJsonArray("completedTaskNames").get(0).getAsString()
         );
     }
 
@@ -84,7 +85,7 @@ public class RuneFolioDiaryTaskParserTest
     {
         RuneFolioDiaryTaskParser.Area area = RuneFolioDiaryTaskParser.areaFromTitle("Varrock Tasks");
         Assert.assertNull(RuneFolioDiaryTaskParser.parse(area, Arrays.asList(
-            "Easy Tasks", "1. An easy task", "Medium Tasks", "1. A medium task"
+            "Easy Tasks", "<str>1. An easy task</str>", "Medium Tasks", "<str>1. A medium task</str>"
         )));
     }
 }
