@@ -23,16 +23,21 @@ import net.runelite.client.game.ItemManager;
 @Singleton
 final class RuneFolioBankCollector
 {
-    @Inject private Client client;
-    @Inject private ItemManager itemManager;
-    @Inject private RuneFolioConfig config;
-    @Inject private EventBus eventBus;
+    private final Client client;
+    private final ItemManager itemManager;
+    private final RuneFolioConfig config;
+    private final EventBus eventBus;
     private Predicate<JsonObject> publish;
     private boolean bankObserved;
     private int changedTick = -1;
     private int lastSentTick = -100;
     private JsonObject lastSent;
     private String lastSentDay;
+
+    @Inject RuneFolioBankCollector(Client client, ItemManager itemManager, RuneFolioConfig config, EventBus eventBus)
+    {
+        this.client = client; this.itemManager = itemManager; this.config = config; this.eventBus = eventBus;
+    }
 
     void startUp(Predicate<JsonObject> publish)
     {
