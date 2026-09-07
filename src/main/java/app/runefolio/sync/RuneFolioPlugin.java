@@ -158,7 +158,6 @@ public class RuneFolioPlugin extends Plugin
     private int ticksSinceLocalSnapshot;
     private final Map<Integer, Integer> collectionButtonItems = new LinkedHashMap<>();
     private final Set<String> pendingCollectionButtonEventIds = ConcurrentHashMap.newKeySet();
-    private final Map<String, String> pendingDiarySyncAreas = new ConcurrentHashMap<>();
     private boolean collectionButtonSyncRequested;
     private int lastCollectionTransmitTick = -1;
     private int lastCollectionButtonClickTick = -1;
@@ -233,7 +232,6 @@ public class RuneFolioPlugin extends Plugin
         collectionButtonSyncRequested = false;
         collectionButtonItems.clear();
         pendingCollectionButtonEventIds.clear();
-        pendingDiarySyncAreas.clear();
         String playerName = lastKnownPlayerName;
         boolean accountMode = isAccountMode();
         String savedToken = accountMode ? accountConnectionToken : connectionToken;
@@ -1082,7 +1080,6 @@ public class RuneFolioPlugin extends Plugin
                 throw new java.io.IOException("RuneFolio connection was revoked or expired.");
             }
             announceCollectionButtonResult(result);
-            announceDiarySyncResult(result);
 
             int sent = result.getAcknowledgedEventIds().size();
             int waiting = result.getRetryableRejectedCount();
@@ -1156,37 +1153,6 @@ public class RuneFolioPlugin extends Plugin
                 addRuneFolioChatMessage("<col=d67966>The Collection Log update was rejected. Please reopen it and try again.</col>");
             }
         });
-    }
-
-    private void announceDiarySyncResult(RuneFolioApiClient.BatchSyncResult result)
-    {
-        Set<String> acknowledged = new HashSet<>(result.getAcknowledgedEventIds());
-        acknowledged.retainAll(pendingDiarySyncAreas.keySet());
-        if (acknowledged.isEmpty())
-        {
-            return;
-        }
-
-        Set<String> successful = new HashSet<>(result.getSuccessfulEventIds());
-        for (String eventId : acknowledged)
-        {
-            String areaName = pendingDiarySyncAreas.remove(eventId);
-            if (areaName == null)
-            {
-                continue;
-            }
-            clientThread.invokeLater(() ->
-            {
-                if (successful.contains(eventId))
-                {
-                    diaryTaskTracker.markSynced(areaName);
-                }
-                else
-                {
-                    diaryTaskTracker.markSyncFailed(areaName);
-                }
-            });
-        }
     }
 
     private static String syncConfirmation(List<RuneFolioSyncEvent> events)
@@ -1891,8 +1857,6 @@ public class RuneFolioPlugin extends Plugin
         boolean queued = enqueueLiveEvent(event);
         if (queued)
         {
-            pendingDiarySyncAreas.clear();
-            pendingDiarySyncAreas.put(event.getId(), areaName);
             syncExecutor.submit(this::flushQueue);
         }
         return queued;
