@@ -11,6 +11,9 @@ import java.util.function.BiFunction;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.events.GameStateChanged;
+import net.runelite.client.events.RuneScapeProfileChanged;
 import net.runelite.api.Player;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.WidgetClosed;
@@ -37,6 +40,7 @@ final class RuneFolioDiaryTaskTracker
     private RuneFolioDiaryTaskParser.Area currentArea;
     private int captureAttemptsRemaining;
     private boolean capturedForOpenDiary;
+    private long captureSession;
 
     @Inject
     RuneFolioDiaryTaskTracker(
@@ -75,6 +79,29 @@ final class RuneFolioDiaryTaskTracker
     }
 
     @Subscribe
+    public void onRuneScapeProfileChanged(RuneScapeProfileChanged event)
+    {
+        resetCapture();
+    }
+
+    @Subscribe
+    public void onGameStateChanged(GameStateChanged event)
+    {
+        if (event.getGameState() != GameState.LOGGED_IN)
+        {
+            resetCapture();
+        }
+    }
+
+    private void resetCapture()
+    {
+        captureSession++;
+        currentArea = null;
+        captureAttemptsRemaining = 0;
+        capturedForOpenDiary = false;
+    }
+
+    @Subscribe
     public void onWidgetLoaded(WidgetLoaded event)
     {
         if (event.getGroupId() == InterfaceID.JOURNALSCROLL)
@@ -82,7 +109,14 @@ final class RuneFolioDiaryTaskTracker
             currentArea = null;
             capturedForOpenDiary = false;
             captureAttemptsRemaining = CAPTURE_ATTEMPTS;
-            clientThread.invokeLater(() -> clientThread.invokeLater(this::setupForOpenDiary));
+            long session = captureSession;
+            clientThread.invokeLater(() -> clientThread.invokeLater(() ->
+            {
+                if (session == captureSession)
+                {
+                    setupForOpenDiary();
+                }
+            }));
         }
     }
 
@@ -109,7 +143,8 @@ final class RuneFolioDiaryTaskTracker
 
     private void setupForOpenDiary()
     {
-        if (capturedForOpenDiary)
+        if (client.getGameState() != GameState.LOGGED_IN
+            || !RuneFolioWorldPolicy.supports(client.getWorldType()) || capturedForOpenDiary)
         {
             return;
         }
