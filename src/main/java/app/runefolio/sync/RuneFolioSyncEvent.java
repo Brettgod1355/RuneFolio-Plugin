@@ -155,6 +155,12 @@ final class RuneFolioSyncEvent
         );
     }
 
+    static RuneFolioSyncEvent historyEvent(String type, String characterName, JsonObject payload)
+    {
+        if (!"bank.snapshot".equals(type)) throw new IllegalArgumentException("Unsupported history event");
+        return create(type, characterName, payload.deepCopy());
+    }
+
     static RuneFolioSyncEvent fromJson(JsonObject json)
     {
         String id = requiredString(json, "id");
