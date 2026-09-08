@@ -1,6 +1,6 @@
 # Third-party notices
 
-These credits do not grant a project-wide license to RuneFolio's original code. Dependencies and any adapted third-party portions retain their own terms. This is a targeted current-source inventory, not an exhaustive historical provenance audit or dependency bill of materials.
+RuneFolio's original source code is licensed under BSD-2-Clause; see LICENSE. This document preserves the separate terms for third-party material. Dependencies and any adapted third-party portions retain their own terms. This is a targeted current-source inventory, not an exhaustive historical provenance audit or dependency bill of materials.
 
 ## RuneLite — APIs and behavior references
 
