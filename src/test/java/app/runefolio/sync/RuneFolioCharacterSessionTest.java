@@ -25,7 +25,16 @@ public class RuneFolioCharacterSessionTest
         AtomicLong session = (AtomicLong) get(plugin, "characterSession");
         long before = session.get();
 
+        RuneFolioBossRecordTracker boss = (RuneFolioBossRecordTracker) get(plugin, "bossRecordTracker");
+        RuneFolioClueRecordTracker clue = (RuneFolioClueRecordTracker) get(plugin, "clueRecordTracker");
+        RuneFolioSlayerRecordTracker slayer = (RuneFolioSlayerRecordTracker) get(plugin, "slayerRecordTracker");
+        boss.message("Your Vorkath kill count is: 5.", 1, Set.of("Vorkath"));
+        clue.message("You have completed 5 easy Treasure Trails.", 1);
+        slayer.message("You've completed 5 tasks.", 1);
         plugin.resetTransientCharacterState();
+        Assert.assertNull(boss.poll(10));
+        Assert.assertNull(clue.poll(10));
+        Assert.assertNull(slayer.poll(10));
 
         Assert.assertEquals(before + 1, session.get());
         Assert.assertEquals(false, get(plugin, "collectionButtonSyncRequested"));
@@ -52,3 +61,4 @@ public class RuneFolioCharacterSessionTest
         field.set(plugin, value);
     }
 }
+

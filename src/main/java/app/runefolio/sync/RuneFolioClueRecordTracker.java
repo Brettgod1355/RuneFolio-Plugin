@@ -36,7 +36,7 @@ final class RuneFolioClueRecordTracker
     JsonObject rewards(JsonArray rewards, int tick, String tier)
     {
         if (pending != null && tier != null && !tier.equals(pending.get("tier").getAsString())) return null;
-        if (pending == null || tick - started > 5 || rewards == null || rewards.size() > 100)
+        if (pending == null || tick - started > 3 || rewards == null || rewards.size() > 100)
         {
             pending = null;
             return null;
@@ -50,7 +50,7 @@ final class RuneFolioClueRecordTracker
 
     JsonObject poll(int tick)
     {
-        if (pending == null || tick - started < 6) return null;
+        if (pending == null || tick - started < 4) return null;
         JsonObject record = pending.deepCopy();
         lastKey = record.get("tier").getAsString() + ":" + record.get("count").getAsInt();
         pending = null;

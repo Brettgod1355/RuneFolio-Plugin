@@ -17,6 +17,8 @@ final class RuneFolioBossRecordTracker
     private int countTick = -100;
     private int timeTick = -100;
     private Long duration;
+    private Integer partySize;
+    private int partyTick = -100;
     private boolean personalBest;
     private boolean challengeTime;
 
@@ -41,6 +43,12 @@ final class RuneFolioBossRecordTracker
                 countTick = tick;
             }
             catch (NumberFormatException ignored) { }
+        }
+        Matcher team = Pattern.compile("Team size: (Solo|[0-9]{1,2})(?: players)?").matcher(message);
+        if (team.find())
+        {
+            int size = "Solo".equals(team.group(1)) ? 1 : Integer.parseInt(team.group(1));
+            if (size > 0) { partySize = size; partyTick = tick; }
         }
         Matcher time = TIME.matcher(message);
         if (time.find())
@@ -67,6 +75,8 @@ final class RuneFolioBossRecordTracker
             record.addProperty("newPersonalBest", personalBest);
             record.addProperty("timingKind", challengeTime ? "challenge" : "completion");
         }
+        if (partySize != null && Math.abs(partyTick - countTick) <= 2
+            && record.get("sourceName").getAsString().startsWith("Chambers of Xeric")) record.addProperty("partySize", partySize);
         lastKey = record.get("sourceName").getAsString() + ":" + record.get("count").getAsInt();
         clearPending();
         return record;
@@ -94,5 +104,5 @@ final class RuneFolioBossRecordTracker
     }
 
     void reset() { lastKey = null; clearPending(); }
-    private void clearPending() { pending = null; countTick = -100; timeTick = -100; duration = null; personalBest = false; challengeTime = false; }
+    private void clearPending() { partySize = null; partyTick = -100; pending = null; countTick = -100; timeTick = -100; duration = null; personalBest = false; challengeTime = false; }
 }
