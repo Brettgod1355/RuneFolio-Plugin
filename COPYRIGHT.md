@@ -1,6 +1,8 @@
 # Copyright and reuse
 
-Copyright (c) 2026, Brett Godfrey and RuneFolio contributors, for their respective original copyrightable contributions.
+Copyright (c) 2026, RuneFolio contributors, for their respective original copyrightable contributions.
+
+Project maintainer: [Brettgod1355](https://github.com/Brettgod1355).
 
 RuneFolio's original source code is licensed under the [BSD 2-Clause License](LICENSE), except where a file carries separate terms. You may use, modify and redistribute it, including commercially, while preserving the copyright notice, license conditions and disclaimer as required by that license. Modified versions do not have to be open source, and no visible in-app credit is required.
 
