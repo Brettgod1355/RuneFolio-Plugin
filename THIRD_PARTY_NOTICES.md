@@ -357,3 +357,7 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## Completion-history API and message references
+
+The original completion-history implementation uses RuneLite's public ChatMessage, LootReceived and game-value APIs. Result message formats and exposed raid fields were checked against RuneLite's `plugins/chatcommands/ChatCommandsPlugin.java`, `plugins/loottracker/LootTrackerPlugin.java`, `plugins/raids/RaidsPlugin.java` and `plugins/slayer/SlayerPlugin.java` on 2026-09-08. These were behavior/API references, not vendored implementations; the independent trackers use their own bounded correlation and output protocol. RuneLite's retained BSD terms are above.
