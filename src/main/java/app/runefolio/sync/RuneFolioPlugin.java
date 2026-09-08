@@ -43,6 +43,7 @@ import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.ScriptID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarClientID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
@@ -168,6 +169,9 @@ public class RuneFolioPlugin extends Plugin
     private boolean interfaceScreenshotPending;
     private long nextManifestRefreshMillis;
     private final RuneFolioPetTracker petTracker = new RuneFolioPetTracker();
+    private final RuneFolioBossRecordTracker bossRecordTracker = new RuneFolioBossRecordTracker();
+    private final RuneFolioClueRecordTracker clueRecordTracker = new RuneFolioClueRecordTracker();
+    private final RuneFolioSlayerRecordTracker slayerRecordTracker = new RuneFolioSlayerRecordTracker();
     private final Set<String> knownPetNames = new HashSet<>();
 
     @Provides
@@ -341,6 +345,9 @@ public class RuneFolioPlugin extends Plugin
         }
         else if (event.getGameState() == GameState.HOPPING)
         {
+            bossRecordTracker.reset();
+            clueRecordTracker.reset();
+            slayerRecordTracker.reset();
             worldHopInProgress = true;
         }
         else if (event.getGameState() == GameState.LOGIN_SCREEN)
@@ -1350,6 +1357,7 @@ public class RuneFolioPlugin extends Plugin
         }
 
         activeIdentityKey = observedIdentity;
+        captureCompletionRecords();
         capturePendingInterfaceScreenshot();
         String petCaption = petTracker.pollCaption(client.getTickCount());
         if (petCaption != null && config.screenshotPets()) requestScreenshot("pet", petCaption);
@@ -1409,7 +1417,7 @@ public class RuneFolioPlugin extends Plugin
     @Subscribe
     public void onLootReceived(LootReceived event)
     {
-        if (!config.syncLootDrops() || !canCollectCurrentWorld()
+        if ((!config.syncLootDrops() && !config.syncCompletionHistory()) || !canCollectCurrentWorld()
             || event.getItems() == null || event.getItems().isEmpty())
         {
             return;
@@ -1466,6 +1474,19 @@ public class RuneFolioPlugin extends Plugin
         String sourceType = event.getType() == null
             ? "unknown"
             : event.getType().name().toLowerCase(Locale.ROOT);
+        if (config.syncCompletionHistory() && sourceName != null)
+        {
+            String lower = sourceName.toLowerCase(Locale.ROOT);
+            for (String tier : new String[] {"beginner", "easy", "medium", "hard", "elite", "master"})
+            {
+                if (lower.equals("clue scroll (" + tier + ")"))
+                {
+                    JsonObject record = clueRecordTracker.rewards(items, client.getTickCount(), tier);
+                    if (record != null) enqueueLiveEvent(RuneFolioSyncEvent.historyEvent("clue.completion", playerName, record));
+                }
+            }
+        }
+        if (!config.syncLootDrops()) return;
         enqueueLiveEvent(RuneFolioSyncEvent.lootDrop(
             playerName,
             sourceName == null || sourceName.isBlank() ? "Unknown loot source" : sourceName,
@@ -1487,6 +1508,49 @@ public class RuneFolioPlugin extends Plugin
         {
             requestScreenshot("untradeable_drop", firstUntradeableItem + " from " + safeSourceName);
         }
+    }
+
+    private void captureCompletionRecords()
+    {
+        if (!config.syncCompletionHistory())
+        {
+            bossRecordTracker.reset(); clueRecordTracker.reset(); slayerRecordTracker.reset();
+            return;
+        }
+        String name = currentPlayerName();
+        if (name == null) return;
+        int tick = client.getTickCount();
+        JsonObject boss = bossRecordTracker.poll(tick);
+        if (boss != null)
+        {
+            String source = boss.get("sourceName").getAsString();
+            if (source.startsWith("Tombs of Amascut"))
+            {
+                int level = client.getVarbitValue(VarbitID.TOA_CLIENT_RAID_LEVEL);
+                if (level >= 0 && level <= 1000) boss.addProperty("raidLevel", level);
+                addObservedPartySize(boss, new int[] {VarbitID.TOA_CLIENT_P0, VarbitID.TOA_CLIENT_P1, VarbitID.TOA_CLIENT_P2, VarbitID.TOA_CLIENT_P3, VarbitID.TOA_CLIENT_P4, VarbitID.TOA_CLIENT_P5, VarbitID.TOA_CLIENT_P6, VarbitID.TOA_CLIENT_P7});
+            }
+            if (source.startsWith("Theatre of Blood")) addObservedPartySize(boss, new int[] {VarbitID.TOB_CLIENT_P0, VarbitID.TOB_CLIENT_P1, VarbitID.TOB_CLIENT_P2, VarbitID.TOB_CLIENT_P3, VarbitID.TOB_CLIENT_P4});
+            if (source.startsWith("Chambers of Xeric") && client.getVarbitValue(VarbitID.RAIDS_CLIENT_INDUNGEON) == 1)
+            {
+                int total = client.getVarbitValue(VarbitID.RAIDS_CLIENT_PARTYSCORE);
+                int personal = client.getVarpValue(VarPlayerID.RAIDS_PLAYERSCORE);
+                if (total > 0 && personal >= 0 && personal <= total)
+                { boss.addProperty("totalPoints", total); boss.addProperty("personalPoints", personal); }
+            }
+            enqueueLiveEvent(RuneFolioSyncEvent.historyEvent("boss.completion", name, boss));
+        }
+        JsonObject clue = clueRecordTracker.poll(tick);
+        if (clue != null) enqueueLiveEvent(RuneFolioSyncEvent.historyEvent("clue.completion", name, clue));
+        JsonObject slayer = slayerRecordTracker.poll(tick);
+        if (slayer != null) enqueueLiveEvent(RuneFolioSyncEvent.historyEvent("slayer.completion", name, slayer));
+    }
+
+    private void addObservedPartySize(JsonObject record, int[] slots)
+    {
+        int present = 0;
+        for (int slot : slots) if (client.getVarbitValue(slot) > 0) present++;
+        if (present > 0) record.addProperty("partySize", present);
     }
 
     private static long safeLootValue(int quantity, int unitValue)
@@ -1521,6 +1585,13 @@ public class RuneFolioPlugin extends Plugin
 
         String rawMessage = event.getMessage();
         String plainMessage = Text.removeTags(rawMessage);
+        if (config.syncCompletionHistory())
+        {
+            int tick = client.getTickCount();
+            bossRecordTracker.message(plainMessage, tick, RuneFolioBossRecordTracker.SOURCES);
+            clueRecordTracker.message(plainMessage, tick);
+            slayerRecordTracker.message(plainMessage, tick);
+        }
         if (config.uploadScreenshots() && config.screenshotPets())
         {
             petTracker.message(plainMessage, client.getTickCount(), petNames());
@@ -2248,6 +2319,9 @@ public class RuneFolioPlugin extends Plugin
 
     void resetTransientCharacterState()
     {
+        bossRecordTracker.reset();
+        clueRecordTracker.reset();
+        slayerRecordTracker.reset();
         petTracker.reset();
         characterSession.incrementAndGet();
         collectionButtonSyncRequested = false;

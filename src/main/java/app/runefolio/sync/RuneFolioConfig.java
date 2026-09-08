@@ -9,6 +9,10 @@ import net.runelite.client.config.Range;
 @ConfigGroup("runefolio")
 public interface RuneFolioConfig extends Config
 {
+    @ConfigItem(keyName = "syncCompletionHistory", name = "Sync completion history",
+        description = "Send observed boss/raid, clue and Slayer completions and available result details to RuneFolio. Clue rewards use the enabled native Loot Tracker.", position = 5)
+    default boolean syncCompletionHistory() { return true; }
+
     @ConfigItem(keyName = "syncBankWealth", name = "Sync bank and wealth",
         description = "Opt-in: send bank, inventory and equipment items and estimated values while your bank is open. Pending snapshots are saved locally for retries.", position = 4)
     default boolean syncBankWealth() { return false; }

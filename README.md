@@ -77,3 +77,9 @@ Original RuneFolio source code is licensed under [BSD-2-Clause](LICENSE). Reuse 
 Individual diary tasks use game completion flags for all 492 catalog tasks, synchronized on login, task changes and Sync now. No diary window needs to be opened. Area identities are withheld if the flag results disagree with the game's tier counters. Requires the matching website task-index support. Rebuild/restart the plugin before testing; website deployments do not update an installed client.
 
 Quest Helper mapping attribution and RuneProfile collector-reference credit, with full BSD notices, are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and distributed in the JAR. Older clients' text observations remain supported by the website.
+
+## Completion history (0.3.28)
+
+The Sync completion history setting sends observed boss/raid, clue and Slayer completions through the existing durable retry queue. It defaults on and can be disabled independently of loot. Only local game messages and exposed result values are read; no gameplay or interface navigation is automated. Boss records include available duration/personal-best and raid details; unobserved details remain absent. Clue item details require RuneLite Loot Tracker and an observed matching reward event; a completion can be recorded without rewards. Slayer records can contain a task streak without a monster name if the game did not provide one.
+
+Website history is available in Bosses, Clue Scrolls, and Activity & Achievements (Slayer). These records do not add loot or replace Hiscores totals. Existing historical completions are not reconstructed. Disabling collection prevents new captures, but already queued events can still upload. Rebuild and restart to install an updated development plugin.
