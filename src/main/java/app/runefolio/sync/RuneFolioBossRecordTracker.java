@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 final class RuneFolioBossRecordTracker
 {
     private static final Pattern ALT_COUNT = Pattern.compile("^Your completion count for (.+) is: ?([0-9,]+)\\.?$");
+    private static final Pattern PREFIX_COUNT = Pattern.compile("^Your (?:completed|subdued) (.+) count is: ?([0-9,]+)\\.?$");
     private static final Pattern COUNT = Pattern.compile("^Your (.+) (?:kill|chest|completion) count is: ?([0-9,]+)\\.?$");
     private static final Pattern TIME = Pattern.compile("(?:Fight duration|Challenge time|Challenge duration|Corrupted challenge duration|Duration|Completion time): ([0-9]{1,2}:[0-9]{2}(?::[0-9]{2})?(?:\\.[0-9]{1,3})?)");
     static final Set<String> SOURCES = Set.of("Abyssal Sire","Alchemical Hydra","Amoxliatl","Araxxor","Artio","Barrows Chests","Brutus","Bryophyta","Callisto","Calvar'ion","Cerberus","Chambers of Xeric","Chambers of Xeric: Challenge Mode","Chaos Elemental","Chaos Fanatic","Commander Zilyana","Corporeal Beast","Crazy Archaeologist","Dagannoth Prime","Dagannoth Rex","Dagannoth Supreme","Deranged Archaeologist","Doom of Mokhaiotl","Duke Sucellus","General Graardor","Giant Mole","Grotesque Guardians","Hespori","Kalphite Queen","King Black Dragon","Kraken","Kree'Arra","K'ril Tsutsaroth","Lunar Chests","Mad Angel","Maggot King","Mimic","Nex","Nightmare","Phosani's Nightmare","Obor","Phantom Muspah","Sarachnis","Scorpia","Scurrius","Shellbane Gryphon","Skotizo","Sol Heredit","Spindel","Tempoross","The Gauntlet","The Corrupted Gauntlet","The Hueycoatl","The Leviathan","The Royal Titans","The Whisperer","Theatre of Blood","Theatre of Blood: Hard Mode","Thermonuclear Smoke Devil","Tombs of Amascut","Tombs of Amascut: Expert Mode","TzKal-Zuk","TzTok-Jad","Vardorvis","Venenatis","Vet'ion","Vorkath","Wintertodt","Yama","Zalcano","Zulrah","Barrows","Gauntlet","Corrupted Gauntlet","Tombs of Amascut: Entry Mode","Theatre of Blood: Entry Mode");
@@ -28,6 +29,7 @@ final class RuneFolioBossRecordTracker
         Matcher count = COUNT.matcher(message);
         boolean counted = count.matches();
         if (!counted) { count = ALT_COUNT.matcher(message); counted = count.matches(); }
+        if (!counted) { count = PREFIX_COUNT.matcher(message); counted = count.matches(); }
         String source = counted ? canonicalSource(count.group(1), knownSources) : null;
         if (source != null)
         {
@@ -84,6 +86,7 @@ final class RuneFolioBossRecordTracker
 
     private static String canonicalSource(String name, Set<String> sources)
     {
+        if (name.equalsIgnoreCase("Barrows chest")) name = "Barrows Chests";
         for (String source : sources) if (source.equalsIgnoreCase(name.trim())) return source;
         return null;
     }

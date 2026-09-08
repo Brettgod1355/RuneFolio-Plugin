@@ -38,4 +38,3 @@ final class RuneFolioBrand
         return image;
     }
 }
-

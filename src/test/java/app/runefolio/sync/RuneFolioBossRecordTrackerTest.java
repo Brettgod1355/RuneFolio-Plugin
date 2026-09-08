@@ -43,4 +43,12 @@ public class RuneFolioBossRecordTrackerTest
         tracker.message("Your Vorkath kill count is: 2.", 20, RuneFolioBossRecordTracker.SOURCES);
         Assert.assertFalse(tracker.poll(22).has("durationMillis"));
     }
+    @Test public void supportsCompletedPrefixAndBarrowsChest()
+    {
+        RuneFolioBossRecordTracker tracker = new RuneFolioBossRecordTracker();
+        tracker.message("Your completed Theatre of Blood count is: 10.", 10, RuneFolioBossRecordTracker.SOURCES);
+        Assert.assertEquals("Theatre of Blood", tracker.poll(12).get("sourceName").getAsString());
+        tracker.message("Your Barrows chest count is: 20.", 20, RuneFolioBossRecordTracker.SOURCES);
+        Assert.assertEquals("Barrows", tracker.poll(22).get("sourceName").getAsString());
+    }
 }
