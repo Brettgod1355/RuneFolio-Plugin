@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
+import java.util.function.BooleanSupplier;
 import javax.inject.Singleton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -22,6 +23,8 @@ import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -69,10 +72,17 @@ class RuneFolioPanel extends PluginPanel
     private boolean accountExpanded = true;
     private boolean temporaryExpanded;
     private boolean temporaryConnecting;
+    private final BooleanSupplier confirmConnection;
 
     RuneFolioPanel()
     {
+        this(null);
+    }
+
+    RuneFolioPanel(BooleanSupplier confirmation)
+    {
         super(false);
+        confirmConnection = confirmation == null ? this::showConnectionDisclosure : confirmation;
         setLayout(new BorderLayout());
         setBackground(ColorScheme.DARK_GRAY_COLOR);
 
@@ -123,7 +133,7 @@ class RuneFolioPanel extends PluginPanel
         accountConnectButton.setAlignmentX(LEFT_ALIGNMENT);
         accountConnectButton.addActionListener(event ->
         {
-            if (accountConnectAction != null)
+            if (accountConnectAction != null && confirmConnection.getAsBoolean())
             {
                 accountConnectAction.run();
             }
@@ -191,6 +201,11 @@ class RuneFolioPanel extends PluginPanel
         openRuneFolio.setAlignmentX(LEFT_ALIGNMENT);
         openRuneFolio.addActionListener(event -> openBrowser(RUNE_FOLIO_URL));
         content.add(openRuneFolio);
+        JButton sharingInfo = new JButton("Data sharing information");
+        sharingInfo.setAlignmentX(LEFT_ALIGNMENT);
+        sharingInfo.addActionListener(event -> JOptionPane.showMessageDialog(this, disclosureText(),
+            "RuneFolio data sharing", JOptionPane.INFORMATION_MESSAGE));
+        content.add(sharingInfo);
         content.add(Box.createRigidArea(new Dimension(0, 16)));
 
         content.add(createSectionHeader(
@@ -486,10 +501,27 @@ class RuneFolioPanel extends PluginPanel
             setStatus("Paste a temporary code from RuneFolio settings first.");
             return;
         }
-        if (temporaryConnectAction != null)
+        if (temporaryConnectAction != null && confirmConnection.getAsBoolean())
         {
             temporaryConnectAction.accept(code);
         }
+    }
+
+    private JScrollPane disclosureText()
+    {
+        JTextArea text = new JTextArea(RuneFolioDataSharing.CONNECTION, 20, 42);
+        text.setEditable(false);
+        text.setLineWrap(true);
+        text.setWrapStyleWord(true);
+        text.setCaretPosition(0);
+        return new JScrollPane(text);
+    }
+
+    private boolean showConnectionDisclosure()
+    {
+        return JOptionPane.showOptionDialog(this, disclosureText(), "Connect to RuneFolio",
+            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
+            new String[]{"Continue", "Cancel"}, "Cancel") == JOptionPane.YES_OPTION;
     }
 
     private void configureWrappedText(JTextArea textArea, Color color, int maximumHeight)

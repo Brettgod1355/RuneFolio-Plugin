@@ -10,10 +10,12 @@ import net.runelite.client.config.Range;
 public interface RuneFolioConfig extends Config
 {
     @ConfigItem(keyName = "syncCompletionHistory", name = "Sync completion history",
+        warning = RuneFolioDataSharing.COMPLETIONS,
         description = "Send observed boss/raid, clue and Slayer completions and available result details to RuneFolio. Clue rewards use the enabled native Loot Tracker.", position = 5)
     default boolean syncCompletionHistory() { return true; }
 
     @ConfigItem(keyName = "syncBankWealth", name = "Sync bank and wealth",
+        warning = RuneFolioDataSharing.BANK,
         description = "Opt-in: send bank, inventory and equipment items and estimated values while your bank is open. Pending snapshots are saved locally for retries.", position = 4)
     default boolean syncBankWealth() { return false; }
 
@@ -49,6 +51,7 @@ public interface RuneFolioConfig extends Config
 
     @ConfigItem(
         keyName = "syncLootDrops",
+        warning = RuneFolioDataSharing.LOOT,
         name = "Sync loot drops",
         description = "Automatically send loot recorded by RuneLite's enabled Loot Tracker to your RuneFolio history",
         position = 2
@@ -71,8 +74,9 @@ public interface RuneFolioConfig extends Config
 
     @ConfigItem(
         keyName = "uploadScreenshots",
+        warning = RuneFolioDataSharing.SCREENSHOTS,
         name = "Upload screenshots",
-        description = "Allow RuneFolio to capture enabled moments and upload compressed images to your private RuneFolio account. Disabled by default.",
+        description = "Upload selected screenshots to the connected RuneFolio account, subject to its sharing settings. Images may contain visible personal information. Disabled by default.",
         position = 0,
         section = screenshotsSection
     )

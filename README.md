@@ -1,5 +1,15 @@
 # RuneFolio Sync
 
+## Data sharing (0.3.29)
+
+Before account login or temporary-code connection, the side panel explains the receiving service, data categories, optional uploads, local retries and receiving-account sharing controls. Cancel stops that connection action. **Data sharing information** reopens the disclosure at any time. Existing authorized connections and saved settings are retained; this update does not silently clear data or reset preferences.
+
+RuneLite's native settings confirmation appears when changing loot, completion-history, bank/wealth or screenshot sharing. Bank/wealth and screenshots remain off by default. Turning a collector off prevents new capture, but does not erase previously queued uploads or website history. Disconnect/revoke connections to stop authorized uploads. Screenshots can contain personal information visible in other interfaces even with chat hiding enabled. Temporary codes send data to the RuneFolio account that issued the code.
+
+Plugin Hub submission disclosure to include with the listing: “This plugin communicates with runefolio.app to upload linked character identity and progress, enabled loot/completion results, and optional bank/inventory/equipment snapshots and screenshots. The receiving RuneFolio account controls sharing. Pending events are saved locally for retries.” The installation warning is configured in the Plugin Hub submission; this repository is not itself a published or approved Plugin Hub listing.
+
+The confirmations use RuneLite's `ConfigItem.warning` API and original Swing UI code. No upstream implementation is copied. API reference: https://github.com/runelite/runelite/blob/master/runelite-client/src/main/java/net/runelite/client/config/ConfigItem.java .
+
 Optional bank/wealth capture (0.3.24): disabled by default. When enabled, opening the ordinary bank sends bank, inventory and equipment item IDs, names, quantities and estimated GE/high-alchemy values to RuneFolio. It does not inspect unopened storage. The server keeps the latest item list and compact daily wealth estimates. Values are estimates, not a complete account valuation.
 
 Pending events are persisted through RuneLite configuration for retries, with a 1,000-event / 4 MiB serialized-event budget for new queue writes and bounded upload batches. A newer bank observation can replace a pending observation for the same character and UTC day; different days are retained. Successful acknowledgements remove queued events. Turning capture off prevents new captures; it does not delete already queued events or server history. Legacy diary caches (no longer read for task detection) and RuneFolio connection/name bindings also use RuneLite configuration. Connection tokens are sensitive: do not share configuration files. Screenshots currently retry in memory, not in the persistent event queue.
