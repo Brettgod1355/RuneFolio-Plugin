@@ -17,6 +17,7 @@ export GIT_CONFIG_KEY_1="protocol.file.allow"
 export GIT_CONFIG_VALUE_1=always
 export GIT_TERMINAL_PROMPT=0
 unset REPO_CREDS REPO_ROOT SIGNING_KEY PACKAGE_COMMIT_RANGE API_FILES_VERSION
+export PACKAGE_IS_PR=true
 export FORCE_BUILD=runefolio
 mkdir -p plugin-hub/plugins
 printf 'repository=%s\ncommit=%s\nwarning=%s\n' "$repository_url" "$source_commit" \
