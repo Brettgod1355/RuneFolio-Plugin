@@ -30,10 +30,6 @@ dependencies {
 group = "app.runefolio"
 version = "0.3.29"
 
-tasks.named("jar") {
-    from(["LICENSE", "COPYRIGHT.md", "THIRD_PARTY_NOTICES.md"]) { into "META-INF" }
-}
-
 tasks.register("verifyDistributionNotices") {
     dependsOn tasks.named("jar")
     doLast {

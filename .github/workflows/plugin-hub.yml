@@ -1,0 +1,39 @@
+name: Plugin Hub preflight
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  plugin-hub:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: plugin-source
+          persist-credentials: false
+      - uses: actions/checkout@v6
+        with:
+          repository: runelite/plugin-hub
+          ref: master
+          path: hub-check/plugin-hub
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "11"
+      - name: Download verified RuneLite packager v3
+        working-directory: hub-check
+        run: |
+          curl --fail --location --retry 4 --max-time 120 --output bundle.tar.zst https://github.com/runelite/plugin-hub-tooling/releases/download/v3/bundle.tar.zst
+          echo "eb0961b7cd0a1e4a351fb0f684731be1a9049167bfb49a2d91a760fea2933fd2  bundle.tar.zst" | sha256sum --check
+          tar xf bundle.tar.zst
+      - name: Run official packager against this checkout
+        working-directory: hub-check
+        run: bash ../plugin-source/scripts/plugin-hub-preflight.sh ../plugin-source
