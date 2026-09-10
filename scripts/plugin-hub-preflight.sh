@@ -23,6 +23,10 @@ mkdir -p plugin-hub/plugins
 printf 'repository=%s\ncommit=%s\nwarning=%s\n' "$repository_url" "$source_commit" \
   'Communicates with runefolio.app to upload linked character progress and enabled optional data.' \
   > plugin-hub/plugins/runefolio
+# The packager reads descriptor commit dates from local Hub history.
+git -C plugin-hub add plugins/runefolio
+git -C plugin-hub -c user.name="RuneFolio CI" -c user.email="ci@runefolio.invalid" \
+  commit --quiet -m "Local preflight descriptor" -- plugins/runefolio
 printf 'Plugin commit: %s\nRuneLite version: ' "$source_commit"
 cat plugin-hub/runelite.version
 printf 'Plugin Hub revision: '
