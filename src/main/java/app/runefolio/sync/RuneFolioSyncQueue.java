@@ -2,7 +2,9 @@ package app.runefolio.sync;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -29,7 +31,24 @@ final class RuneFolioSyncQueue
     }
 
     private final Storage storage;
-    private final Map<String, RuneFolioSyncEvent> events = new LinkedHashMap<>();
+    // Entries own their event and encoded JSON. Neither callers nor upload snapshots
+    // may mutate the cached representation after its byte budget has been checked.
+    private final Map<String, Entry> events = new LinkedHashMap<>();
+
+    private static final class Entry
+    {
+        private final RuneFolioSyncEvent event;
+        private final String json;
+        private final int bytes;
+
+        private Entry(RuneFolioSyncEvent source)
+        {
+            JsonObject value = source.toJson();
+            event = RuneFolioSyncEvent.fromJson(value);
+            json = value.toString();
+            bytes = json.getBytes(StandardCharsets.UTF_8).length + 1;
+        }
+    }
 
     RuneFolioSyncQueue(ConfigManager configManager)
     {
@@ -57,34 +76,42 @@ final class RuneFolioSyncQueue
 
     synchronized boolean enqueue(RuneFolioSyncEvent event)
     {
-        Map<String, RuneFolioSyncEvent> candidate = new LinkedHashMap<>(events);
-        candidate.values().removeIf(event::supersedes);
-        candidate.put(event.getId(), event);
-        if (candidate.size() > MAX_EVENTS || byteSize(event) > MAX_BATCH_BYTES / 2
-            || candidate.values().stream().mapToLong(RuneFolioSyncQueue::byteSize).sum() > MAX_QUEUE_BYTES)
+        Entry entry = new Entry(event);
+        if (entry.bytes > MAX_BATCH_BYTES / 2)
+        {
+            log.warn("RuneFolio sync event exceeds the upload byte limit");
+            return false;
+        }
+        Map<String, Entry> candidate = new LinkedHashMap<>(events);
+        candidate.values().removeIf(existing -> entry.event.supersedes(existing.event));
+        candidate.put(entry.event.getId(), entry);
+        if (candidate.size() > MAX_EVENTS
+            || candidate.values().stream().mapToLong(existing -> existing.bytes).sum() > MAX_QUEUE_BYTES)
         {
             log.warn("RuneFolio sync queue is full; refusing to discard an existing event");
-            persist();
             return false;
         }
 
+        // Preserve synchronous durability, without re-encoding the existing backlog.
+        // A failed storage write must not publish a replacement only in memory.
+        persist(candidate);
         events.clear();
         events.putAll(candidate);
-        persist();
         return true;
     }
 
     synchronized List<RuneFolioSyncEvent> snapshot(int limit, Predicate<RuneFolioSyncEvent> filter)
     {
         List<RuneFolioSyncEvent> result = new ArrayList<>();
+        if (limit <= 0) return result;
         long bytes = 0;
-        for (RuneFolioSyncEvent event : events.values())
+        for (Entry entry : events.values())
         {
-            if (filter.test(event))
+            if (filter.test(entry.event))
             {
-                int size = byteSize(event);
+                int size = entry.bytes;
                 if (bytes + size > MAX_BATCH_BYTES) break;
-                result.add(event);
+                result.add(RuneFolioSyncEvent.fromJson(entry.event.toJson()));
                 bytes += size;
                 if (result.size() >= limit)
                 {
@@ -101,8 +128,13 @@ final class RuneFolioSyncQueue
         {
             return;
         }
-        eventIds.forEach(events::remove);
-        persist();
+        Map<String, Entry> candidate = new LinkedHashMap<>(events);
+        boolean changed = false;
+        for (String id : eventIds) changed |= candidate.remove(id) != null;
+        if (!changed) return;
+        persist(candidate);
+        events.clear();
+        events.putAll(candidate);
     }
 
     synchronized int size()
@@ -126,7 +158,7 @@ final class RuneFolioSyncQueue
                 try
                 {
                     RuneFolioSyncEvent event = RuneFolioSyncEvent.fromJson(element.getAsJsonObject());
-                    events.put(event.getId(), event);
+                    events.put(event.getId(), new Entry(event));
                 }
                 catch (RuntimeException exception)
                 {
@@ -138,18 +170,19 @@ final class RuneFolioSyncQueue
         {
             log.warn("Unable to read the saved RuneFolio sync queue", exception);
         }
-        persist();
+        persist(events);
     }
 
-    private void persist()
+    private void persist(Map<String, Entry> entries)
     {
-        JsonArray array = new JsonArray();
-        events.values().forEach(event -> array.add(event.toJson()));
-        storage.set(array.toString());
-    }
-
-    private static int byteSize(RuneFolioSyncEvent event)
-    {
-        return event.toJson().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length + 1;
+        StringBuilder json = new StringBuilder();
+        json.append('[');
+        for (Entry entry : entries.values())
+        {
+            if (json.length() > 1) json.append(',');
+            json.append(entry.json);
+        }
+        json.append(']');
+        storage.set(json.toString());
     }
 }
