@@ -1,0 +1,30 @@
+name: Offline component benchmarks
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'build.gradle'
+      - '.github/workflows/component-benchmarks.yml'
+      - 'src/test/java/app/runefolio/sync/RuneFolioPerformanceBenchmark.java'
+      - 'src/main/java/app/runefolio/sync/RuneFolioSyncQueue.java'
+      - 'src/main/java/app/runefolio/sync/RuneFolioSyncEvent.java'
+      - 'src/main/java/app/runefolio/sync/RuneFolioScreenshotEncoder.java'
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - run: gradle performanceBenchmark

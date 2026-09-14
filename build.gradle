@@ -62,3 +62,11 @@ tasks.register("queueBenchmark", JavaExec) {
     mainClass = "app.runefolio.sync.RuneFolioQueueBenchmark"
     maxHeapSize = "512m"
 }
+
+tasks.register("performanceBenchmark", JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = "app.runefolio.sync.RuneFolioPerformanceBenchmark"
+    maxHeapSize = "512m"
+    systemProperty "java.awt.headless", "true"
+}
