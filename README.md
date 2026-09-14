@@ -1,5 +1,15 @@
 # RuneFolio Sync
 
+## Reward screenshots and PvP history (0.3.33)
+
+Four additional screenshot switches capture clue rewards, supported raid/chest rewards, your observed PvP finishing blows, and Wilderness loot-key windows. They default off and require the screenshot master switch. RuneLite's native Screenshot plugin can stay disabled. The enabled native Loot Tracker supplies reward and ground-loot events; it is required for clue/raid/chest/loot-key captures. A clue screenshot links to its specific completion when completion history is also enabled. A linked image may appear after the result because screenshot uploads are paced separately; missing or trashed images have no active link.
+
+**Sync PvP history** is a separate opt-in, off by default. It sends observed finishing blows, opponent names, capture dates and available loot items/quantities/GE estimates to the connected account. It does not collect opponent equipment or locations or provide combat assistance. The website shows individual results, overall counts/value and chronological running totals. Finishing-blow observations are not authoritative game kill credit. Multi-combat, unobserved damage and interrupted sessions may leave gaps; no historical kills are reconstructed.
+
+Loot-key rewards are separate, unassigned observations, never additional kills or guessed opponent links. A multi-key window produces one image shared by that window's records; its visible tab may differ from an individual record. Native Loot Tracker suppresses ordinary repeated views in a session, but reopening retained keys after restarting the client can be reported again; key observations are not guaranteed unique lifetime keys. Values are observed GE estimates, not net profit or verified banked loot. This ledger does not add a second transaction to general loot totals. The existing screenshot compression, disk limits, retry pacing and acknowledgement-only cleanup remain unchanged.
+
+The website/backend must support these categories and the PvP result contract before this build is installed. New screenshots and PvP history retain the existing consent, connection and world restrictions; new public PvP sharing defaults off. Existing authorized queue entries may upload after a collector is disabled.
+
 ## Data sharing (0.3.29)
 
 Before account login or temporary-code connection, the side panel explains the receiving service, data categories, optional uploads, local retries and receiving-account sharing controls. Cancel stops that connection action. **Data sharing information** reopens the disclosure at any time. Existing authorized connections and saved settings are retained; this update does not silently clear data or reset preferences.

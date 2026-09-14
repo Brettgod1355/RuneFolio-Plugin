@@ -178,6 +178,11 @@ public class RuneFolioPlugin extends Plugin
     private final RuneFolioPetTracker petTracker = new RuneFolioPetTracker();
     private final RuneFolioBossRecordTracker bossRecordTracker = new RuneFolioBossRecordTracker();
     private final RuneFolioClueRecordTracker clueRecordTracker = new RuneFolioClueRecordTracker();
+    private final RuneFolioPvpTracker pvpTracker = new RuneFolioPvpTracker();
+    private final java.util.Map<net.runelite.api.Player, Integer> pvpHits = new java.util.IdentityHashMap<>();
+    private final java.util.Map<net.runelite.api.Player, Integer> pvpDeaths = new java.util.IdentityHashMap<>();
+    private int lootKeyScreenshotTick = -100;
+    private UUID lootKeyScreenshotId;
     private final RuneFolioSlayerRecordTracker slayerRecordTracker = new RuneFolioSlayerRecordTracker();
     private final Set<String> knownPetNames = new HashSet<>();
 
@@ -266,6 +271,7 @@ public class RuneFolioPlugin extends Plugin
     @Override
     protected void shutDown()
     {
+        finishPvpResults();
         collectionLogButton.shutDown();
         collectionButtonSyncRequested = false;
         collectionButtonItems.clear();
@@ -313,6 +319,8 @@ public class RuneFolioPlugin extends Plugin
     @Subscribe
     public void onConfigChanged(ConfigChanged event)
     {
+        if (CONFIG_GROUP.equals(event.getGroup()) && "syncPvpHistory".equals(event.getKey()))
+            clientThread.invokeLater(() -> { pvpTracker.reset(); pvpHits.clear(); pvpDeaths.clear(); });
         if (CONFIG_GROUP.equals(event.getGroup()) && "hideSidePanel".equals(event.getKey()))
         {
             refreshNavigationButton();
@@ -358,6 +366,9 @@ public class RuneFolioPlugin extends Plugin
         }
         else if (event.getGameState() == GameState.HOPPING)
         {
+            finishPvpResults();
+            pvpTracker.reset(); pvpHits.clear(); pvpDeaths.clear();
+            lootKeyScreenshotTick = -100; lootKeyScreenshotId = null;
             bossRecordTracker.reset();
             clueRecordTracker.reset();
             slayerRecordTracker.reset();
@@ -1371,6 +1382,7 @@ public class RuneFolioPlugin extends Plugin
 
         activeIdentityKey = observedIdentity;
         captureCompletionRecords();
+        capturePvpResults();
         capturePendingInterfaceScreenshot();
         String petCaption = petTracker.pollCaption(client.getTickCount());
         if (petCaption != null && config.screenshotPets()) requestScreenshot("pet", petCaption);
@@ -1430,7 +1442,7 @@ public class RuneFolioPlugin extends Plugin
     @Subscribe
     public void onLootReceived(LootReceived event)
     {
-        if ((!config.syncLootDrops() && !config.syncCompletionHistory()) || !canCollectCurrentWorld()
+        if ((!config.syncLootDrops() && !config.syncCompletionHistory() && !config.syncPvpHistory() && !config.uploadScreenshots()) || !canCollectCurrentWorld()
             || event.getItems() == null || event.getItems().isEmpty())
         {
             return;
@@ -1487,6 +1499,31 @@ public class RuneFolioPlugin extends Plugin
         String sourceType = event.getType() == null
             ? "unknown"
             : event.getType().name().toLowerCase(Locale.ROOT);
+        if (config.syncPvpHistory() && "player".equals(sourceType)) pvpTracker.loot(sourceName, client.getTickCount(), items);
+        String rewardCategory = RuneFolioRewardScreenshots.category(sourceName, sourceType);
+        UUID rewardScreenshot = null;
+        boolean rewardEnabled = ("clue_reward".equals(rewardCategory) && config.screenshotClueRewards())
+            || ("raid_chest_reward".equals(rewardCategory) && config.screenshotRaidChestRewards())
+            || ("loot_key".equals(rewardCategory) && config.screenshotLootKeys());
+        if (config.uploadScreenshots() && rewardEnabled)
+        {
+            // Native loot-key events include every nonempty tab. Capture the visible window once.
+            if ("loot_key".equals(rewardCategory) && lootKeyScreenshotTick == client.getTickCount()) rewardScreenshot = lootKeyScreenshotId;
+            else
+            {
+                rewardScreenshot = UUID.randomUUID();
+                requestScreenshot(rewardCategory, sourceName + " rewards", rewardScreenshot);
+                if ("loot_key".equals(rewardCategory)) { lootKeyScreenshotTick = client.getTickCount(); lootKeyScreenshotId = rewardScreenshot; }
+            }
+        }
+        if (config.syncPvpHistory() && "loot_key".equals(rewardCategory))
+        {
+            JsonObject result = new JsonObject();
+            result.addProperty("kind", "loot_key"); result.addProperty("evidence", "loot_chest"); result.add("items", items.deepCopy());
+            // This links the opening window, not a claim that its visible tab depicts this key.
+            if (rewardScreenshot != null) result.addProperty("screenshotId", rewardScreenshot.toString());
+            enqueueLiveEvent(RuneFolioSyncEvent.historyEvent("pvp.result", playerName, result));
+        }
         if (config.syncCompletionHistory() && sourceName != null)
         {
             String lower = sourceName.toLowerCase(Locale.ROOT);
@@ -1495,7 +1532,10 @@ public class RuneFolioPlugin extends Plugin
                 if (lower.equals("clue scroll (" + tier + ")"))
                 {
                     JsonObject record = clueRecordTracker.rewards(items, client.getTickCount(), tier);
-                    if (record != null) enqueueLiveEvent(RuneFolioSyncEvent.historyEvent("clue.completion", playerName, record));
+                    if (record != null) {
+                        if (rewardScreenshot != null) record.addProperty("screenshotId", rewardScreenshot.toString());
+                        enqueueLiveEvent(RuneFolioSyncEvent.historyEvent("clue.completion", playerName, record));
+                    }
                 }
             }
         }
@@ -1512,6 +1552,7 @@ public class RuneFolioPlugin extends Plugin
         ));
 
         String safeSourceName = sourceName == null || sourceName.isBlank() ? "Unknown loot source" : sourceName;
+        if (rewardEnabled) return;
         if (config.uploadScreenshots() && config.screenshotValuableDrops()
             && totalGeValue >= Math.max(0, config.screenshotValuableDropThreshold()))
         {
@@ -1522,6 +1563,63 @@ public class RuneFolioPlugin extends Plugin
             requestScreenshot("untradeable_drop", firstUntradeableItem + " from " + safeSourceName);
         }
     }
+
+    @Subscribe
+    public void onHitsplatApplied(net.runelite.api.events.HitsplatApplied event)
+    {
+        if (!canCapturePvp() || (!config.syncPvpHistory() && !(config.uploadScreenshots() && config.screenshotPvpKills()))
+            || !event.getHitsplat().isMine() || event.getHitsplat().getAmount() <= 0
+            || !(event.getActor() instanceof net.runelite.api.Player) || event.getActor() == client.getLocalPlayer()) return;
+        net.runelite.api.Player target = (net.runelite.api.Player) event.getActor();
+        if (pvpHits.size() < 32 && !pvpDeaths.containsKey(target)) pvpHits.put(target, client.getTickCount());
+    }
+
+    private void capturePvpResults()
+    {
+        if (!config.syncPvpHistory() && !(config.uploadScreenshots() && config.screenshotPvpKills()))
+        { pvpTracker.reset(); pvpHits.clear(); pvpDeaths.clear(); return; }
+        int tick = client.getTickCount();
+        pvpDeaths.entrySet().removeIf(entry -> tick - entry.getValue() > 10 || tick < entry.getValue());
+        java.util.Iterator<java.util.Map.Entry<net.runelite.api.Player, Integer>> hits = pvpHits.entrySet().iterator();
+        while (hits.hasNext())
+        {
+            java.util.Map.Entry<net.runelite.api.Player, Integer> hit = hits.next();
+            if (tick < hit.getValue() || tick - hit.getValue() > 1) { hits.remove(); continue; }
+            if (!hit.getKey().isDead()) continue;
+            hits.remove(); pvpDeaths.put(hit.getKey(), tick);
+            String name = hit.getKey().getName();
+            RuneFolioPvpTracker.Result result = pvpTracker.death(name == null ? null : Text.toJagexName(name), tick, Instant.now().toString());
+            if (result != null) {
+                result.historyEnabled = config.syncPvpHistory() && canCapturePvp();
+                result.characterName = currentPlayerName(); result.identityKey = activeIdentityKey;
+            }
+            if (result != null && config.uploadScreenshots() && config.screenshotPvpKills())
+            {
+                UUID screenshotId = UUID.randomUUID(); result.payload.addProperty("screenshotId", screenshotId.toString());
+                requestScreenshot("pvp_kill", "PvP finishing blow", screenshotId);
+            }
+        }
+        for (RuneFolioPvpTracker.Result result : pvpTracker.poll(tick))
+            savePvpResult(result);
+    }
+
+    private boolean canCapturePvp()
+    {
+        String token = isAccountMode() ? accountConnectionToken : connectionToken;
+        return canCollectCurrentWorld() && token != null && !token.isBlank()
+            && namesMatch(currentPlayerName(), connectedCharacterName);
+    }
+
+    private void savePvpResult(RuneFolioPvpTracker.Result result)
+    {
+        if (config.syncPvpHistory() && result.historyEnabled && result.characterName != null && syncQueue != null)
+        {
+            if (!syncQueue.enqueue(RuneFolioSyncEvent.pvpResult(result.characterName, result).withIdentityKey(result.identityKey)))
+                log.warn("RuneFolio PvP result could not fit in the local sync queue");
+        }
+    }
+
+    private void finishPvpResults() { for (RuneFolioPvpTracker.Result result : pvpTracker.finish()) savePvpResult(result); }
 
     private void captureCompletionRecords()
     {
@@ -1716,6 +1814,11 @@ public class RuneFolioPlugin extends Plugin
 
     private void requestScreenshot(String category, String caption)
     {
+        requestScreenshot(category, caption, UUID.randomUUID());
+    }
+
+    private void requestScreenshot(String category, String caption, UUID eventId)
+    {
         if (!config.uploadScreenshots() || !canCollectCurrentWorld())
         {
             return;
@@ -1740,7 +1843,6 @@ public class RuneFolioPlugin extends Plugin
             }
             return;
         }
-        UUID eventId = UUID.randomUUID();
         String identityKey = activeIdentityKey;
         long session = characterSession.get();
         String occurredAt = Instant.now().toString();
@@ -2410,6 +2512,8 @@ public class RuneFolioPlugin extends Plugin
 
     void resetTransientCharacterState()
     {
+        finishPvpResults();
+        pvpTracker.reset(); pvpHits.clear(); pvpDeaths.clear(); lootKeyScreenshotTick = -100; lootKeyScreenshotId = null;
         bossRecordTracker.reset();
         clueRecordTracker.reset();
         slayerRecordTracker.reset();

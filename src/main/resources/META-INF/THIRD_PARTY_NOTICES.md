@@ -1,5 +1,40 @@
 # Third-party notices
 
+
+## Reward and PvP capture references (0.3.33)
+
+RuneLite's ScreenshotPlugin, LootTrackerPlugin, PlayerLootReceived, LootManager and public Hitsplat/Actor APIs were inspected for event timing and behavior. Reward classification and the bounded result correlator are implemented in RuneFolioRewardScreenshots.java, RuneFolioPvpTracker.java and RuneFolioPlugin.java. They consume observed results only; no upstream screenshot/loot implementation is bundled. The native Loot Tracker's Loot Chest event contains tab rewards without an opponent identity. Referenced LootTrackerPlugin blob: 9f9c009122946575d437bb4695ef9fa79e4354a5.
+
+Dink's PlayerKillNotifier was inspected as a behavior/API reference for local-player hitsplat ownership and observed death signals, not copied or translated. RuneFolio uses its own bounded correlation and result schema, excludes opponent gear/location capture and does not provide combat assistance. Upstream: https://github.com/pajlads/DinkPlugin/blob/master/src/main/java/dinkplugin/notifiers/PlayerKillNotifier.java (reviewed blob 1c9ef0602376ba13b829a3d9fb4d70754a3a4f4b). This reference is not official approval of RuneFolio. Dink's BSD notice is retained below as attribution:
+
+BSD 2-Clause License
+
+Copyright (c) 2022, Jake Barter
+All rights reserved.
+
+Copyright (c) 2022, pajlads
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 RuneFolio's original source code is licensed under BSD-2-Clause; see LICENSE. This document preserves the separate terms for third-party material. Dependencies and any adapted third-party portions retain their own terms. This is a targeted current-source inventory, not an exhaustive historical provenance audit or dependency bill of materials.
 
 ## RuneLite — APIs and behavior references
