@@ -131,7 +131,8 @@ public class RuneFolioPlugin extends Plugin
 
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
     private final ScheduledExecutorService syncExecutor = Executors.newSingleThreadScheduledExecutor();
-    private final ExecutorService screenshotExecutor = Executors.newSingleThreadExecutor();
+    private final RuneFolioScreenshotQueue screenshotQueue = new RuneFolioScreenshotQueue();
+    private long lastScreenshotQueueWarningMillis;
     private final AtomicBoolean uploadInFlight = new AtomicBoolean();
     private NavigationButton navigationButton;
     private boolean navigationButtonAdded;
@@ -280,7 +281,7 @@ public class RuneFolioPlugin extends Plugin
         }
         navigationButton = null;
         connectionExecutor.shutdownNow();
-        screenshotExecutor.shutdownNow();
+        screenshotQueue.close();
         syncExecutor.shutdown();
         try
         {
@@ -1715,25 +1716,90 @@ public class RuneFolioPlugin extends Plugin
             return;
         }
 
+        // Reserve before requesting a frame, including frame/client-thread callbacks.
+        RuneFolioScreenshotQueue.Reservation reservation = screenshotQueue.tryReserve();
+        if (reservation == null)
+        {
+            long now = System.currentTimeMillis();
+            if (now - lastScreenshotQueueWarningMillis >= TimeUnit.MINUTES.toMillis(1))
+            {
+                lastScreenshotQueueWarningMillis = now;
+                log.warn("RuneFolio screenshot queue is busy or stopped; skipping new screenshot. Progress sync is unaffected.");
+            }
+            return;
+        }
         UUID eventId = UUID.randomUUID();
         String identityKey = activeIdentityKey;
         long session = characterSession.get();
         String occurredAt = Instant.now().toString();
-        boolean chatHidden = hideScreenshotWidget(config.hideChatInScreenshots(), InterfaceID.Chatbox.CHATAREA);
-        boolean privateMessagesHidden = hideScreenshotWidget(config.hideChatInScreenshots(), InterfaceID.PmChat.CONTAINER);
-        drawManager.requestNextFrameListener(frame ->
+        boolean chatHidden = false;
+        boolean privateMessagesHidden = false;
+        Runnable frameCheck = null;
+        try
         {
-            restoreScreenshotWidget(chatHidden, InterfaceID.Chatbox.CHATAREA);
-            restoreScreenshotWidget(privateMessagesHidden, InterfaceID.PmChat.CONTAINER);
-            clientThread.invokeLater(() ->
+            chatHidden = hideScreenshotWidget(config.hideChatInScreenshots(), InterfaceID.Chatbox.CHATAREA);
+            privateMessagesHidden = hideScreenshotWidget(config.hideChatInScreenshots(), InterfaceID.PmChat.CONTAINER);
+            final boolean restoreChat = chatHidden;
+            final boolean restorePrivateMessages = privateMessagesHidden;
+            // DrawManager drops next-frame callbacks if its image supplier fails.
+            // Its every-frame hook runs first; defer checking until the client
+            // thread resumes, after the frame callbacks have had a chance to run.
+            frameCheck = new Runnable()
             {
-                if (session == characterSession.get() && canCollectCurrentWorld()
-                    && namesMatch(playerName, currentPlayerName()))
+                @Override
+                public void run()
                 {
-                    uploadScreenshotAsync(savedToken, playerName, eventId, identityKey, category, caption, occurredAt, frame);
+                    drawManager.unregisterEveryFrameListener(this);
+                    clientThread.invokeLater(() ->
+                    {
+                        if (reservation.cancelIfFrameMissing())
+                        {
+                            restoreScreenshotWidget(restoreChat, InterfaceID.Chatbox.CHATAREA);
+                            restoreScreenshotWidget(restorePrivateMessages, InterfaceID.PmChat.CONTAINER);
+                        }
+                    });
+                }
+            };
+            drawManager.registerEveryFrameListener(frameCheck);
+            drawManager.requestNextFrameListener(frame ->
+            {
+                try
+                {
+                    restoreScreenshotWidget(restoreChat, InterfaceID.Chatbox.CHATAREA);
+                    restoreScreenshotWidget(restorePrivateMessages, InterfaceID.PmChat.CONTAINER);
+                    if (!reservation.markFrameReceived()) return;
+                    clientThread.invokeLater(() ->
+                    {
+                        try
+                        {
+                            if (session == characterSession.get() && canCollectCurrentWorld()
+                                && namesMatch(playerName, currentPlayerName()))
+                            {
+                                uploadScreenshotAsync(reservation, savedToken, playerName, eventId,
+                                    identityKey, category, caption, occurredAt, frame);
+                            }
+                        }
+                        finally
+                        {
+                            reservation.cancel();
+                        }
+                    });
+                }
+                catch (RuntimeException exception)
+                {
+                    reservation.cancel();
+                    log.warn("RuneFolio could not schedule a screenshot");
                 }
             });
-        });
+        }
+        catch (RuntimeException exception)
+        {
+            reservation.cancel();
+            if (frameCheck != null) drawManager.unregisterEveryFrameListener(frameCheck);
+            restoreScreenshotWidget(chatHidden, InterfaceID.Chatbox.CHATAREA);
+            restoreScreenshotWidget(privateMessagesHidden, InterfaceID.PmChat.CONTAINER);
+            log.warn("RuneFolio could not request a screenshot frame");
+        }
     }
 
     private boolean hideScreenshotWidget(boolean shouldHide, int componentId)
@@ -1768,6 +1834,7 @@ public class RuneFolioPlugin extends Plugin
     }
 
     private void uploadScreenshotAsync(
+        RuneFolioScreenshotQueue.Reservation reservation,
         String token,
         String playerName,
         UUID eventId,
@@ -1778,10 +1845,11 @@ public class RuneFolioPlugin extends Plugin
         Image frame
     )
     {
-        screenshotExecutor.submit(() ->
+        reservation.submit(() ->
         {
             try
             {
+                if (Thread.currentThread().isInterrupted()) return;
                 byte[] jpeg = RuneFolioScreenshotEncoder.encode(frame);
                 if (jpeg.length > SCREENSHOT_MAX_BYTES)
                 {
@@ -1791,6 +1859,7 @@ public class RuneFolioPlugin extends Plugin
                 long[] retryDelays = {0L, 1_000L, 3_000L};
                 for (int attempt = 0; attempt < retryDelays.length; attempt++)
                 {
+                    if (Thread.currentThread().isInterrupted()) return;
                     if (retryDelays[attempt] > 0)
                     {
                         Thread.sleep(retryDelays[attempt]);

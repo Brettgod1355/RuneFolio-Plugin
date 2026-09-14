@@ -14,6 +14,8 @@ Optional bank/wealth capture (0.3.24): disabled by default. When enabled, openin
 
 Pending events are persisted through RuneLite configuration for retries, with a 1,000-event / 4 MiB serialized-event budget for new queue writes and bounded upload batches. A newer bank observation can replace a pending observation for the same character and UTC day; different days are retained. Successful acknowledgements remove queued events. Turning capture off prevents new captures; it does not delete already queued events or server history. Legacy diary caches (no longer read for task detection) and RuneFolio connection/name bindings also use RuneLite configuration. Connection tokens are sensitive: do not share configuration files. Screenshots currently retry in memory, not in the persistent event queue.
 
+Screenshot backpressure (0.3.31): at most three screenshots are outstanding across frame capture, waiting work and the single encoding/upload worker. When full, new screenshot captures are skipped, preserving already accepted work; a generic warning is logged at most once per minute. Normal progress/loot synchronization uses its separate durable queue and worker. Screenshot retries remain in memory with the same event ID; they do not survive a restart. Stopping the plugin clears waiting screenshot work and interrupts the active worker (an in-progress network call may finish or reach its timeout). The limit bounds screenshot count, not a fixed number of bytes: memory use still depends on source frame size.
+
 Private-alpha RuneLite plugin that securely syncs an Old School RuneScape character with [RuneFolio](https://runefolio.app).
 
 ## Current milestone
