@@ -14,6 +14,26 @@ import static org.junit.Assert.*;
 public class RuneFolioDataSharingTest
 {
     @Test
+    public void localScreenshotDeletionRequiresSeparateConfirmation() throws Exception
+    {
+        SwingUtilities.invokeAndWait(() -> {
+            AtomicBoolean accepted = new AtomicBoolean();
+            AtomicInteger clears = new AtomicInteger();
+            RuneFolioPanel panel = new RuneFolioPanel(() -> true, accepted::get);
+            panel.setClearScreenshotsAction(clears::incrementAndGet);
+            JButton clear = (JButton) find(panel, JButton.class, "Clear local screenshot queue");
+            assertNotNull(clear);
+            clear.doClick();
+            assertEquals(0, clears.get());
+            accepted.set(true);
+            clear.doClick();
+            assertEquals(1, clears.get());
+        });
+        assertTrue(RuneFolioDataSharing.SCREENSHOTS.contains("256 MiB"));
+        assertTrue(RuneFolioDataSharing.SCREENSHOTS.contains("unencrypted"));
+    }
+
+    @Test
     public void uploadControlsDeclareNativeWarningsAndRetainOptInDefaults() throws Exception
     {
         for (String method : new String[]{"syncBankWealth", "uploadScreenshots", "syncLootDrops", "syncCompletionHistory"})

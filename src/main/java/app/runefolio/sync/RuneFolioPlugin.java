@@ -132,6 +132,10 @@ public class RuneFolioPlugin extends Plugin
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
     private final ScheduledExecutorService syncExecutor = Executors.newSingleThreadScheduledExecutor();
     private final RuneFolioScreenshotQueue screenshotQueue = new RuneFolioScreenshotQueue();
+    private final RuneFolioScreenshotSpool screenshotSpool = new RuneFolioScreenshotSpool(
+        net.runelite.client.RuneLite.RUNELITE_DIR.toPath().resolve("runefolio-screenshot-queue"));
+    private final ScheduledExecutorService screenshotUploadExecutor = Executors.newSingleThreadScheduledExecutor();
+    private final AtomicBoolean clearScreenshotSpoolRequested = new AtomicBoolean();
     private long lastScreenshotQueueWarningMillis;
     private final AtomicBoolean uploadInFlight = new AtomicBoolean();
     private NavigationButton navigationButton;
@@ -203,6 +207,9 @@ public class RuneFolioPlugin extends Plugin
         panel.setAccountDisconnectAction(this::disconnectRuneFolioAccount);
         panel.setCharacterSetupAction(this::openCharacterSetup);
         panel.setManualSyncAction(() -> requestFullSync("manual"));
+        panel.setClearScreenshotsAction(() -> clearScreenshotSpoolRequested.set(true));
+        screenshotUploadExecutor.scheduleWithFixedDelay(this::drainScreenshotSpool,
+            5 + java.util.concurrent.ThreadLocalRandom.current().nextInt(11), 5, TimeUnit.SECONDS);
 
         syncQueue = new RuneFolioSyncQueue(configManager);
         lastSuccessfulSyncAtMillis = savedLong(LAST_SUCCESSFUL_SYNC_KEY);
@@ -282,6 +289,7 @@ public class RuneFolioPlugin extends Plugin
         navigationButton = null;
         connectionExecutor.shutdownNow();
         screenshotQueue.close();
+        screenshotUploadExecutor.shutdownNow();
         syncExecutor.shutdown();
         try
         {
@@ -1775,7 +1783,7 @@ public class RuneFolioPlugin extends Plugin
                             if (session == characterSession.get() && canCollectCurrentWorld()
                                 && namesMatch(playerName, currentPlayerName()))
                             {
-                                uploadScreenshotAsync(reservation, savedToken, playerName, eventId,
+                                saveScreenshotAsync(reservation, savedToken, playerName, eventId,
                                     identityKey, category, caption, occurredAt, frame);
                             }
                         }
@@ -1833,7 +1841,7 @@ public class RuneFolioPlugin extends Plugin
         });
     }
 
-    private void uploadScreenshotAsync(
+    private void saveScreenshotAsync(
         RuneFolioScreenshotQueue.Reservation reservation,
         String token,
         String playerName,
@@ -1856,46 +1864,56 @@ public class RuneFolioPlugin extends Plugin
                     log.warn("RuneFolio screenshot was too large to upload: {} bytes", jpeg.length);
                     return;
                 }
-                long[] retryDelays = {0L, 1_000L, 3_000L};
-                for (int attempt = 0; attempt < retryDelays.length; attempt++)
+                RuneFolioScreenshotSpool.Entry entry = new RuneFolioScreenshotSpool.Entry(
+                    eventId, token, playerName, identityKey, category, caption, occurredAt);
+                if (!screenshotSpool.save(entry, jpeg))
                 {
-                    if (Thread.currentThread().isInterrupted()) return;
-                    if (retryDelays[attempt] > 0)
-                    {
-                        Thread.sleep(retryDelays[attempt]);
-                    }
-                    try
-                    {
-                        RuneFolioApiClient.uploadScreenshot(
-                            token,
-                            playerName,
-                            eventId,
-                            identityKey,
-                            category,
-                            caption,
-                            occurredAt,
-                            jpeg
-                        );
-                        return;
-                    }
-                    catch (java.io.IOException exception)
-                    {
-                        if (attempt == retryDelays.length - 1)
-                        {
-                            log.warn("RuneFolio screenshot upload failed after retries", exception);
-                        }
-                    }
+                    log.warn("RuneFolio local screenshot storage is full or busy; newest screenshot was not saved");
+                    SwingUtilities.invokeLater(() -> panel.setScreenshotQueueState("Full / busy"));
                 }
             }
-            catch (InterruptedException exception)
+            catch (java.io.IOException | RuntimeException exception)
             {
-                Thread.currentThread().interrupt();
-            }
-            catch (java.io.IOException exception)
-            {
-                log.warn("RuneFolio could not compress a screenshot", exception);
+                log.warn("RuneFolio could not save a screenshot locally; progress sync is unaffected");
+                SwingUtilities.invokeLater(() -> panel.setScreenshotQueueState("Local save failed"));
             }
         });
+    }
+
+    private List<String> screenshotConnectionTokens()
+    {
+        String account = accountConnectionToken;
+        if (account != null && !account.isBlank()) return List.of(account);
+        String temporary = connectionToken;
+        return temporary == null || temporary.isBlank() ? List.of() : List.of(temporary);
+    }
+
+    private void drainScreenshotSpool()
+    {
+        try
+        {
+            if (clearScreenshotSpoolRequested.getAndSet(false))
+            {
+                boolean cleared = screenshotSpool.clear();
+                SwingUtilities.invokeLater(() -> panel.setStatus(cleared
+                    ? "Local screenshot queue cleared. Website images were not changed."
+                    : "A screenshot operation is active in another client. Try clearing again shortly."));
+            }
+            screenshotSpool.drainOnce(this::screenshotConnectionTokens, (token, entry, jpeg) ->
+                RuneFolioApiClient.uploadScreenshot(token, entry.characterName, UUID.fromString(entry.eventId),
+                    entry.identityKey, entry.category, entry.caption, entry.occurredAt, jpeg));
+            RuneFolioScreenshotSpool.Stats stats = screenshotSpool.stats();
+            if (stats != null)
+            {
+                String status = stats.saved + " saved" + (stats.held == 0 ? "" : ", " + stats.held + " held");
+                SwingUtilities.invokeLater(() -> panel.setScreenshotQueueState(status));
+            }
+        }
+        catch (java.io.IOException | RuntimeException exception)
+        {
+            log.warn("RuneFolio screenshot outbox unavailable; saved files were retained");
+            SwingUtilities.invokeLater(() -> panel.setScreenshotQueueState("Needs attention"));
+        }
     }
 
     static boolean isDiaryTaskCompletionMessage(String message)

@@ -63,6 +63,8 @@ class RuneFolioPanel extends PluginPanel
     private final JButton syncNowButton = new JButton("Sync now");
     private final JLabel lastSyncValue = metricValue("Never");
     private final JLabel pendingEventsValue = metricValue("0");
+    private final JLabel screenshotQueueValue = metricValue("0 saved");
+    private Runnable clearScreenshotsAction;
     private Consumer<String> temporaryConnectAction;
     private Runnable accountConnectAction;
     private Runnable accountDisconnectAction;
@@ -73,6 +75,7 @@ class RuneFolioPanel extends PluginPanel
     private boolean temporaryExpanded;
     private boolean temporaryConnecting;
     private final BooleanSupplier confirmConnection;
+    private final BooleanSupplier confirmClearScreenshots;
 
     RuneFolioPanel()
     {
@@ -81,8 +84,14 @@ class RuneFolioPanel extends PluginPanel
 
     RuneFolioPanel(BooleanSupplier confirmation)
     {
+        this(confirmation, null);
+    }
+
+    RuneFolioPanel(BooleanSupplier confirmation, BooleanSupplier clearConfirmation)
+    {
         super(false);
         confirmConnection = confirmation == null ? this::showConnectionDisclosure : confirmation;
+        confirmClearScreenshots = clearConfirmation == null ? this::showClearScreenshotConfirmation : clearConfirmation;
         setLayout(new BorderLayout());
         setBackground(ColorScheme.DARK_GRAY_COLOR);
 
@@ -180,9 +189,10 @@ class RuneFolioPanel extends PluginPanel
         syncActivity.setLayout(new BoxLayout(syncActivity, BoxLayout.Y_AXIS));
         syncActivity.setOpaque(false);
         syncActivity.setAlignmentX(LEFT_ALIGNMENT);
-        syncActivity.setMaximumSize(new Dimension(CONTENT_WIDTH, 80));
+        syncActivity.setMaximumSize(new Dimension(CONTENT_WIDTH, 110));
         syncActivity.add(createMetricRow("Last successful sync", lastSyncValue));
         syncActivity.add(createMetricRow("Pending events", pendingEventsValue));
+        syncActivity.add(createMetricRow("Local screenshots", screenshotQueueValue));
         syncActivity.setBorder(BorderFactory.createEmptyBorder(5, 0, 8, 0));
         content.add(syncActivity);
 
@@ -206,6 +216,13 @@ class RuneFolioPanel extends PluginPanel
         sharingInfo.addActionListener(event -> JOptionPane.showMessageDialog(this, disclosureText(),
             "RuneFolio data sharing", JOptionPane.INFORMATION_MESSAGE));
         content.add(sharingInfo);
+        JButton clearScreenshots = new JButton("Clear local screenshot queue");
+        clearScreenshots.setAlignmentX(LEFT_ALIGNMENT);
+        clearScreenshots.addActionListener(event -> {
+            if (clearScreenshotsAction != null && confirmClearScreenshots.getAsBoolean())
+                clearScreenshotsAction.run();
+        });
+        content.add(clearScreenshots);
         content.add(Box.createRigidArea(new Dimension(0, 16)));
 
         content.add(createSectionHeader(
@@ -280,6 +297,25 @@ class RuneFolioPanel extends PluginPanel
     void setManualSyncAction(Runnable action)
     {
         manualSyncAction = action;
+    }
+
+    void setClearScreenshotsAction(Runnable action) { clearScreenshotsAction = action; }
+
+    private boolean showClearScreenshotConfirmation()
+    {
+        return JOptionPane.showConfirmDialog(this,
+            "Delete all pictures saved in the local screenshot queue? This cannot be undone.\n"
+            + "This queue is shared by clients using this RuneLite settings folder.\n"
+            + "Website images are unchanged. New captures may still be saved while enabled.",
+            "Clear local screenshot queue", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
+    }
+
+    void setScreenshotQueueState(String status)
+    {
+        screenshotQueueValue.setText(status);
+        screenshotQueueValue.setToolTipText("Saved locally until acknowledged; held files need attention. Clear only if no longer needed.");
+        revalidate();
+        repaint();
     }
 
     void setSyncState(long lastSuccessfulSyncAtMillis, int pendingEvents)
