@@ -36,7 +36,7 @@ final class RuneFolioScreenshotSpool
     static final int MAX_JPEG_BYTES = 3 * 1024 * 1024;
     private static final int MAX_HEADER = 16 * 1024;
     private static final int MAGIC = 0x52465331;
-    private static final Gson GSON = new Gson();
+    private final Gson gson;
     private final Path root;
     private final LongSupplier clock;
     private final LongSupplier jitter;
@@ -91,14 +91,15 @@ final class RuneFolioScreenshotSpool
         Stored(Path path, Entry entry) { this.path = path; this.entry = entry; }
     }
 
-    RuneFolioScreenshotSpool(Path root)
+    RuneFolioScreenshotSpool(Path root, Gson gson)
     {
-        this(root, System::currentTimeMillis,
+        this(root, gson, System::currentTimeMillis,
             () -> java.util.concurrent.ThreadLocalRandom.current().nextLong(5001), MAX_BYTES, MAX_FILES);
     }
 
-    RuneFolioScreenshotSpool(Path root, LongSupplier clock, LongSupplier jitter, long maxBytes, int maxFiles)
+    RuneFolioScreenshotSpool(Path root, Gson gson, LongSupplier clock, LongSupplier jitter, long maxBytes, int maxFiles)
     {
+        this.gson = java.util.Objects.requireNonNull(gson);
         this.root = root.toAbsolutePath().normalize();
         this.clock = clock;
         this.jitter = jitter;
@@ -134,7 +135,7 @@ final class RuneFolioScreenshotSpool
         entry.jpegHash = hash(jpeg);
         entry.queuedAt = clock.getAsLong();
         validate(entry);
-        byte[] header = GSON.toJson(entry).getBytes(StandardCharsets.UTF_8);
+        byte[] header = gson.toJson(entry).getBytes(StandardCharsets.UTF_8);
         if (header.length > MAX_HEADER) throw new IOException("Screenshot metadata too large");
         prepare();
         try (Guard guard = awaitQueueLock())
@@ -312,7 +313,7 @@ final class RuneFolioScreenshotSpool
             if (length < 1 || length > MAX_HEADER || length > size - 12) throw new IOException("Invalid screenshot header");
             byte[] header = new byte[length];
             input.readFully(header);
-            Entry entry = GSON.fromJson(new String(header, StandardCharsets.UTF_8), Entry.class);
+            Entry entry = gson.fromJson(new String(header, StandardCharsets.UTF_8), Entry.class);
             validate(entry);
             if (!path.getFileName().toString().equals(entry.eventId + ".pending"))
                 throw new IOException("Screenshot event filename mismatch");
@@ -370,7 +371,7 @@ final class RuneFolioScreenshotSpool
         if (Files.size(path) > 1024) throw new IOException("Invalid screenshot pacing state");
         try (InputStream input = Files.newInputStream(path, LinkOption.NOFOLLOW_LINKS))
         {
-            State state = GSON.fromJson(new String(input.readNBytes(1025), StandardCharsets.UTF_8), State.class);
+            State state = gson.fromJson(new String(input.readNBytes(1025), StandardCharsets.UTF_8), State.class);
             if (state == null || state.next < 0 || state.failures < 0 || state.failures > 6) throw new IOException("Invalid screenshot pacing state");
             return state;
         }
@@ -384,7 +385,7 @@ final class RuneFolioScreenshotSpool
         Files.deleteIfExists(temporary);
         try (FileChannel channel = createPrivateFile(temporary))
         {
-            java.nio.ByteBuffer bytes = StandardCharsets.UTF_8.encode(GSON.toJson(state));
+            java.nio.ByteBuffer bytes = StandardCharsets.UTF_8.encode(gson.toJson(state));
             while (bytes.hasRemaining()) channel.write(bytes);
             channel.force(true);
         }

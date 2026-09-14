@@ -129,11 +129,13 @@ public class RuneFolioPlugin extends Plugin
     @Inject
     private DrawManager drawManager;
 
+    @Inject
+    private com.google.gson.Gson gson;
+
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
     private final ScheduledExecutorService syncExecutor = Executors.newSingleThreadScheduledExecutor();
     private final RuneFolioScreenshotQueue screenshotQueue = new RuneFolioScreenshotQueue();
-    private final RuneFolioScreenshotSpool screenshotSpool = new RuneFolioScreenshotSpool(
-        net.runelite.client.RuneLite.RUNELITE_DIR.toPath().resolve("runefolio-screenshot-queue"));
+    private RuneFolioScreenshotSpool screenshotSpool;
     private final ScheduledExecutorService screenshotUploadExecutor = Executors.newSingleThreadScheduledExecutor();
     private final AtomicBoolean clearScreenshotSpoolRequested = new AtomicBoolean();
     private long lastScreenshotQueueWarningMillis;
@@ -188,6 +190,8 @@ public class RuneFolioPlugin extends Plugin
     @Override
     protected void startUp()
     {
+        screenshotSpool = new RuneFolioScreenshotSpool(
+            net.runelite.client.RuneLite.RUNELITE_DIR.toPath().resolve("runefolio-screenshot-queue"), gson);
         navigationButton = NavigationButton.builder()
             .tooltip("RuneFolio Sync")
             .icon(RuneFolioBrand.createIcon(16))

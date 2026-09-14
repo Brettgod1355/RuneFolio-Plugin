@@ -29,7 +29,7 @@ public class RuneFolioScreenshotSpoolTest
 
     private RuneFolioScreenshotSpool spool(Path root)
     {
-        return new RuneFolioScreenshotSpool(root, now::get, () -> 0, RuneFolioScreenshotSpool.MAX_BYTES, 500);
+        return new RuneFolioScreenshotSpool(root, new com.google.gson.Gson(), now::get, () -> 0, RuneFolioScreenshotSpool.MAX_BYTES, 500);
     }
 
     private RuneFolioScreenshotSpool.Entry entry(String token, String name)
@@ -160,12 +160,12 @@ public class RuneFolioScreenshotSpoolTest
     public void countAndByteLimitsPreserveAcceptedPictures() throws Exception
     {
         Path root = temporary.newFolder().toPath();
-        RuneFolioScreenshotSpool spool = new RuneFolioScreenshotSpool(root, now::get, () -> 0, 100_000, 2);
+        RuneFolioScreenshotSpool spool = new RuneFolioScreenshotSpool(root, new com.google.gson.Gson(), now::get, () -> 0, 100_000, 2);
         assertTrue(spool.save(entry(TOKEN, "Example"), jpeg()));
         assertTrue(spool.save(entry(TOKEN, "Example"), jpeg()));
         assertFalse(spool.save(entry(TOKEN, "Example"), jpeg()));
         assertEquals(2, spool.stats().saved);
-        RuneFolioScreenshotSpool tiny = new RuneFolioScreenshotSpool(temporary.newFolder().toPath(), now::get, () -> 0, 1, 500);
+        RuneFolioScreenshotSpool tiny = new RuneFolioScreenshotSpool(temporary.newFolder().toPath(), new com.google.gson.Gson(), now::get, () -> 0, 1, 500);
         assertFalse(tiny.save(entry(TOKEN, "Example"), jpeg()));
         assertEquals(0, tiny.stats().saved);
     }
@@ -256,7 +256,7 @@ public class RuneFolioScreenshotSpoolTest
         {
             List<Future<Boolean>> results = new ArrayList<>();
             for (int i = 0; i < 12; i++) results.add(workers.submit(() ->
-                new RuneFolioScreenshotSpool(root, now::get, () -> 0, 100_000, 5).save(entry(TOKEN, "Example"), jpeg)));
+                new RuneFolioScreenshotSpool(root, new com.google.gson.Gson(), now::get, () -> 0, 100_000, 5).save(entry(TOKEN, "Example"), jpeg)));
             int accepted = 0;
             for (Future<Boolean> result : results) if (result.get(5, TimeUnit.SECONDS)) accepted++;
             assertEquals(5, accepted);
