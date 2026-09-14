@@ -154,10 +154,12 @@ final class RuneFolioScreenshotSpool
             long bytes = 8L + header.length + jpeg.length;
             if (stats.saved + stats.held >= maxFiles || bytes > maxBytes - stats.bytes) return false;
             Path temporary = root.resolve(UUID.randomUUID() + ".part");
+            boolean created = false;
             try
             {
                 try (FileChannel channel = createPrivateFile(temporary))
                 {
+                    created = true;
                     DataOutputStream output = new DataOutputStream(Channels.newOutputStream(channel));
                     output.writeInt(MAGIC);
                     output.writeInt(header.length);
@@ -169,7 +171,7 @@ final class RuneFolioScreenshotSpool
                 Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE);
                 return true;
             }
-            finally { Files.deleteIfExists(temporary); }
+            finally { if (created) Files.deleteIfExists(temporary); }
         }
     }
 
@@ -410,7 +412,7 @@ final class RuneFolioScreenshotSpool
             if (lock != null) return new Guard(channel, lock);
         }
         catch (OverlappingFileLockException busy) { /* Another local client/task owns it. */ }
-        catch (IOException failure) { channel.close(); throw failure; }
+        catch (IOException | RuntimeException failure) { channel.close(); throw failure; }
         channel.close();
         return null;
     }
