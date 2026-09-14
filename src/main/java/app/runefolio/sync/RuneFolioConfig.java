@@ -76,7 +76,7 @@ public interface RuneFolioConfig extends Config
         keyName = "uploadScreenshots",
         warning = RuneFolioDataSharing.SCREENSHOTS,
         name = "Upload screenshots",
-        description = "Upload selected screenshots to the connected RuneFolio account, subject to its sharing settings. Images may contain visible personal information. Disabled by default.",
+        description = "Save compressed screenshots locally for staggered upload (500 pictures / 256 MiB). Images may contain personal information. Turning off stops new captures, not pending uploads. Disabled by default.",
         position = 0,
         section = screenshotsSection
     )

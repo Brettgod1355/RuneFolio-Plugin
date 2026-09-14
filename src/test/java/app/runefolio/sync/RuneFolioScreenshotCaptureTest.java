@@ -25,6 +25,36 @@ import static org.junit.Assert.*;
 /** Exercises the real plugin capture path and DrawManager, without network or a game session. */
 public class RuneFolioScreenshotCaptureTest
 {
+    @org.junit.Rule public org.junit.rules.TemporaryFolder temporary = new org.junit.rules.TemporaryFolder();
+
+    @Test
+    public void capturePersistsBeforeAnyNetworkUploadAndReleasesRawFrameSlot() throws Exception
+    {
+        java.nio.file.Path root = temporary.newFolder().toPath();
+        RuneFolioScreenshotSpool spool = new RuneFolioScreenshotSpool(root, new com.google.gson.Gson());
+        try (Fixture fixture = new Fixture())
+        {
+            fixture.set("screenshotSpool", spool);
+            fixture.capture();
+            fixture.draw.processDrawComplete(() -> new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB));
+            fixture.thread.drain();
+            long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(5);
+            while (fixture.queue.outstandingCount() > 0 && System.nanoTime() < deadline) Thread.sleep(5);
+            assertEquals(0, fixture.queue.outstandingCount());
+            assertEquals(1, spool.stats().saved);
+            fixture.assertRestored();
+            spool.drainOnce(() -> List.of("synthetic-test-placeholder"), (token, entry, jpeg) -> {
+                assertEquals("Example", entry.characterName);
+                assertEquals("level_up", entry.category);
+                assertEquals("Example level 2", entry.caption);
+                assertTrue(jpeg.length > 4);
+                assertEquals(255, jpeg[0] & 255);
+                assertEquals(216, jpeg[1] & 255);
+            });
+            assertEquals(0, spool.stats().saved);
+        }
+    }
+
     @Test
     public void overloadIsRejectedBeforeRegisteringMoreFrameCallbacks() throws Exception
     {

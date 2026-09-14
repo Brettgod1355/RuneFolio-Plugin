@@ -18,7 +18,7 @@ final class RuneFolioApiClient
 {
     private static final String API_BASE = "https://runefolio.app/api";
     private static final int PROTOCOL_VERSION = 1;
-    static final String CLIENT_VERSION = "0.3.31";
+    static final String CLIENT_VERSION = "0.3.32";
 
     private RuneFolioApiClient()
     {
@@ -178,6 +178,7 @@ final class RuneFolioApiClient
         HttpURLConnection connection = (HttpURLConnection) new URL(API_BASE + "/plugin-screenshots").openConnection();
         try
         {
+            connection.setInstanceFollowRedirects(false);
             connection.setRequestMethod("POST");
             connection.setConnectTimeout(10_000);
             connection.setReadTimeout(20_000);
@@ -193,17 +194,14 @@ final class RuneFolioApiClient
             }
 
             int status = connection.getResponseCode();
-            InputStream stream = status >= 200 && status < 300
-                ? connection.getInputStream()
-                : connection.getErrorStream();
-            JsonObject json = readJsonResponse(stream);
             if (status < 200 || status >= 300)
             {
-                String message = json.has("message")
-                    ? json.get("message").getAsString()
-                    : (json.has("error") ? json.get("error").getAsString() : "RuneFolio rejected the screenshot.");
-                throw new IOException(message);
+                InputStream error = connection.getErrorStream();
+                if (error != null) error.close();
+                throw new RuneFolioScreenshotSpool.UploadException(status,
+                    screenshotRetryAfterMillis(connection.getHeaderField("Retry-After"), System.currentTimeMillis()));
             }
+            verifyScreenshotAcknowledgement(readJsonResponse(connection.getInputStream()), eventId);
         }
         finally
         {
@@ -218,6 +216,33 @@ final class RuneFolioApiClient
         writeAscii(output, "Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n");
         output.write(value.getBytes(StandardCharsets.UTF_8));
         writeAscii(output, "\r\n");
+    }
+
+    static void verifyScreenshotAcknowledgement(JsonObject json, UUID eventId) throws IOException
+    {
+        if (json == null || !json.has("screenshotId") || !json.get("screenshotId").isJsonPrimitive()
+            || !eventId.toString().equals(json.get("screenshotId").getAsString()))
+            throw new IOException("Screenshot acknowledgement did not match its event");
+    }
+
+    static long screenshotRetryAfterMillis(String header, long now)
+    {
+        if (header == null) return 0;
+        try
+        {
+            long seconds = Long.parseLong(header.trim());
+            return Math.max(0, Math.min(86_400, seconds)) * 1000;
+        }
+        catch (RuntimeException notSeconds)
+        {
+            try
+            {
+                long until = java.time.ZonedDateTime.parse(header,
+                    java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME).toInstant().toEpochMilli();
+                return Math.max(0, Math.min(86_400_000, until - now));
+            }
+            catch (RuntimeException invalid) { return 0; }
+        }
     }
 
     private static void writeAscii(ByteArrayOutputStream output, String value) throws IOException
