@@ -46,6 +46,15 @@ public class RuneFolioDataSharingTest
         RuneFolioConfig config = new RuneFolioConfig() { };
         assertFalse(config.syncBankWealth());
         assertFalse(config.uploadScreenshots());
+        assertFalse(config.syncPvpHistory());
+        assertFalse(config.screenshotClueRewards());
+        assertFalse(config.screenshotRaidChestRewards());
+        assertFalse(config.screenshotPvpKills());
+        assertFalse(config.screenshotLootKeys());
+        ConfigItem pvp = RuneFolioConfig.class.getMethod("syncPvpHistory").getAnnotation(ConfigItem.class);
+        assertTrue(pvp.warning().contains("https://runefolio.app"));
+        assertTrue(pvp.warning().contains("defeated player names"));
+        assertTrue(pvp.warning().contains("temporary-code issuer"));
     }
 
     @Test

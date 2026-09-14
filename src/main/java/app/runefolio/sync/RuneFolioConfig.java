@@ -9,6 +9,19 @@ import net.runelite.client.config.Range;
 @ConfigGroup("runefolio")
 public interface RuneFolioConfig extends Config
 {
+    @ConfigItem(keyName = "syncPvpHistory", name = "Sync PvP history", warning = RuneFolioDataSharing.PVP,
+        description = "Opt-in: send your observed finishing blows, opponent names, timestamps and observed loot. Native Loot Tracker supplies unassigned loot-key contents. No opponent gear or location is collected.", position = 6)
+    default boolean syncPvpHistory() { return false; }
+
+    @ConfigItem(keyName = "screenshotClueRewards", name = "Clue reward screens", description = "Capture new clue rewards reported by native Loot Tracker. Enable completion history to link them to clue results.", position = 11, section = screenshotsSection)
+    default boolean screenshotClueRewards() { return false; }
+    @ConfigItem(keyName = "screenshotRaidChestRewards", name = "Raid and chest rewards", description = "Capture supported raid/chest rewards reported by native Loot Tracker.", position = 12, section = screenshotsSection)
+    default boolean screenshotRaidChestRewards() { return false; }
+    @ConfigItem(keyName = "screenshotPvpKills", name = "PvP kills", description = "Capture your observed finishing blows. PvP history is a separate opt-in.", position = 13, section = screenshotsSection)
+    default boolean screenshotPvpKills() { return false; }
+    @ConfigItem(keyName = "screenshotLootKeys", name = "Wilderness loot-key screens", description = "Capture the visible loot-key reward screen reported by native Loot Tracker. A screen can include several keys and does not identify a defeated player.", position = 14, section = screenshotsSection)
+    default boolean screenshotLootKeys() { return false; }
+
     @ConfigItem(keyName = "syncCompletionHistory", name = "Sync completion history",
         warning = RuneFolioDataSharing.COMPLETIONS,
         description = "Send observed boss/raid, clue and Slayer completions and available result details to RuneFolio. Clue rewards use the enabled native Loot Tracker.", position = 5)

@@ -56,6 +56,34 @@ public class RuneFolioScreenshotCaptureTest
     }
 
     @Test
+    public void rewardCapturePreservesLinkedIdWithoutNativeScreenshotPlugin() throws Exception
+    {
+        for (String category : new String[]{"clue_reward", "raid_chest_reward", "pvp_kill", "loot_key"})
+        {
+            RuneFolioScreenshotSpool spool = new RuneFolioScreenshotSpool(temporary.newFolder().toPath(), new com.google.gson.Gson());
+            java.util.UUID id = java.util.UUID.randomUUID();
+            try (Fixture fixture = new Fixture())
+            {
+                fixture.set("screenshotSpool", spool);
+                Method method = RuneFolioPlugin.class.getDeclaredMethod("requestScreenshot", String.class, String.class, java.util.UUID.class);
+                method.setAccessible(true);
+                method.invoke(fixture.plugin, category, "Observed reward", id);
+                fixture.draw.processDrawComplete(() -> new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB));
+                fixture.thread.drain();
+                long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(5);
+                while (fixture.queue.outstandingCount() > 0 && System.nanoTime() < deadline) Thread.sleep(5);
+                assertEquals(1, spool.stats().saved);
+                spool.drainOnce(() -> List.of("synthetic-test-placeholder"), (token, entry, jpeg) -> {
+                    assertEquals(id.toString(), entry.eventId);
+                    assertEquals(category, entry.category);
+                });
+                assertEquals(0, spool.stats().saved);
+                fixture.assertRestored();
+            }
+        }
+    }
+
+    @Test
     public void overloadIsRejectedBeforeRegisteringMoreFrameCallbacks() throws Exception
     {
         try (Fixture fixture = new Fixture())

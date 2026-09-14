@@ -353,7 +353,7 @@ final class RuneFolioScreenshotSpool
                 || entry.characterName == null || entry.characterName.isBlank() || entry.characterName.length() > 12
                 || entry.caption == null || entry.caption.isBlank() || entry.caption.length() > 240
                 || entry.category == null || !Set.of("level_up", "quest_completion", "diary_task", "combat_achievement",
-                    "collection_log", "pet", "high_value_drop", "untradeable_drop").contains(entry.category)
+                    "collection_log", "pet", "high_value_drop", "untradeable_drop", "clue_reward", "raid_chest_reward", "pvp_kill", "loot_key").contains(entry.category)
                 || (entry.identityKey != null && entry.identityKey.length() > 200)) throw new IOException("Invalid screenshot metadata");
             Instant.parse(entry.occurredAt);
         }
