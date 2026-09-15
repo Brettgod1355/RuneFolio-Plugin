@@ -122,6 +122,7 @@ public class RuneFolioPlugin extends Plugin
     @Inject
     private RuneFolioDiaryTaskTracker diaryTaskTracker;
     @Inject private RuneFolioBankCollector bankCollector;
+    @Inject private RuneFolioUnlockCollector unlockCollector;
 
     @Inject
     private ItemManager itemManager;
@@ -211,6 +212,10 @@ public class RuneFolioPlugin extends Plugin
             String name = currentPlayerName();
             return name != null && enqueueLiveEvent(RuneFolioSyncEvent.historyEvent("bank.snapshot", name, state));
         });
+        unlockCollector.startUp(state -> {
+            String name = currentPlayerName();
+            return name != null && enqueueLiveEvent(RuneFolioSyncEvent.historyEvent("unlocks.snapshot", name, state));
+        });
         panel.setTemporaryConnectAction(this::connectTemporaryCode);
         panel.setAccountConnectAction(this::connectRuneFolioAccount);
         panel.setAccountDisconnectAction(this::disconnectRuneFolioAccount);
@@ -282,6 +287,7 @@ public class RuneFolioPlugin extends Plugin
         enqueueKnownSnapshots("shutdown");
         diaryTaskTracker.shutDown();
         bankCollector.shutDown();
+        unlockCollector.shutDown();
         if (savedToken != null && !savedToken.isBlank())
         {
             syncExecutor.submit(() -> flushQueueWithToken(
@@ -1047,6 +1053,7 @@ public class RuneFolioPlugin extends Plugin
             }
 
             List<RuneFolioSyncEvent> events = new ArrayList<>();
+            unlockCollector.syncNow();
             events.add(RuneFolioSyncEvent.skillSnapshot(playerName, trigger, skills));
             events.add(RuneFolioSyncEvent.progressSnapshot(
                 RuneFolioSyncEvent.QUEST_SNAPSHOT_TYPE, playerName, trigger, questState

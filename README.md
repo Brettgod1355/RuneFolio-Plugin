@@ -1,5 +1,11 @@
 # RuneFolio Sync
 
+## Account unlocks (0.3.34)
+
+Enable **Sync account unlocks** and use **Sync now** to send supported route, bank-construction, spellbook, shortcut and area unlock observations to Account Unlocks on the website. The setting defaults OFF and has its own sharing disclosure. Selected checklist items are recognized in inventory/equipment and when the ordinary bank is opened; full bank contents are not sent by this setting.
+
+The catalog contains 75 entries. Some entries require manual confirmation on the website where automatic detection is not verified. An item sighting means previously obtained, not currently owned; first-observed dates are not original acquisition dates. Already confirmed permanent unlocks survive retries and later incomplete observations. Observations use the existing durable event queue; turning this setting off stops new capture, not queued uploads or stored history. Special worlds with separate progress are excluded. Website public unlock sharing defaults OFF.
+
 ## Reward screenshots and PvP history (0.3.33)
 
 Four additional screenshot switches capture clue rewards, supported raid/chest rewards, your observed PvP finishing blows, and Wilderness loot-key windows. They default off and require the screenshot master switch. RuneLite's native Screenshot plugin can stay disabled. The enabled native Loot Tracker supplies reward and ground-loot events; it is required for clue/raid/chest/loot-key captures. A clue screenshot links to its specific completion when completion history is also enabled. A linked image may appear after the result because screenshot uploads are paced separately; missing or trashed images have no active link.
