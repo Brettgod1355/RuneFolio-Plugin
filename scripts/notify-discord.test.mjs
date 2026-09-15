@@ -1,0 +1,19 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { notification, publicSummary } from './notify-discord.mjs';
+test('only explicit public notes are posted; internal body sections and closed-unmerged PRs are excluded', () => {
+  const body = '## Summary\nInternal implementation details\n## Discord changelog\n- The calendar now opens the selected day.\n## Validation\nPrivate diagnostic notes';
+  assert.equal(publicSummary(body), '- The calendar now opens the selected day.');
+  const pr = { number: 4, merged:true, merge_commit_sha:'a'.repeat(40), title:'feat: Better calendar', body, base:{ref:'main',repo:{full_name:'example/site'}} };
+  const result = notification({pull_request:pr},'website','example/site','1');
+  assert.equal(result.kind,'merge'); assert.equal(result.title,'Better calendar'); assert.ok(!JSON.stringify(result).includes('diagnostic'));
+  assert.equal(notification({pull_request:{...pr,merged:false}},'website','example/site','1'),null);
+  assert.equal(notification({pull_request:{...pr,body:'Technical-only notes'}},'website','example/site','1').code,'missing_changelog');
+  assert.equal(publicSummary('## Discord changelog\n@everyone see this update'),null);
+  assert.equal(publicSummary('## Discord changelog\n<!-- Write a summary here -->\n'),null);
+});
+test('CI notifications only accept failed main-branch runs from the correct repository', () => {
+  const run={id:8,conclusion:'failure',head_branch:'main',head_repository:{full_name:'example/site'}};
+  assert.equal(notification({workflow_run:run},'website','example/site','1').code,'ci_failed');
+  for(const patch of [{head_branch:'feature'},{conclusion:'success'},{head_repository:{full_name:'fork/site'}}]) assert.equal(notification({workflow_run:{...run,...patch}},'website','example/site','1'),null);
+});

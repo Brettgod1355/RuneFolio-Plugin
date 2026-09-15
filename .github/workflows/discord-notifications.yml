@@ -1,0 +1,45 @@
+name: Discord notifications
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [main]
+  workflow_run:
+    workflows: ['CI', 'Plugin Hub preflight']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Merged PR to deliver; leave empty to send a private test alert'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: discord-${{ github.event.pull_request.number || github.event.workflow_run.id || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    if: vars.DISCORD_EVENTS_URL != '' && (github.event_name != 'pull_request_target' || github.event.pull_request.merged == true)
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      # Never check out the PR head or execute untrusted contributor code here.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+      - run: node scripts/notify-discord.mjs
+        env:
+          DISCORD_SOURCE: plugin
+          DISCORD_EVENTS_URL: ${{ vars.DISCORD_EVENTS_URL }}
+          DISCORD_EVENTS_SECRET: ${{ secrets.DISCORD_EVENTS_SECRET }}
+          GITHUB_TOKEN: ${{ github.token }}
