@@ -217,7 +217,7 @@ final class RuneFolioSyncEvent
 
     static RuneFolioSyncEvent historyEvent(String type, String characterName, JsonObject payload)
     {
-        if (!Set.of("bank.snapshot", "boss.completion", "clue.completion", "slayer.completion", "pvp.result").contains(type)) throw new IllegalArgumentException("Unsupported history event");
+        if (!Set.of("bank.snapshot", "boss.completion", "clue.completion", "slayer.completion", "pvp.result", "unlocks.snapshot").contains(type)) throw new IllegalArgumentException("Unsupported history event");
         return create(type, characterName, payload.deepCopy());
     }
 

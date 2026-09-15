@@ -9,6 +9,10 @@ import net.runelite.client.config.Range;
 @ConfigGroup("runefolio")
 public interface RuneFolioConfig extends Config
 {
+    @ConfigItem(keyName = "syncAccountUnlocks", name = "Sync account unlocks", warning = RuneFolioDataSharing.UNLOCKS,
+        description = "Opt-in: send supported account unlock flags and observations of checklist items. No full bank contents are sent by this setting. Unknown entries can be confirmed on the website.", position = 7)
+    default boolean syncAccountUnlocks() { return false; }
+
     @ConfigItem(keyName = "syncPvpHistory", name = "Sync PvP history", warning = RuneFolioDataSharing.PVP,
         description = "Opt-in: send your observed finishing blows, opponent names, timestamps and observed loot. Native Loot Tracker supplies unassigned loot-key contents. No opponent gear or location is collected.", position = 6)
     default boolean syncPvpHistory() { return false; }

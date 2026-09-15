@@ -1,0 +1,925 @@
+[
+  {
+    "id": "quetzal.fortis",
+    "name": "Civitas illa Fortis",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 9951,
+      "name": "QUETZAL_FORTIS"
+    }
+  },
+  {
+    "id": "quetzal.teomat",
+    "name": "The Teomat",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 9952,
+      "name": "QUETZAL_TEOMAT"
+    }
+  },
+  {
+    "id": "quetzal.sunsetcoast",
+    "name": "Sunset Coast",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 9953,
+      "name": "QUETZAL_SUNSETCOAST"
+    }
+  },
+  {
+    "id": "quetzal.hunterguild",
+    "name": "Hunter Guild",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 9954,
+      "name": "QUETZAL_HUNTERGUILD"
+    }
+  },
+  {
+    "id": "quetzal.camtorum",
+    "name": "Cam Torum",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 9955,
+      "name": "QUETZAL_CAMTORUM"
+    }
+  },
+  {
+    "id": "quetzal.colossalwyrm",
+    "name": "Colossal Wyrm Remains",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 9956,
+      "name": "QUETZAL_COLOSSALWYRM"
+    }
+  },
+  {
+    "id": "quetzal.outerfortis",
+    "name": "Outer Fortis",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 9957,
+      "name": "QUETZAL_OUTERFORTIS"
+    }
+  },
+  {
+    "id": "quetzal.colosseum",
+    "name": "Fortis Colosseum",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 9958,
+      "name": "QUETZAL_COLOSSEUM"
+    }
+  },
+  {
+    "id": "quetzal.aldarin",
+    "name": "Aldarin",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 11377,
+      "name": "QUETZAL_ALDARIN"
+    }
+  },
+  {
+    "id": "quetzal.quetzacalligorge",
+    "name": "Quetzacalli Gorge",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 11378,
+      "name": "QUETZAL_QUETZACALLIGORGE"
+    }
+  },
+  {
+    "id": "quetzal.salvageroverlook",
+    "name": "Salvager Overlook",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 11379,
+      "name": "QUETZAL_SALVAGEROVERLOOK"
+    }
+  },
+  {
+    "id": "quetzal.talteklan",
+    "name": "Tal Teklan",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 17755,
+      "name": "QUETZAL_TALTEKLAN"
+    }
+  },
+  {
+    "id": "quetzal.auburnvalley",
+    "name": "Auburn Valley",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 17756,
+      "name": "QUETZAL_AUBURNVALLEY"
+    }
+  },
+  {
+    "id": "quetzal.kastori",
+    "name": "Kastori",
+    "category": "Quetzal routes",
+    "kind": "unlock",
+    "description": "Landing site in the Quetzal Transport System.",
+    "wiki": "Quetzal Transport System",
+    "rule": {
+      "kind": "flag",
+      "id": 17757,
+      "name": "QUETZAL_KASTORI"
+    }
+  },
+  {
+    "id": "bank.fossil",
+    "name": "Fossil Island Museum Camp",
+    "category": "Banks",
+    "kind": "unlock",
+    "description": "Build or repair this bank chest.",
+    "wiki": "Fossil Island Museum Camp",
+    "rule": {
+      "kind": "flag",
+      "id": 5800,
+      "name": "FOSSIL_BANK"
+    }
+  },
+  {
+    "id": "bank.wyrmscraig",
+    "name": "Wyrmscraig",
+    "category": "Banks",
+    "kind": "unlock",
+    "description": "Build or repair this bank chest.",
+    "wiki": "Wyrmscraig",
+    "rule": {
+      "kind": "flag",
+      "id": 15774,
+      "name": "AMENITY_BANKCHEST_WYRMSCRAIG"
+    }
+  },
+  {
+    "id": "bank.sangvesti",
+    "name": "Sangvesti",
+    "category": "Banks",
+    "kind": "unlock",
+    "description": "Build or repair this bank chest.",
+    "wiki": "Sangvesti",
+    "rule": {
+      "kind": "flag",
+      "id": 15621,
+      "name": "AMENITY_BANKCHEST_SANGVESTI"
+    }
+  },
+  {
+    "id": "bank.charred",
+    "name": "Charred Island",
+    "category": "Banks",
+    "kind": "unlock",
+    "description": "Build or repair this bank chest.",
+    "wiki": "Charred Island",
+    "rule": {
+      "kind": "flag",
+      "id": 18353,
+      "name": "AMENITY_BANKCHEST_CHARRED_ISLAND"
+    }
+  },
+  {
+    "id": "bank.sunbleak",
+    "name": "Sunbleak Island",
+    "category": "Banks",
+    "kind": "unlock",
+    "description": "Build or repair this bank chest.",
+    "wiki": "Sunbleak Island",
+    "rule": {
+      "kind": "flag",
+      "id": 18358,
+      "name": "AMENITY_BANKCHEST_SUNBLEAK"
+    }
+  },
+  {
+    "id": "bank.deepfin_west",
+    "name": "Deepfin Point — first bank",
+    "category": "Banks",
+    "kind": "unlock",
+    "description": "Build or repair this bank chest.",
+    "wiki": "Deepfin Point",
+    "rule": {
+      "kind": "flag",
+      "id": 18361,
+      "name": "AMENITY_BANKCHEST_DEEPFIN_1"
+    }
+  },
+  {
+    "id": "bank.deepfin_east",
+    "name": "Deepfin Point — second bank",
+    "category": "Banks",
+    "kind": "unlock",
+    "description": "Build or repair this bank chest.",
+    "wiki": "Deepfin Point",
+    "rule": {
+      "kind": "flag",
+      "id": 18362,
+      "name": "AMENITY_BANKCHEST_DEEPFIN_2"
+    }
+  },
+  {
+    "id": "bank.onyx",
+    "name": "Onyx Crest",
+    "category": "Banks",
+    "kind": "unlock",
+    "description": "Build or repair this bank chest.",
+    "wiki": "Onyx Crest",
+    "rule": {
+      "kind": "flag",
+      "id": 18363,
+      "name": "AMENITY_BANKCHEST_ONYX_CREST"
+    }
+  },
+  {
+    "id": "bank.buccaneers",
+    "name": "Buccaneers' Haven",
+    "category": "Banks",
+    "kind": "unlock",
+    "description": "Build or repair this bank chest.",
+    "wiki": "Buccaneers' Haven",
+    "rule": {
+      "kind": "flag",
+      "id": 18369,
+      "name": "AMENITY_BANKCHEST_BUCCANEERS"
+    }
+  },
+  {
+    "id": "bank.burgh",
+    "name": "Burgh de Rott",
+    "category": "Banks",
+    "kind": "unlock",
+    "description": "Repair the bank during In Aid of the Myreque.",
+    "wiki": "Burgh de Rott",
+    "rule": {
+      "kind": "quest",
+      "name": "IN_AID_OF_THE_MYREQUE",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "item.dragon_defender",
+    "name": "Dragon defender",
+    "category": "Equipment & tools",
+    "kind": "item",
+    "description": "An observed item is retained as previously obtained; this does not prove you still own it.",
+    "wiki": "Dragon defender",
+    "rule": {
+      "kind": "item",
+      "ids": [
+        12954,
+        19722,
+        24143,
+        27008,
+        20463
+      ]
+    }
+  },
+  {
+    "id": "item.ancient_icon",
+    "name": "Ancient icon",
+    "category": "Equipment & tools",
+    "kind": "item",
+    "description": "An observed item is retained as previously obtained; this does not prove you still own it.",
+    "wiki": "Ancient icon",
+    "rule": {
+      "kind": "item",
+      "ids": [
+        27627
+      ]
+    }
+  },
+  {
+    "id": "item.herb_sack",
+    "name": "Herb sack",
+    "category": "Equipment & tools",
+    "kind": "item",
+    "description": "An observed item is retained as previously obtained; this does not prove you still own it.",
+    "wiki": "Herb sack",
+    "rule": {
+      "kind": "item",
+      "ids": [
+        13226,
+        24478,
+        33135,
+        33137
+      ]
+    }
+  },
+  {
+    "id": "item.pristine_spider_silk",
+    "name": "Pristine spider silk",
+    "category": "Equipment & tools",
+    "kind": "item",
+    "description": "An observed item is retained as previously obtained; this does not prove you still own it.",
+    "wiki": "Pristine spider silk",
+    "rule": {
+      "kind": "item",
+      "ids": [
+        33133
+      ]
+    }
+  },
+  {
+    "id": "item.silklined_herb_sack",
+    "name": "Silk-lined herb sack",
+    "category": "Equipment & tools",
+    "kind": "item",
+    "description": "An observed item is retained as previously obtained; this does not prove you still own it.",
+    "wiki": "Silk-lined herb sack",
+    "rule": {
+      "kind": "item",
+      "ids": [
+        33135,
+        33137
+      ]
+    }
+  },
+  {
+    "id": "item.abyssal_needle",
+    "name": "Abyssal needle",
+    "category": "Equipment & tools",
+    "kind": "item",
+    "description": "Permanent needle reward flag; obtaining it does not date the original drop.",
+    "wiki": "Abyssal needle",
+    "rule": {
+      "kind": "flag",
+      "id": 13690,
+      "name": "GOTR_UNLOCKED_NEEDLE"
+    }
+  },
+  {
+    "id": "spellbook.standard",
+    "name": "Standard spellbook",
+    "category": "Spellbooks",
+    "kind": "unlock",
+    "description": "The default spellbook.",
+    "wiki": "Standard spellbook",
+    "rule": {
+      "kind": "available"
+    }
+  },
+  {
+    "id": "spellbook.ancient",
+    "name": "Ancient Magicks",
+    "category": "Spellbooks",
+    "kind": "unlock",
+    "description": "Complete Desert Treasure I.",
+    "wiki": "Ancient Magicks",
+    "rule": {
+      "kind": "quest",
+      "name": "DESERT_TREASURE_I"
+    }
+  },
+  {
+    "id": "spellbook.lunar",
+    "name": "Lunar spellbook",
+    "category": "Spellbooks",
+    "kind": "unlock",
+    "description": "Complete Lunar Diplomacy.",
+    "wiki": "Lunar spellbook",
+    "rule": {
+      "kind": "quest",
+      "name": "LUNAR_DIPLOMACY"
+    }
+  },
+  {
+    "id": "spellbook.arceuus",
+    "name": "Arceuus spellbook",
+    "category": "Spellbooks",
+    "kind": "unlock",
+    "description": "Unlock access to the Arceuus spellbook.",
+    "wiki": "Arceuus spellbook",
+    "rule": {
+      "kind": "flag",
+      "id": 9631,
+      "name": "ARCEUUS_SPELLBOOK_UNLOCKED"
+    }
+  },
+  {
+    "id": "travel.spirit_network",
+    "name": "Spirit tree network",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Unlock the spirit tree network through Tree Gnome Village.",
+    "wiki": "Spirit tree",
+    "rule": {
+      "kind": "quest",
+      "name": "TREE_GNOME_VILLAGE"
+    }
+  },
+  {
+    "id": "travel.fairy_rings",
+    "name": "Fairy ring network",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Fairy ring permission is separate from finishing Fairytale II.",
+    "wiki": "Fairy rings",
+    "rule": {
+      "kind": "flag",
+      "id": 2329,
+      "name": "FAIRYRING_PERMISSION"
+    }
+  },
+  {
+    "id": "travel.fairy_cis",
+    "name": "Arceuus fairy ring (CIS)",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Unlock the additional fairy ring destination.",
+    "wiki": "Fairy rings",
+    "rule": {
+      "kind": "flag",
+      "id": 4885,
+      "name": "ZEAH_FAIRYRING_CIS_UNLOCKED"
+    }
+  },
+  {
+    "id": "spirit.brimhaven",
+    "name": "Brimhaven spirit tree",
+    "category": "Teleports & travel",
+    "kind": "grown",
+    "description": "Record having grown or built a usable spirit tree here. Trees can later be removed; this checklist does not claim current availability.",
+    "wiki": "Spirit tree",
+    "rule": null
+  },
+  {
+    "id": "spirit.etceteria",
+    "name": "Etceteria spirit tree",
+    "category": "Teleports & travel",
+    "kind": "grown",
+    "description": "Record having grown or built a usable spirit tree here. Trees can later be removed; this checklist does not claim current availability.",
+    "wiki": "Spirit tree",
+    "rule": null
+  },
+  {
+    "id": "spirit.port_sarim",
+    "name": "Port Sarim spirit tree",
+    "category": "Teleports & travel",
+    "kind": "grown",
+    "description": "Record having grown or built a usable spirit tree here. Trees can later be removed; this checklist does not claim current availability.",
+    "wiki": "Spirit tree",
+    "rule": null
+  },
+  {
+    "id": "spirit.hosidius",
+    "name": "Hosidius spirit tree",
+    "category": "Teleports & travel",
+    "kind": "grown",
+    "description": "Record having grown or built a usable spirit tree here. Trees can later be removed; this checklist does not claim current availability.",
+    "wiki": "Spirit tree",
+    "rule": null
+  },
+  {
+    "id": "spirit.farming_guild",
+    "name": "Farming Guild spirit tree",
+    "category": "Teleports & travel",
+    "kind": "grown",
+    "description": "Record having grown or built a usable spirit tree here. Trees can later be removed; this checklist does not claim current availability.",
+    "wiki": "Spirit tree",
+    "rule": null
+  },
+  {
+    "id": "spirit.house",
+    "name": "Player-owned house spirit tree",
+    "category": "Teleports & travel",
+    "kind": "grown",
+    "description": "Record having grown or built a usable spirit tree here. Trees can later be removed; this checklist does not claim current availability.",
+    "wiki": "Spirit tree",
+    "rule": null
+  },
+  {
+    "id": "mushtree.house",
+    "name": "House on the Hill mushtree",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Discover this Magic Mushtree destination on Fossil Island.",
+    "wiki": "Magic Mushtree",
+    "rule": null
+  },
+  {
+    "id": "mushtree.meadow",
+    "name": "Verdant Valley mushtree",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Discover this Magic Mushtree destination on Fossil Island.",
+    "wiki": "Magic Mushtree",
+    "rule": null
+  },
+  {
+    "id": "mushtree.swamp",
+    "name": "Sticky Swamp mushtree",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Discover this Magic Mushtree destination on Fossil Island.",
+    "wiki": "Magic Mushtree",
+    "rule": null
+  },
+  {
+    "id": "mushtree.mountain",
+    "name": "Mushroom Meadow mushtree",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Discover this Magic Mushtree destination on Fossil Island.",
+    "wiki": "Magic Mushtree",
+    "rule": null
+  },
+  {
+    "id": "travel.gliders",
+    "name": "Gnome glider network",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Quest completion confirms the network or reward; individual routes may have extra requirements.",
+    "wiki": "Transportation",
+    "rule": {
+      "kind": "quest",
+      "name": "THE_GRAND_TREE"
+    }
+  },
+  {
+    "id": "travel.balloons",
+    "name": "Balloon transport network",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Enlightened Journey confirms the initial Entrana–Taverley route. Other destinations require their own unlock journey.",
+    "wiki": "Balloon transport system",
+    "rule": {
+      "kind": "quest",
+      "name": "ENLIGHTENED_JOURNEY"
+    }
+  },
+  {
+    "id": "travel.eagles",
+    "name": "Eagle transport network",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Quest completion confirms the network or reward; individual routes may have extra requirements.",
+    "wiki": "Transportation",
+    "rule": {
+      "kind": "quest",
+      "name": "EAGLES_PEAK"
+    }
+  },
+  {
+    "id": "travel.ectophial",
+    "name": "Ectophial teleport",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Quest completion confirms the network or reward; individual routes may have extra requirements.",
+    "wiki": "Transportation",
+    "rule": {
+      "kind": "quest",
+      "name": "GHOSTS_AHOY"
+    }
+  },
+  {
+    "id": "balloon.varrock",
+    "name": "Varrock balloon route",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Complete this balloon route's unlock journey.",
+    "wiki": "Balloon transport system",
+    "rule": null
+  },
+  {
+    "id": "balloon.crafting_guild",
+    "name": "Crafting Guild balloon route",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Complete this balloon route's unlock journey.",
+    "wiki": "Balloon transport system",
+    "rule": null
+  },
+  {
+    "id": "balloon.castle_wars",
+    "name": "Castle Wars balloon route",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Complete this balloon route's unlock journey.",
+    "wiki": "Balloon transport system",
+    "rule": null
+  },
+  {
+    "id": "balloon.grand_tree",
+    "name": "Grand Tree balloon route",
+    "category": "Teleports & travel",
+    "kind": "unlock",
+    "description": "Complete this balloon route's unlock journey.",
+    "wiki": "Balloon transport system",
+    "rule": null
+  },
+  {
+    "id": "shortcut.wyrmscraig",
+    "name": "Wyrmscraig cliff",
+    "category": "Shortcuts",
+    "kind": "unlock",
+    "description": "Track the permanent preparation or unlock. Required Agility levels and equipment still apply.",
+    "wiki": "Shortcuts",
+    "rule": {
+      "kind": "flag",
+      "id": 15720,
+      "name": "WYRMSCRAIG_CLIFF_SHORTCUT"
+    }
+  },
+  {
+    "id": "shortcut.observatory",
+    "name": "Observatory rope",
+    "category": "Shortcuts",
+    "kind": "unlock",
+    "description": "Track the permanent preparation or unlock. Required Agility levels and equipment still apply.",
+    "wiki": "Shortcuts",
+    "rule": {
+      "kind": "flag",
+      "id": 5810,
+      "name": "OBSERVATORY_SHORTCUT_ROPE"
+    }
+  },
+  {
+    "id": "shortcut.darkmeyer_inner",
+    "name": "Darkmeyer inner wall",
+    "category": "Shortcuts",
+    "kind": "unlock",
+    "description": "Track the permanent preparation or unlock. Required Agility levels and equipment still apply.",
+    "wiki": "Shortcuts",
+    "rule": {
+      "kind": "flag",
+      "id": 10449,
+      "name": "DARKM_SHORTCUT_INNER"
+    }
+  },
+  {
+    "id": "shortcut.darkmeyer_outer",
+    "name": "Darkmeyer outer wall",
+    "category": "Shortcuts",
+    "kind": "unlock",
+    "description": "Track the permanent preparation or unlock. Required Agility levels and equipment still apply.",
+    "wiki": "Shortcuts",
+    "rule": {
+      "kind": "flag",
+      "id": 10450,
+      "name": "DARKM_SHORTCUT_OUTER"
+    }
+  },
+  {
+    "id": "shortcut.viyeldi",
+    "name": "Viyeldi caves",
+    "category": "Shortcuts",
+    "kind": "unlock",
+    "description": "Track the permanent preparation or unlock. Required Agility levels and equipment still apply.",
+    "wiki": "Shortcuts",
+    "rule": {
+      "kind": "flag",
+      "id": 11799,
+      "name": "VIYELDI_SHORTCUT"
+    }
+  },
+  {
+    "id": "shortcut.ghorrock_one",
+    "name": "Ghorrock Prison — first shortcut",
+    "category": "Shortcuts",
+    "kind": "unlock",
+    "description": "Track the permanent preparation or unlock. Required Agility levels and equipment still apply.",
+    "wiki": "Shortcuts",
+    "rule": {
+      "kind": "flag",
+      "id": 15177,
+      "name": "DT2_GHORROCK_SHORTCUT_1"
+    }
+  },
+  {
+    "id": "shortcut.ghorrock_two",
+    "name": "Ghorrock Prison — second shortcut",
+    "category": "Shortcuts",
+    "kind": "unlock",
+    "description": "Track the permanent preparation or unlock. Required Agility levels and equipment still apply.",
+    "wiki": "Shortcuts",
+    "rule": {
+      "kind": "flag",
+      "id": 15178,
+      "name": "DT2_GHORROCK_SHORTCUT_2"
+    }
+  },
+  {
+    "id": "area.varlamore",
+    "name": "Varlamore",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Complete the associated access quest.",
+    "wiki": "Varlamore",
+    "rule": {
+      "kind": "quest",
+      "name": "CHILDREN_OF_THE_SUN",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.morytania",
+    "name": "Morytania",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Complete the associated access quest.",
+    "wiki": "Morytania",
+    "rule": {
+      "kind": "quest",
+      "name": "PRIEST_IN_PERIL",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.prifddinas",
+    "name": "Prifddinas",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Complete the associated access quest.",
+    "wiki": "Prifddinas",
+    "rule": {
+      "kind": "quest",
+      "name": "SONG_OF_THE_ELVES",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.fossil_island",
+    "name": "Fossil Island",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Complete the associated access quest.",
+    "wiki": "Fossil Island",
+    "rule": {
+      "kind": "quest",
+      "name": "BONE_VOYAGE",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.darkmeyer",
+    "name": "Darkmeyer",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Complete the associated access quest.",
+    "wiki": "Darkmeyer",
+    "rule": {
+      "kind": "quest",
+      "name": "SINS_OF_THE_FATHER",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.tirannwn",
+    "name": "Tirannwn",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Quest completion confirms access. Earlier access may require manual confirmation.",
+    "wiki": "Tirannwn",
+    "rule": {
+      "kind": "quest",
+      "name": "REGICIDE",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.ape_atoll",
+    "name": "Ape Atoll",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Quest completion confirms access. Earlier access may require manual confirmation.",
+    "wiki": "Ape Atoll",
+    "rule": {
+      "kind": "quest",
+      "name": "MONKEY_MADNESS_I",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.shilo",
+    "name": "Shilo Village",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Complete the associated access quest.",
+    "wiki": "Shilo Village",
+    "rule": {
+      "kind": "quest",
+      "name": "SHILO_VILLAGE",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.mos_leharmless",
+    "name": "Mos Le'Harmless",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Complete the associated access quest.",
+    "wiki": "Mos Le'Harmless",
+    "rule": {
+      "kind": "quest",
+      "name": "CABIN_FEVER",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.lunar_isle",
+    "name": "Lunar Isle",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Quest completion confirms access. Earlier access may require manual confirmation.",
+    "wiki": "Lunar Isle",
+    "rule": {
+      "kind": "quest",
+      "name": "LUNAR_DIPLOMACY",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.myths_guild",
+    "name": "Myths' Guild",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Complete the associated access quest.",
+    "wiki": "Myths' Guild",
+    "rule": {
+      "kind": "quest",
+      "name": "DRAGON_SLAYER_II",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.miscellania",
+    "name": "Managing Miscellania",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Complete the associated access quest.",
+    "wiki": "Managing Miscellania",
+    "rule": {
+      "kind": "quest",
+      "name": "THRONE_OF_MISCELLANIA",
+      "positiveOnly": true
+    }
+  },
+  {
+    "id": "area.wyrmscraig",
+    "name": "Wyrmscraig quest access",
+    "category": "Area access",
+    "kind": "unlock",
+    "description": "Quest completion confirms access. Earlier access may require manual confirmation.",
+    "wiki": "Wyrmscraig quest access",
+    "rule": {
+      "kind": "quest",
+      "name": "FALLEN_FROM_GRACE",
+      "positiveOnly": true
+    }
+  }
+]
