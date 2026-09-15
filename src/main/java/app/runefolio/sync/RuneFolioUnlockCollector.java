@@ -7,7 +7,10 @@ import com.google.gson.JsonObject;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import javax.inject.Inject;
@@ -32,13 +35,15 @@ import net.runelite.client.events.RuneScapeProfileChanged;
 @Singleton
 final class RuneFolioUnlockCollector
 {
+    static final int MAX_OBSERVATIONS = 200;
     private final Client client;
     private final RuneFolioConfig config;
     private final EventBus eventBus;
     private final JsonArray catalog;
     private final Map<String, JsonObject> observedItems = new LinkedHashMap<>();
+    private final Map<Integer, List<String>> itemUnlocks = new HashMap<>();
+    private final Map<String, JsonObject> accepted = new HashMap<>();
     private Predicate<JsonObject> publish;
-    private JsonObject lastSent;
     private long characterHash;
     private int ticks;
     private boolean itemChanged;
@@ -50,7 +55,16 @@ final class RuneFolioUnlockCollector
         {
             if (stream == null) throw new IllegalStateException("Unlock catalog is missing");
             catalog = gson.fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), JsonArray.class);
-            if (catalog == null || catalog.size() > 200) throw new IllegalStateException("Invalid unlock catalog");
+            if (catalog == null || catalog.size() == 0 || catalog.size() > 1000) throw new IllegalStateException("Invalid unlock catalog");
+            for (JsonElement value : catalog)
+            {
+                JsonObject entry = value.getAsJsonObject();
+                if (entry.get("rule").isJsonNull()) continue;
+                JsonObject rule = entry.getAsJsonObject("rule");
+                if (!"item".equals(rule.get("kind").getAsString())) continue;
+                for (JsonElement item : rule.getAsJsonArray("ids"))
+                    itemUnlocks.computeIfAbsent(item.getAsInt(), ignored -> new ArrayList<>()).add(entry.get("id").getAsString());
+            }
         }
         catch (java.io.IOException exception) { throw new IllegalStateException("Unlock catalog could not be read", exception); }
     }
@@ -86,34 +100,27 @@ final class RuneFolioUnlockCollector
         {
             JsonArray observations = new JsonArray();
             for (JsonObject item : observedItems.values()) observations.add(item.deepCopy());
-            JsonObject payload = new JsonObject(); payload.add("observations", observations);
-            if (publish.test(payload)) itemChanged = false;
+            if (publishObservations(observations, false)) itemChanged = false;
         }
     }
 
     private void observeItems(ItemContainer container)
     {
-        if (container == null || container.getItems().length > 1200) return;
-        for (JsonElement value : catalog)
+        if (container == null) return;
+        Item[] items = container.getItems();
+        if (items == null || items.length > 2000) return;
+        // One pass through the visible container; no catalog-by-bank nested scan.
+        for (Item item : items)
         {
-            JsonObject entry = value.getAsJsonObject();
-            if (entry.get("rule").isJsonNull()) continue;
-            JsonObject rule = entry.getAsJsonObject("rule");
-            if (!"item".equals(rule.get("kind").getAsString())) continue;
-            String id = entry.get("id").getAsString();
-            if (observedItems.containsKey(id)) continue;
-            for (Item item : container.getItems())
+            if (item == null || item.getQuantity() <= 0) continue;
+            List<String> ids = itemUnlocks.get(item.getId());
+            if (ids == null) continue;
+            for (String id : ids)
             {
-                if (item.getQuantity() <= 0 || !containsItem(rule.getAsJsonArray("ids"), item.getId())) continue;
-                observedItems.put(id, observation(id, true, "item")); itemChanged = true; break;
+                if (observedItems.containsKey(id)) continue;
+                observedItems.put(id, observation(id, true, "item")); itemChanged = true;
             }
         }
-    }
-
-    static boolean containsItem(JsonArray ids, int id)
-    {
-        for (JsonElement value : ids) if (value.getAsInt() == id) return true;
-        return false;
     }
 
     @Subscribe public void onGameTick(GameTick event)
@@ -132,6 +139,7 @@ final class RuneFolioUnlockCollector
         observeItems(client.getItemContainer(InventoryID.INVENTORY));
         observeItems(client.getItemContainer(InventoryID.EQUIPMENT));
         JsonArray observations = new JsonArray();
+        Map<String, QuestState> questStates = new HashMap<>();
         for (JsonElement value : catalog)
         {
             JsonObject entry = value.getAsJsonObject();
@@ -141,18 +149,23 @@ final class RuneFolioUnlockCollector
             Boolean unlocked = null; String evidence = null;
             try
             {
-                if ("flag".equals(kind))
+                if ("flag".equals(kind) || "threshold".equals(kind))
                 {
                     int varbit = rule.get("id").getAsInt();
                     if (client.getVarbit(varbit) == null) continue;
-                    unlocked = binaryFlag(client.getVarbitValue(varbit)); evidence = "game_flag";
+                    int raw = client.getVarbitValue(varbit);
+                    unlocked = "threshold".equals(kind)
+                        ? thresholdFlag(raw, rule.get("minimum").getAsInt(), rule.get("maximum").getAsInt())
+                        : binaryFlag(raw);
+                    evidence = "game_flag";
                     // Item rewards only establish that an item was obtained; absence is not an inventory audit.
                     if ("item".equals(entry.get("kind").getAsString()) && Boolean.FALSE.equals(unlocked)) unlocked = null;
                 }
                 else if ("quest".equals(kind))
                 {
-                    Quest quest = Quest.valueOf(rule.get("name").getAsString());
-                    QuestState state = quest.getState(client);
+                    String name = rule.get("name").getAsString();
+                    if (!questStates.containsKey(name)) questStates.put(name, Quest.valueOf(name).getState(client));
+                    QuestState state = questStates.get(name);
                     if (state != null) unlocked = state == QuestState.FINISHED;
                     if (rule.has("positiveOnly") && rule.get("positiveOnly").getAsBoolean() && Boolean.FALSE.equals(unlocked)) unlocked = null;
                     evidence = "quest";
@@ -163,11 +176,42 @@ final class RuneFolioUnlockCollector
             if (unlocked != null) observations.add(observation(id, unlocked, evidence));
         }
         for (JsonObject item : observedItems.values()) observations.add(item.deepCopy());
-        JsonObject payload = new JsonObject(); payload.add("observations", observations);
-        if (observations.size() == 0 || (!force && payload.equals(lastSent))) { itemChanged = false; return; }
-        if (publish != null && publish.test(payload)) { lastSent = payload.deepCopy(); itemChanged = false; }
+        if (publishObservations(observations, force)) itemChanged = false;
     }
 
+    private boolean publishObservations(JsonArray observations, boolean force)
+    {
+        if (publish == null) return false;
+        JsonArray batch = new JsonArray();
+        for (JsonElement value : observations)
+        {
+            JsonObject row = value.getAsJsonObject();
+            if (!force && row.equals(accepted.get(row.get("id").getAsString()))) continue;
+            batch.add(row.deepCopy());
+            if (batch.size() == MAX_OBSERVATIONS)
+            {
+                if (!publishBatch(batch)) return false;
+                batch = new JsonArray();
+            }
+        }
+        return batch.size() == 0 || publishBatch(batch);
+    }
+
+    private boolean publishBatch(JsonArray batch)
+    {
+        JsonObject payload = new JsonObject(); payload.add("observations", batch);
+        if (!publish.test(payload)) return false;
+        // Only accepted chunks become deduplicated. A later rejected chunk stays pending.
+        for (JsonElement value : batch)
+        {
+            JsonObject row = value.getAsJsonObject();
+            accepted.put(row.get("id").getAsString(), row.deepCopy());
+        }
+        return true;
+    }
+
+    static Boolean thresholdFlag(int value, int minimum, int maximum)
+    { return value < 0 || value > maximum || minimum < 1 || minimum > maximum ? null : value >= minimum; }
     static Boolean binaryFlag(int value) { return value == 0 ? Boolean.FALSE : value == 1 ? Boolean.TRUE : null; }
     static JsonObject observation(String id, boolean unlocked, String evidence)
     {
@@ -180,5 +224,5 @@ final class RuneFolioUnlockCollector
     }
     @Subscribe public void onRuneScapeProfileChanged(RuneScapeProfileChanged event) { reset(); }
     @Subscribe public void onConfigChanged(ConfigChanged event) { if ("runefolio".equals(event.getGroup()) && "syncAccountUnlocks".equals(event.getKey())) reset(); }
-    private void reset() { observedItems.clear(); lastSent = null; ticks = 0; characterHash = 0; itemChanged = false; }
+    private void reset() { observedItems.clear(); accepted.clear(); ticks = 0; characterHash = 0; itemChanged = false; }
 }
