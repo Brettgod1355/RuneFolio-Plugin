@@ -667,8 +667,8 @@
     "name": "Wyrmscraig cliff",
     "category": "Shortcuts",
     "kind": "unlock",
-    "description": "Track the permanent preparation or unlock. Required Agility levels and equipment still apply.",
-    "wiki": "Shortcuts",
+    "description": "Access to the cliff opens during Fallen From Grace. Mine the rocks at the top to open the shortcut to Ardeaglais cathedral. Requires 54 Agility to use; quest progress alone does not confirm that you cleared the rocks.",
+    "wiki": "Rocks (Wyrmscraig)",
     "rule": {
       "kind": "flag",
       "id": 15720,
