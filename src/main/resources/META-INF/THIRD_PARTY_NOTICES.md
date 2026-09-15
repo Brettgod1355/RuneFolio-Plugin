@@ -2,6 +2,8 @@
 
 ## Account unlock catalog and passive collector — 2026-09-15
 
+Wyrmscraig shortcut requirement facts were checked against https://oldschool.runescape.wiki/w/Rocks_(Wyrmscraig) on 2026-09-15. The catalog explanation is independently worded; no article prose or artwork is reproduced.
+
 `lib/unlocks-catalog.json` (website) and `src/main/resources/unlocks-catalog.json` (plugin) share a bounded checklist of game names and API identifiers. Identifier references: RuneLite commit `bc408c5a53a5dea3e586327002f1d3b59a9fbc28`, `runelite-api/src/main/java/net/runelite/api/gameval/VarbitID.java`, `ItemID.java`, `Quest.java`, and the public Client/ItemContainer APIs: https://github.com/runelite/runelite/tree/bc408c5a53a5dea3e586327002f1d3b59a9fbc28/runelite-api/src/main/java/net/runelite/api . RuneLite's root BSD-2-Clause terms and applicable source headers were inspected. Catalog descriptions, evidence protocol, collector and interface are independently implemented; no RuneLite implementation or wiki article prose/assets are copied. Game names and identifiers belong to their applicable rights holders. Credit: RuneLite contributors and Jagex.
 
 RuneLite's FarmingWorld and Quest Helper's InAidOfTheMyreque quest definition were inspected as behavior references. Region-dependent tree state is deliberately not treated as a globally readable unlock. No code or task mapping was copied from those references for this feature. Unsupported automatic mappings are left to explicit manual confirmation. This entry does not close the historical provenance review above.
