@@ -9,7 +9,9 @@ public class RuneFolioCatalogContractTest
     public void progressCatalogsMatchTheGameTotals()
     {
         Assert.assertEquals(29, RuneFolioProgressCollector.supplementalQuestCount());
-        Assert.assertEquals(182, net.runelite.api.Quest.values().length - RuneFolioProgressCollector.supplementalQuestCount());
+        // Matches net.runelite:client 1.12.39, pinned in build.gradle. Bump this
+        // alongside the pin, not independently, if it ever needs to change again.
+        Assert.assertEquals(184, net.runelite.api.Quest.values().length - RuneFolioProgressCollector.supplementalQuestCount());
         Assert.assertEquals(48, RuneFolioProgressCollector.trackedDiaryTierCount());
         Assert.assertEquals(655, RuneFolioCombatTaskCatalog.trackedTaskCount());
     }
