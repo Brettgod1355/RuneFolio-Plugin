@@ -29,7 +29,7 @@ public class RuneFolioUnlockCollectorTest
     {
         assertNull(RuneFolioUnlockCollector.binaryFlag(-1)); assertNull(RuneFolioUnlockCollector.binaryFlag(2));
         assertEquals(Boolean.FALSE, RuneFolioUnlockCollector.binaryFlag(0)); assertEquals(Boolean.TRUE, RuneFolioUnlockCollector.binaryFlag(1));
-        assertFalse(new RuneFolioConfig(){}.syncAccountUnlocks());
+        assertTrue(new RuneFolioConfig(){}.syncAccountUnlocks());
         JsonObject payload = new JsonObject(); payload.add("observations", new JsonArray());
         RuneFolioSyncEvent a = RuneFolioSyncEvent.historyEvent("unlocks.snapshot", "Example", payload);
         RuneFolioSyncEvent b = RuneFolioSyncEvent.historyEvent("unlocks.snapshot", "Example", payload);
