@@ -6786,5 +6786,5017 @@
     "wiki": "Doomsayer",
     "rule": null,
     "group": "Doomsayer warning options"
+  },
+  {
+    "id": "sea_charting.0",
+    "name": "Board Port Sarim",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Bay of Sarim · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18574,
+      "name": "SAILING_CHARTING_GENERIC_BOARD_PORT_SARIM_COMPLETE"
+    },
+    "group": "Ardent Ocean — Bay of Sarim"
+  },
+  {
+    "id": "sea_charting.1",
+    "name": "Salvage Station Port Sarim",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Bay of Sarim · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18575,
+      "name": "SAILING_CHARTING_GENERIC_SALVAGE_STATION_PORT_SARIM_COMPLETE"
+    },
+    "group": "Ardent Ocean — Bay of Sarim"
+  },
+  {
+    "id": "sea_charting.2",
+    "name": "Wizards Tower",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Bay of Sarim · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18576,
+      "name": "SAILING_CHARTING_SPYGLASS_WIZARDS_TOWER_COMPLETE"
+    },
+    "group": "Ardent Ocean — Bay of Sarim"
+  },
+  {
+    "id": "sea_charting.3",
+    "name": "Fairy Ring",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Bay of Sarim · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18577,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_FAIRY_RING_COMPLETE"
+    },
+    "group": "Ardent Ocean — Bay of Sarim"
+  },
+  {
+    "id": "sea_charting.4",
+    "name": "Rock Bay Of Sarim",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Bay of Sarim · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18578,
+      "name": "SAILING_CHARTING_GENERIC_ROCK_BAY_OF_SARIM_COMPLETE"
+    },
+    "group": "Ardent Ocean — Bay of Sarim"
+  },
+  {
+    "id": "sea_charting.5",
+    "name": "Rowboat Bay Of Sarim",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Bay of Sarim · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18579,
+      "name": "SAILING_CHARTING_GENERIC_ROWBOAT_BAY_OF_SARIM_COMPLETE"
+    },
+    "group": "Ardent Ocean — Bay of Sarim"
+  },
+  {
+    "id": "sea_charting.6",
+    "name": "Crunch Poster",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Mudskipper Sound · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18580,
+      "name": "SAILING_CHARTING_GENERIC_CRUNCH_POSTER_COMPLETE"
+    },
+    "group": "Ardent Ocean — Mudskipper Sound"
+  },
+  {
+    "id": "sea_charting.7",
+    "name": "Glider Kharidian Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharidian Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18581,
+      "name": "SAILING_CHARTING_GENERIC_GLIDER_KHARIDIAN_SEA_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharidian Sea"
+  },
+  {
+    "id": "sea_charting.8",
+    "name": "Rowboat Mudskipper Sound",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Mudskipper Sound · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18582,
+      "name": "SAILING_CHARTING_GENERIC_ROWBOAT_MUDSKIPPER_SOUND_COMPLETE"
+    },
+    "group": "Ardent Ocean — Mudskipper Sound"
+  },
+  {
+    "id": "sea_charting.9",
+    "name": "Musa Point",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Mudskipper Sound · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18583,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_MUSA_POINT_COMPLETE"
+    },
+    "group": "Ardent Ocean — Mudskipper Sound"
+  },
+  {
+    "id": "sea_charting.10",
+    "name": "Shipyard",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Mudskipper Sound · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18584,
+      "name": "SAILING_CHARTING_SPYGLASS_SHIPYARD_COMPLETE"
+    },
+    "group": "Ardent Ocean — Mudskipper Sound"
+  },
+  {
+    "id": "sea_charting.11",
+    "name": "Prying Times",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharidian Sea · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18585,
+      "name": "SAILING_CHARTING_DRINK_CRATE_PRYING_TIMES_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharidian Sea"
+  },
+  {
+    "id": "sea_charting.12",
+    "name": "Kharidian Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharidian Sea · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18586,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_KHARIDIAN_SEA_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharidian Sea"
+  },
+  {
+    "id": "sea_charting.13",
+    "name": "Kharidian Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharidian Sea · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18587,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_KHARIDIAN_SEA_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharidian Sea"
+  },
+  {
+    "id": "sea_charting.14",
+    "name": "The Pandemonium",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharidian Sea · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18588,
+      "name": "SAILING_CHARTING_SPYGLASS_THE_PANDEMONIUM_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharidian Sea"
+  },
+  {
+    "id": "sea_charting.15",
+    "name": "Pandemonium 2",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharidian Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18589,
+      "name": "SAILING_CHARTING_GENERIC_PANDEMONIUM_2_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharidian Sea"
+  },
+  {
+    "id": "sea_charting.16",
+    "name": "Pandemonium 3",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharidian Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18590,
+      "name": "SAILING_CHARTING_GENERIC_PANDEMONIUM_3_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharidian Sea"
+  },
+  {
+    "id": "sea_charting.17",
+    "name": "Corpse Lumbridge Basin",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Lumbridge Basin · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18591,
+      "name": "SAILING_CHARTING_GENERIC_CORPSE_LUMBRIDGE_BASIN_COMPLETE"
+    },
+    "group": "Ardent Ocean — Lumbridge Basin"
+  },
+  {
+    "id": "sea_charting.18",
+    "name": "Rock Lumbridge Basin",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Lumbridge Basin · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18592,
+      "name": "SAILING_CHARTING_GENERIC_ROCK_LUMBRIDGE_BASIN_COMPLETE"
+    },
+    "group": "Ardent Ocean — Lumbridge Basin"
+  },
+  {
+    "id": "sea_charting.19",
+    "name": "Lumbridge Mine",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Lumbridge Basin · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18593,
+      "name": "SAILING_CHARTING_SPYGLASS_LUMBRIDGE_MINE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Lumbridge Basin"
+  },
+  {
+    "id": "sea_charting.20",
+    "name": "Lumbridge Basin",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Lumbridge Basin · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18594,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_LUMBRIDGE_BASIN_COMPLETE"
+    },
+    "group": "Ardent Ocean — Lumbridge Basin"
+  },
+  {
+    "id": "sea_charting.21",
+    "name": "Rock Rimmington Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Rimmington Strait · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18595,
+      "name": "SAILING_CHARTING_GENERIC_ROCK_RIMMINGTON_STRAIT_COMPLETE"
+    },
+    "group": "Ardent Ocean — Rimmington Strait"
+  },
+  {
+    "id": "sea_charting.22",
+    "name": "Dragon Statue Rimmington Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Rimmington Strait · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18596,
+      "name": "SAILING_CHARTING_GENERIC_DRAGON_STATUE_RIMMINGTON_STRAIT_COMPLETE"
+    },
+    "group": "Ardent Ocean — Rimmington Strait"
+  },
+  {
+    "id": "sea_charting.23",
+    "name": "Karamja Volcano",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Rimmington Strait · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18597,
+      "name": "SAILING_CHARTING_SPYGLASS_KARAMJA_VOLCANO_COMPLETE"
+    },
+    "group": "Ardent Ocean — Rimmington Strait"
+  },
+  {
+    "id": "sea_charting.24",
+    "name": "Rimmington Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Rimmington Strait · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18598,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_RIMMINGTON_STRAIT_COMPLETE"
+    },
+    "group": "Ardent Ocean — Rimmington Strait"
+  },
+  {
+    "id": "sea_charting.25",
+    "name": "Thorns Catherby Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Catherby Bay · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18599,
+      "name": "SAILING_CHARTING_GENERIC_THORNS_CATHERBY_BAY_COMPLETE"
+    },
+    "group": "Ardent Ocean — Catherby Bay"
+  },
+  {
+    "id": "sea_charting.26",
+    "name": "Megashrimp Catherby Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Catherby Bay · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18600,
+      "name": "SAILING_CHARTING_GENERIC_MEGASHRIMP_CATHERBY_BAY_COMPLETE"
+    },
+    "group": "Ardent Ocean — Catherby Bay"
+  },
+  {
+    "id": "sea_charting.27",
+    "name": "Keep Le Faye",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Catherby Bay · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18601,
+      "name": "SAILING_CHARTING_SPYGLASS_KEEP_LE_FAYE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Catherby Bay"
+  },
+  {
+    "id": "sea_charting.28",
+    "name": "Catherby Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Catherby Bay · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18602,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_CATHERBY_BAY_COMPLETE"
+    },
+    "group": "Ardent Ocean — Catherby Bay"
+  },
+  {
+    "id": "sea_charting.29",
+    "name": "Wreck Brimhaven Passage",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Brimhaven Passage · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18603,
+      "name": "SAILING_CHARTING_GENERIC_WRECK_BRIMHAVEN_PASSAGE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Brimhaven Passage"
+  },
+  {
+    "id": "sea_charting.30",
+    "name": "Bottle Brimhaven Passage",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Brimhaven Passage · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18604,
+      "name": "SAILING_CHARTING_GENERIC_BOTTLE_BRIMHAVEN_PASSAGE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Brimhaven Passage"
+  },
+  {
+    "id": "sea_charting.31",
+    "name": "Fishing Platform",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Brimhaven Passage · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18605,
+      "name": "SAILING_CHARTING_SPYGLASS_FISHING_PLATFORM_COMPLETE"
+    },
+    "group": "Ardent Ocean — Brimhaven Passage"
+  },
+  {
+    "id": "sea_charting.32",
+    "name": "Brimhaven Passage",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Brimhaven Passage · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18606,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_BRIMHAVEN_PASSAGE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Brimhaven Passage"
+  },
+  {
+    "id": "sea_charting.33",
+    "name": "Rowboat Port Khazard",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Strait of Khazard · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18607,
+      "name": "SAILING_CHARTING_GENERIC_ROWBOAT_PORT_KHAZARD_COMPLETE"
+    },
+    "group": "Ardent Ocean — Strait of Khazard"
+  },
+  {
+    "id": "sea_charting.34",
+    "name": "Rock Strait Of Khazard",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Strait of Khazard · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18608,
+      "name": "SAILING_CHARTING_GENERIC_ROCK_STRAIT_OF_KHAZARD_COMPLETE"
+    },
+    "group": "Ardent Ocean — Strait of Khazard"
+  },
+  {
+    "id": "sea_charting.35",
+    "name": "Sign Strait Of Khazard",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Strait of Khazard · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18609,
+      "name": "SAILING_CHARTING_GENERIC_SIGN_STRAIT_OF_KHAZARD_COMPLETE"
+    },
+    "group": "Ardent Ocean — Strait of Khazard"
+  },
+  {
+    "id": "sea_charting.36",
+    "name": "Two Towers",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Strait of Khazard · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18610,
+      "name": "SAILING_CHARTING_SPYGLASS_TWO_TOWERS_COMPLETE"
+    },
+    "group": "Ardent Ocean — Strait of Khazard"
+  },
+  {
+    "id": "sea_charting.37",
+    "name": "Strait Of Khazard",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Strait of Khazard · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18611,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_STRAIT_OF_KHAZARD_COMPLETE"
+    },
+    "group": "Ardent Ocean — Strait of Khazard"
+  },
+  {
+    "id": "sea_charting.38",
+    "name": "Smuggled Rum",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Mudskipper Sound · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18612,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SMUGGLED_RUM_COMPLETE"
+    },
+    "group": "Ardent Ocean — Mudskipper Sound"
+  },
+  {
+    "id": "sea_charting.39",
+    "name": "Sorodamin Bru",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Lumbridge Basin · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18613,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SORODAMIN_BRU_COMPLETE"
+    },
+    "group": "Ardent Ocean — Lumbridge Basin"
+  },
+  {
+    "id": "sea_charting.40",
+    "name": "Marrow Wine",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Catherby Bay · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18614,
+      "name": "SAILING_CHARTING_DRINK_CRATE_MARROW_WINE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Catherby Bay"
+  },
+  {
+    "id": "sea_charting.41",
+    "name": "Slug Balm",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Strait of Khazard · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18615,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SLUG_BALM_COMPLETE"
+    },
+    "group": "Ardent Ocean — Strait of Khazard"
+  },
+  {
+    "id": "sea_charting.42",
+    "name": "Rimmington Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Rimmington Strait · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18616,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_RIMMINGTON_STRAIT_COMPLETE"
+    },
+    "group": "Ardent Ocean — Rimmington Strait"
+  },
+  {
+    "id": "sea_charting.43",
+    "name": "Strait Of Khazard",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Strait of Khazard · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18617,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_STRAIT_OF_KHAZARD_COMPLETE"
+    },
+    "group": "Ardent Ocean — Strait of Khazard"
+  },
+  {
+    "id": "sea_charting.44",
+    "name": "Mudskipper Sound",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Mudskipper Sound · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18618,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_MUDSKIPPER_SOUND_COMPLETE"
+    },
+    "group": "Ardent Ocean — Mudskipper Sound"
+  },
+  {
+    "id": "sea_charting.45",
+    "name": "Catherby Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Catherby Bay · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18619,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_CATHERBY_BAY_COMPLETE"
+    },
+    "group": "Ardent Ocean — Catherby Bay"
+  },
+  {
+    "id": "sea_charting.46",
+    "name": "Strait Of Khazard",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Strait of Khazard · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18620,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_STRAIT_OF_KHAZARD_COMPLETE"
+    },
+    "group": "Ardent Ocean — Strait of Khazard"
+  },
+  {
+    "id": "sea_charting.47",
+    "name": "Red Reef",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Red Reef · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18621,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_RED_REEF_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Red Reef"
+  },
+  {
+    "id": "sea_charting.48",
+    "name": "Barracuda Hq",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Barracuda Belt · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18622,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_BARRACUDA_HQ_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Barracuda Belt"
+  },
+  {
+    "id": "sea_charting.49",
+    "name": "Arrow Passage",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Arrow Passage · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18623,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_ARROW_PASSAGE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Arrow Passage"
+  },
+  {
+    "id": "sea_charting.50",
+    "name": "Turtle Belt",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Turtle Belt · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18624,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_TURTLE_BELT_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Turtle Belt"
+  },
+  {
+    "id": "sea_charting.51",
+    "name": "Great Conch",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Tortugan Sea · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18625,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_GREAT_CONCH_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Tortugan Sea"
+  },
+  {
+    "id": "sea_charting.52",
+    "name": "Rainbow Reef",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Rainbow Reef · Diving (Level 72 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18626,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_RAINBOW_REEF_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Rainbow Reef"
+  },
+  {
+    "id": "sea_charting.53",
+    "name": "Anglerfishs Light",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Anglerfish's Light · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18627,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_ANGLERFISHS_LIGHT_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Anglerfish's Light"
+  },
+  {
+    "id": "sea_charting.54",
+    "name": "The Skullhorde",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · The Skullhorde · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18628,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_THE_SKULLHORDE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — The Skullhorde"
+  },
+  {
+    "id": "sea_charting.55",
+    "name": "Barracuda Belt",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Barracuda Belt · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18629,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_BARRACUDA_BELT_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Barracuda Belt"
+  },
+  {
+    "id": "sea_charting.56",
+    "name": "Arrow Passage",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Arrow Passage · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18630,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_ARROW_PASSAGE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Arrow Passage"
+  },
+  {
+    "id": "sea_charting.57",
+    "name": "Storm Tempor",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · The Storm Tempor · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18631,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_STORM_TEMPOR_COMPLETE"
+    },
+    "group": "Ardent Ocean — The Storm Tempor"
+  },
+  {
+    "id": "sea_charting.58",
+    "name": "Great Conch",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Pearl Bank · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18632,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_GREAT_CONCH_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Pearl Bank"
+  },
+  {
+    "id": "sea_charting.59",
+    "name": "Anglerfishs Light",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Anglerfish's Light · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18633,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_ANGLERFISHS_LIGHT_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Anglerfish's Light"
+  },
+  {
+    "id": "sea_charting.60",
+    "name": "Spinners Gasp",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · The Simian Sea · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18634,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SPINNERS_GASP_COMPLETE"
+    },
+    "group": "Ardent Ocean — The Simian Sea"
+  },
+  {
+    "id": "sea_charting.61",
+    "name": "Barracuda Brew",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Barracuda Belt · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18635,
+      "name": "SAILING_CHARTING_DRINK_CRATE_BARRACUDA_BREW_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Barracuda Belt"
+  },
+  {
+    "id": "sea_charting.62",
+    "name": "Banana Daiquiri",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Arrow Passage · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18636,
+      "name": "SAILING_CHARTING_DRINK_CRATE_BANANA_DAIQUIRI_COMPLETE"
+    },
+    "group": "Ardent Ocean — Arrow Passage"
+  },
+  {
+    "id": "sea_charting.63",
+    "name": "Kharazi Cooler",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharazi Strait · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18637,
+      "name": "SAILING_CHARTING_DRINK_CRATE_KHARAZI_COOLER_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharazi Strait"
+  },
+  {
+    "id": "sea_charting.64",
+    "name": "Dognose Draught",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Turtle Belt · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18638,
+      "name": "SAILING_CHARTING_DRINK_CRATE_DOGNOSE_DRAUGHT_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Turtle Belt"
+  },
+  {
+    "id": "sea_charting.65",
+    "name": "Way Home",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Sea of Shells · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18639,
+      "name": "SAILING_CHARTING_DRINK_CRATE_WAY_HOME_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Sea of Shells"
+  },
+  {
+    "id": "sea_charting.66",
+    "name": "Platinum Rum",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Rainbow Reef · Crate (Level 72 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18640,
+      "name": "SAILING_CHARTING_DRINK_CRATE_PLATINUM_RUM_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Rainbow Reef"
+  },
+  {
+    "id": "sea_charting.67",
+    "name": "Light Dark",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Anglerfish's Light · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18641,
+      "name": "SAILING_CHARTING_DRINK_CRATE_LIGHT_DARK_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Anglerfish's Light"
+  },
+  {
+    "id": "sea_charting.68",
+    "name": "The Simian Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · The Simian Sea · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18642,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_THE_SIMIAN_SEA_COMPLETE"
+    },
+    "group": "Ardent Ocean — The Simian Sea"
+  },
+  {
+    "id": "sea_charting.69",
+    "name": "Pest Island",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · The Simian Sea · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18643,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_PEST_ISLAND_COMPLETE"
+    },
+    "group": "Ardent Ocean — The Simian Sea"
+  },
+  {
+    "id": "sea_charting.70",
+    "name": "Kharazi Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharazi Strait · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18644,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_KHARAZI_STRAIT_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharazi Strait"
+  },
+  {
+    "id": "sea_charting.71",
+    "name": "Red Reef",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Red Reef · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18645,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_RED_REEF_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Red Reef"
+  },
+  {
+    "id": "sea_charting.72",
+    "name": "Storm Tempor",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · The Storm Tempor · Current (Level 24 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18646,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_STORM_TEMPOR_COMPLETE"
+    },
+    "group": "Ardent Ocean — The Storm Tempor"
+  },
+  {
+    "id": "sea_charting.73",
+    "name": "Great Conch",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Sea of Shells · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18647,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_GREAT_CONCH_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Sea of Shells"
+  },
+  {
+    "id": "sea_charting.74",
+    "name": "Rainbow Reef",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Rainbow Reef · Current (Level 72 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18648,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_RAINBOW_REEF_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Rainbow Reef"
+  },
+  {
+    "id": "sea_charting.75",
+    "name": "The Lonely Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · The Lonely Sea · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18649,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_THE_LONELY_SEA_COMPLETE"
+    },
+    "group": "Unquiet Ocean — The Lonely Sea"
+  },
+  {
+    "id": "sea_charting.76",
+    "name": "Void Knights",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · The Simian Sea · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18650,
+      "name": "SAILING_CHARTING_SPYGLASS_VOID_KNIGHTS_COMPLETE"
+    },
+    "group": "Ardent Ocean — The Simian Sea"
+  },
+  {
+    "id": "sea_charting.77",
+    "name": "Monkey Temple",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Arrow Passage · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18651,
+      "name": "SAILING_CHARTING_SPYGLASS_MONKEY_TEMPLE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Arrow Passage"
+  },
+  {
+    "id": "sea_charting.78",
+    "name": "Kharazi Cave",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharazi Strait · Spyglass (Level 24 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18652,
+      "name": "SAILING_CHARTING_SPYGLASS_KHARAZI_CAVE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharazi Strait"
+  },
+  {
+    "id": "sea_charting.79",
+    "name": "Dognose Island",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Turtle Belt · Spyglass (Level 40 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18653,
+      "name": "SAILING_CHARTING_SPYGLASS_DOGNOSE_ISLAND_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Turtle Belt"
+  },
+  {
+    "id": "sea_charting.80",
+    "name": "Unkah Ship",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · The Storm Tempor · Spyglass (Level 24 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18654,
+      "name": "SAILING_CHARTING_SPYGLASS_UNKAH_SHIP_COMPLETE"
+    },
+    "group": "Ardent Ocean — The Storm Tempor"
+  },
+  {
+    "id": "sea_charting.81",
+    "name": "Tortugan Village",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Sea of Shells · Spyglass (Level 45 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18655,
+      "name": "SAILING_CHARTING_SPYGLASS_TORTUGAN_VILLAGE_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Sea of Shells"
+  },
+  {
+    "id": "sea_charting.82",
+    "name": "Conch Mountain",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Bay of Elidinis · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18656,
+      "name": "SAILING_CHARTING_SPYGLASS_CONCH_MOUNTAIN_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Bay of Elidinis"
+  },
+  {
+    "id": "sea_charting.83",
+    "name": "Anglerfishs Lighthouse",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Anglerfish's Light · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18657,
+      "name": "SAILING_CHARTING_SPYGLASS_ANGLERFISHS_LIGHTHOUSE_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Anglerfish's Light"
+  },
+  {
+    "id": "sea_charting.84",
+    "name": "Atoll Cape",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · The Simian Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18658,
+      "name": "SAILING_CHARTING_GENERIC_ATOLL_CAPE_COMPLETE"
+    },
+    "group": "Ardent Ocean — The Simian Sea"
+  },
+  {
+    "id": "sea_charting.85",
+    "name": "Banana Boat",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Oo'glog Channel · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18659,
+      "name": "SAILING_CHARTING_GENERIC_BANANA_BOAT_COMPLETE"
+    },
+    "group": "Ardent Ocean — Oo'glog Channel"
+  },
+  {
+    "id": "sea_charting.86",
+    "name": "Dead Shifter",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Red Reef · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18660,
+      "name": "SAILING_CHARTING_GENERIC_DEAD_SHIFTER_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Red Reef"
+  },
+  {
+    "id": "sea_charting.87",
+    "name": "Pest Shipwreck",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · The Skullhorde · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18661,
+      "name": "SAILING_CHARTING_GENERIC_PEST_SHIPWRECK_COMPLETE"
+    },
+    "group": "Shrouded Ocean — The Skullhorde"
+  },
+  {
+    "id": "sea_charting.88",
+    "name": "Barracuda Rope",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Barracuda Belt · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18662,
+      "name": "SAILING_CHARTING_GENERIC_BARRACUDA_ROPE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Barracuda Belt"
+  },
+  {
+    "id": "sea_charting.89",
+    "name": "Barracuda Portion",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Barracuda Belt · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18663,
+      "name": "SAILING_CHARTING_GENERIC_BARRACUDA_PORTION_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Barracuda Belt"
+  },
+  {
+    "id": "sea_charting.90",
+    "name": "Glider Kharazi Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharazi Strait · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18664,
+      "name": "SAILING_CHARTING_GENERIC_GLIDER_KHARAZI_STRAIT_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharazi Strait"
+  },
+  {
+    "id": "sea_charting.91",
+    "name": "Sea Monkeys",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Arrow Passage · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18665,
+      "name": "SAILING_CHARTING_GENERIC_SEA_MONKEYS_COMPLETE"
+    },
+    "group": "Ardent Ocean — Arrow Passage"
+  },
+  {
+    "id": "sea_charting.92",
+    "name": "Map Bottle",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharazi Strait · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18666,
+      "name": "SAILING_CHARTING_GENERIC_MAP_BOTTLE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharazi Strait"
+  },
+  {
+    "id": "sea_charting.93",
+    "name": "Rapidless Rapid",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharazi Strait · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18667,
+      "name": "SAILING_CHARTING_GENERIC_RAPIDLESS_RAPID_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharazi Strait"
+  },
+  {
+    "id": "sea_charting.94",
+    "name": "Treasure Chest",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Turtle Belt · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18668,
+      "name": "SAILING_CHARTING_GENERIC_TREASURE_CHEST_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Turtle Belt"
+  },
+  {
+    "id": "sea_charting.95",
+    "name": "Crab Statue",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Barracuda Belt · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18669,
+      "name": "SAILING_CHARTING_GENERIC_CRAB_STATUE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Barracuda Belt"
+  },
+  {
+    "id": "sea_charting.96",
+    "name": "Desert Trout",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · The Storm Tempor · Generic (Level 24 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18670,
+      "name": "SAILING_CHARTING_GENERIC_DESERT_TROUT_COMPLETE"
+    },
+    "group": "Ardent Ocean — The Storm Tempor"
+  },
+  {
+    "id": "sea_charting.97",
+    "name": "Lightning Rod",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · The Storm Tempor · Generic (Level 24 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18671,
+      "name": "SAILING_CHARTING_GENERIC_LIGHTNING_ROD_COMPLETE"
+    },
+    "group": "Ardent Ocean — The Storm Tempor"
+  },
+  {
+    "id": "sea_charting.98",
+    "name": "Minor Conch",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Tortugan Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18672,
+      "name": "SAILING_CHARTING_GENERIC_MINOR_CONCH_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Tortugan Sea"
+  },
+  {
+    "id": "sea_charting.99",
+    "name": "Crab Apple",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Tortugan Sea · Generic (Level 45 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18673,
+      "name": "SAILING_CHARTING_GENERIC_CRAB_APPLE_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Tortugan Sea"
+  },
+  {
+    "id": "sea_charting.100",
+    "name": "Gnome Ball",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Rainbow Reef · Generic (Level 72 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18674,
+      "name": "SAILING_CHARTING_GENERIC_GNOME_BALL_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Rainbow Reef"
+  },
+  {
+    "id": "sea_charting.101",
+    "name": "Edge Boat",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Rainbow Reef · Generic (Level 72 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18675,
+      "name": "SAILING_CHARTING_GENERIC_EDGE_BOAT_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Rainbow Reef"
+  },
+  {
+    "id": "sea_charting.102",
+    "name": "Dragon Scales",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · The Lonely Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18676,
+      "name": "SAILING_CHARTING_GENERIC_DRAGON_SCALES_COMPLETE"
+    },
+    "group": "Unquiet Ocean — The Lonely Sea"
+  },
+  {
+    "id": "sea_charting.103",
+    "name": "Large Light",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Anglerfish's Light · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18677,
+      "name": "SAILING_CHARTING_GENERIC_LARGE_LIGHT_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Anglerfish's Light"
+  },
+  {
+    "id": "sea_charting.104",
+    "name": "Gutanoth Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Gu'tanoth Bay · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18678,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_GUTANOTH_BAY_COMPLETE"
+    },
+    "group": "Ardent Ocean — Gu'tanoth Bay"
+  },
+  {
+    "id": "sea_charting.105",
+    "name": "Breakbone Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Breakbone Strait · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18679,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_BREAKBONE_STRAIT_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Breakbone Strait"
+  },
+  {
+    "id": "sea_charting.106",
+    "name": "Soul Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Soul Bay · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18680,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_SOUL_BAY_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Soul Bay"
+  },
+  {
+    "id": "sea_charting.107",
+    "name": "Zul Egil",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Neigwl · Weather (Level 66 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18681,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_ZUL_EGIL_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Neigwl"
+  },
+  {
+    "id": "sea_charting.108",
+    "name": "Ogre Island",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Gu'tanoth Bay · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18682,
+      "name": "SAILING_CHARTING_SPYGLASS_OGRE_ISLAND_COMPLETE"
+    },
+    "group": "Ardent Ocean — Gu'tanoth Bay"
+  },
+  {
+    "id": "sea_charting.109",
+    "name": "Cove Throne",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Oo'glog Channel · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18683,
+      "name": "SAILING_CHARTING_SPYGLASS_COVE_THRONE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Oo'glog Channel"
+  },
+  {
+    "id": "sea_charting.110",
+    "name": "Myths Guild",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Breakbone Strait · Spyglass (Level 40 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18684,
+      "name": "SAILING_CHARTING_SPYGLASS_MYTHS_GUILD_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Breakbone Strait"
+  },
+  {
+    "id": "sea_charting.111",
+    "name": "Cape Soul Island",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Sea of Souls · Spyglass (Level 61 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18685,
+      "name": "SAILING_CHARTING_SPYGLASS_CAPE_SOUL_ISLAND_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Sea of Souls"
+  },
+  {
+    "id": "sea_charting.112",
+    "name": "Toad Ponds",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Backwater · Spyglass (Level 40 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18686,
+      "name": "SAILING_CHARTING_SPYGLASS_TOAD_PONDS_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Backwater"
+  },
+  {
+    "id": "sea_charting.113",
+    "name": "Ruined Tower",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Zul-Egil · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18687,
+      "name": "SAILING_CHARTING_SPYGLASS_RUINED_TOWER_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Zul-Egil"
+  },
+  {
+    "id": "sea_charting.114",
+    "name": "Zul Andra",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Zul-Egil · Spyglass (Level 40 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18688,
+      "name": "SAILING_CHARTING_SPYGLASS_ZUL_ANDRA_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Zul-Egil"
+  },
+  {
+    "id": "sea_charting.115",
+    "name": "Ogre Prayer",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Gu'tanoth Bay · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18689,
+      "name": "SAILING_CHARTING_DRINK_CRATE_OGRE_PRAYER_COMPLETE"
+    },
+    "group": "Ardent Ocean — Gu'tanoth Bay"
+  },
+  {
+    "id": "sea_charting.116",
+    "name": "Point Punch",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Feldip Gulf · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18690,
+      "name": "SAILING_CHARTING_DRINK_CRATE_POINT_PUNCH_COMPLETE"
+    },
+    "group": "Ardent Ocean — Feldip Gulf"
+  },
+  {
+    "id": "sea_charting.117",
+    "name": "Ooglug",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Oo'glog Channel · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18691,
+      "name": "SAILING_CHARTING_DRINK_CRATE_OOGLUG_COMPLETE"
+    },
+    "group": "Ardent Ocean — Oo'glog Channel"
+  },
+  {
+    "id": "sea_charting.118",
+    "name": "Myths Mixer",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Mythic Sea · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18692,
+      "name": "SAILING_CHARTING_DRINK_CRATE_MYTHS_MIXER_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Mythic Sea"
+  },
+  {
+    "id": "sea_charting.119",
+    "name": "Goldless Ale",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Breakbone Strait · Crate (Level 40 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18693,
+      "name": "SAILING_CHARTING_DRINK_CRATE_GOLDLESS_ALE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Breakbone Strait"
+  },
+  {
+    "id": "sea_charting.120",
+    "name": "Destructors Cocktail",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Backwater · Crate (Level 40 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18694,
+      "name": "SAILING_CHARTING_DRINK_CRATE_DESTRUCTORS_COCKTAIL_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Backwater"
+  },
+  {
+    "id": "sea_charting.121",
+    "name": "Zogres Kiss",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Backwater · Crate (Level 40 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18695,
+      "name": "SAILING_CHARTING_DRINK_CRATE_ZOGRES_KISS_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Backwater"
+  },
+  {
+    "id": "sea_charting.122",
+    "name": "Creators Cocktail",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Soul Bay · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18696,
+      "name": "SAILING_CHARTING_DRINK_CRATE_CREATORS_COCKTAIL_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Soul Bay"
+  },
+  {
+    "id": "sea_charting.123",
+    "name": "Soul Bottle",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Sea of Souls · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18697,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SOUL_BOTTLE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Sea of Souls"
+  },
+  {
+    "id": "sea_charting.124",
+    "name": "Zul Rye",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Zul-Egil · Crate (Level 40 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18698,
+      "name": "SAILING_CHARTING_DRINK_CRATE_ZUL_RYE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Zul-Egil"
+  },
+  {
+    "id": "sea_charting.125",
+    "name": "Gutanoth Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Gu'tanoth Bay · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18699,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_GUTANOTH_BAY_COMPLETE"
+    },
+    "group": "Ardent Ocean — Gu'tanoth Bay"
+  },
+  {
+    "id": "sea_charting.126",
+    "name": "Ooglog Channel",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Oo'glog Channel · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18700,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_OOGLOG_CHANNEL_COMPLETE"
+    },
+    "group": "Ardent Ocean — Oo'glog Channel"
+  },
+  {
+    "id": "sea_charting.127",
+    "name": "Mythic Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Mythic Sea · Diving (Level 40 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18701,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_MYTHIC_SEA_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Mythic Sea"
+  },
+  {
+    "id": "sea_charting.128",
+    "name": "Backwater",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Backwater · Diving (Level 40 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18702,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_BACKWATER_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Backwater"
+  },
+  {
+    "id": "sea_charting.129",
+    "name": "Soul Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Soul Bay · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18703,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_SOUL_BAY_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Soul Bay"
+  },
+  {
+    "id": "sea_charting.130",
+    "name": "Feldip Gulf",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Feldip Gulf · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18704,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_FELDIP_GULF_COMPLETE"
+    },
+    "group": "Ardent Ocean — Feldip Gulf"
+  },
+  {
+    "id": "sea_charting.131",
+    "name": "Mythic Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Mythic Sea · Current (Level 40 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18705,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_MYTHIC_SEA_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Mythic Sea"
+  },
+  {
+    "id": "sea_charting.132",
+    "name": "Breakbone Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Breakbone Strait · Current (Level 40 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18706,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_BREAKBONE_STRAIT_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Breakbone Strait"
+  },
+  {
+    "id": "sea_charting.133",
+    "name": "Soul Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Soul Bay · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18707,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_SOUL_BAY_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Soul Bay"
+  },
+  {
+    "id": "sea_charting.134",
+    "name": "Backwater",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Backwater · Current (Level 40 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18708,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_BACKWATER_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Backwater"
+  },
+  {
+    "id": "sea_charting.135",
+    "name": "Ogre Boat",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Gu'tanoth Bay · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18709,
+      "name": "SAILING_CHARTING_GENERIC_OGRE_BOAT_COMPLETE"
+    },
+    "group": "Ardent Ocean — Gu'tanoth Bay"
+  },
+  {
+    "id": "sea_charting.136",
+    "name": "Feldip Ridge",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Feldip Gulf · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18710,
+      "name": "SAILING_CHARTING_GENERIC_FELDIP_RIDGE_COMPLETE"
+    },
+    "group": "Ardent Ocean — Feldip Gulf"
+  },
+  {
+    "id": "sea_charting.137",
+    "name": "Dead Monster",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Oo'glog Channel · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18711,
+      "name": "SAILING_CHARTING_GENERIC_DEAD_MONSTER_COMPLETE"
+    },
+    "group": "Ardent Ocean — Oo'glog Channel"
+  },
+  {
+    "id": "sea_charting.138",
+    "name": "Abandoned Camp",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Mythic Sea · Generic (Level 51 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18712,
+      "name": "SAILING_CHARTING_GENERIC_ABANDONED_CAMP_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Mythic Sea"
+  },
+  {
+    "id": "sea_charting.139",
+    "name": "Soul Shipwreck",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Sea of Souls · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18713,
+      "name": "SAILING_CHARTING_GENERIC_SOUL_SHIPWRECK_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Sea of Souls"
+  },
+  {
+    "id": "sea_charting.140",
+    "name": "Army Attire",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Breakbone Strait · Generic (Level 40 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18714,
+      "name": "SAILING_CHARTING_GENERIC_ARMY_ATTIRE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Breakbone Strait"
+  },
+  {
+    "id": "sea_charting.141",
+    "name": "Diseased Coral",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Backwater · Generic (Level 40 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18715,
+      "name": "SAILING_CHARTING_GENERIC_DISEASED_CORAL_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Backwater"
+  },
+  {
+    "id": "sea_charting.142",
+    "name": "Snake Eggs",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Western Gate · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18716,
+      "name": "SAILING_CHARTING_GENERIC_SNAKE_EGGS_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Western Gate"
+  },
+  {
+    "id": "sea_charting.143",
+    "name": "Large Jellyfish",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Soul Bay · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18717,
+      "name": "SAILING_CHARTING_GENERIC_LARGE_JELLYFISH_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Soul Bay"
+  },
+  {
+    "id": "sea_charting.144",
+    "name": "Poison Spill",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Zul-Egil · Generic (Level 40 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18718,
+      "name": "SAILING_CHARTING_GENERIC_POISON_SPILL_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Zul-Egil"
+  },
+  {
+    "id": "sea_charting.145",
+    "name": "Tirannwn Bight",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Tirannwn Bight · Weather (Level 66 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18719,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_TIRANNWN_BIGHT_COMPLETE"
+    },
+    "group": "Western Ocean — Tirannwn Bight"
+  },
+  {
+    "id": "sea_charting.146",
+    "name": "Porth Neigwl",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Neigwl · Weather (Level 66 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18720,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_PORTH_NEIGWL_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Neigwl"
+  },
+  {
+    "id": "sea_charting.147",
+    "name": "Western Gate",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Western Gate · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18721,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_WESTERN_GATE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Western Gate"
+  },
+  {
+    "id": "sea_charting.148",
+    "name": "Porth Neigwl",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Neigwl · Current (Level 66 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18722,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_PORTH_NEIGWL_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Neigwl"
+  },
+  {
+    "id": "sea_charting.149",
+    "name": "Tirannwn Bight",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Tirannwn Bight · Current (Level 66 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18723,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_TIRANNWN_BIGHT_COMPLETE"
+    },
+    "group": "Western Ocean — Tirannwn Bight"
+  },
+  {
+    "id": "sea_charting.150",
+    "name": "Tyras Camp",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Neigwl · Spyglass (Level 66 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18724,
+      "name": "SAILING_CHARTING_SPYGLASS_TYRAS_CAMP_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Neigwl"
+  },
+  {
+    "id": "sea_charting.151",
+    "name": "Prifddinas Gate",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Tirannwn Bight · Spyglass (Level 66 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18725,
+      "name": "SAILING_CHARTING_SPYGLASS_PRIFDDINAS_GATE_COMPLETE"
+    },
+    "group": "Western Ocean — Tirannwn Bight"
+  },
+  {
+    "id": "sea_charting.152",
+    "name": "Western Gate",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Western Gate · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18726,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_WESTERN_GATE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Western Gate"
+  },
+  {
+    "id": "sea_charting.153",
+    "name": "Crystal Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crystal Sea · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18727,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_CRYSTAL_SEA_COMPLETE"
+    },
+    "group": "Western Ocean — Crystal Sea"
+  },
+  {
+    "id": "sea_charting.154",
+    "name": "Porth Neigwl",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Neigwl · Diving (Level 66 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18728,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_PORTH_NEIGWL_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Neigwl"
+  },
+  {
+    "id": "sea_charting.155",
+    "name": "Sapphire Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Sapphire Sea · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18729,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_SAPPHIRE_SEA_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Sapphire Sea"
+  },
+  {
+    "id": "sea_charting.156",
+    "name": "Tirannwn Bight",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Tirannwn Bight · Diving (Level 66 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18730,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_TIRANNWN_BIGHT_COMPLETE"
+    },
+    "group": "Western Ocean — Tirannwn Bight"
+  },
+  {
+    "id": "sea_charting.157",
+    "name": "Sharhais Purse",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Western Gate · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18731,
+      "name": "SAILING_CHARTING_GENERIC_SHARHAIS_PURSE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Western Gate"
+  },
+  {
+    "id": "sea_charting.158",
+    "name": "Elven Ship",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crystal Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18732,
+      "name": "SAILING_CHARTING_GENERIC_ELVEN_SHIP_COMPLETE"
+    },
+    "group": "Western Ocean — Crystal Sea"
+  },
+  {
+    "id": "sea_charting.159",
+    "name": "Halberd Poles",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Neigwl · Generic (Level 66 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18733,
+      "name": "SAILING_CHARTING_GENERIC_HALBERD_POLES_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Neigwl"
+  },
+  {
+    "id": "sea_charting.160",
+    "name": "River Mine",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Tirannwn Bight · Generic (Level 66 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18734,
+      "name": "SAILING_CHARTING_GENERIC_RIVER_MINE_COMPLETE"
+    },
+    "group": "Western Ocean — Tirannwn Bight"
+  },
+  {
+    "id": "sea_charting.161",
+    "name": "Half Built Ship",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Vagabonds Rest · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18735,
+      "name": "SAILING_CHARTING_GENERIC_HALF_BUILT_SHIP_COMPLETE"
+    },
+    "group": "Western Ocean — Vagabonds Rest"
+  },
+  {
+    "id": "sea_charting.162",
+    "name": "Mango Gin",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Western Gate · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18736,
+      "name": "SAILING_CHARTING_DRINK_CRATE_MANGO_GIN_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Western Gate"
+  },
+  {
+    "id": "sea_charting.163",
+    "name": "Snake Gravy",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crystal Sea · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18737,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SNAKE_GRAVY_COMPLETE"
+    },
+    "group": "Western Ocean — Crystal Sea"
+  },
+  {
+    "id": "sea_charting.164",
+    "name": "Crystal Water",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Neigwl · Crate (Level 66 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18738,
+      "name": "SAILING_CHARTING_DRINK_CRATE_CRYSTAL_WATER_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Neigwl"
+  },
+  {
+    "id": "sea_charting.165",
+    "name": "Underground Milk",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Gwenith · Crate (Level 66 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18739,
+      "name": "SAILING_CHARTING_DRINK_CRATE_UNDERGROUND_MILK_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Gwenith"
+  },
+  {
+    "id": "sea_charting.166",
+    "name": "Elven Wine",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Tirannwn Bight · Crate (Level 66 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18740,
+      "name": "SAILING_CHARTING_DRINK_CRATE_ELVEN_WINE_COMPLETE"
+    },
+    "group": "Western Ocean — Tirannwn Bight"
+  },
+  {
+    "id": "sea_charting.167",
+    "name": "Vagabonds Rest",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Gwenith · Weather (Level 66 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18741,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_VAGABONDS_REST_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Gwenith"
+  },
+  {
+    "id": "sea_charting.168",
+    "name": "Pilgrims Passage",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Pilgrims' Passage · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18742,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_PILGRIMS_PASSAGE_COMPLETE"
+    },
+    "group": "Western Ocean — Pilgrims' Passage"
+  },
+  {
+    "id": "sea_charting.169",
+    "name": "Winters Edge",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Winter's Edge · Weather (Level 78 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18743,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_WINTERS_EDGE_COMPLETE"
+    },
+    "group": "Northern Ocean — Winter's Edge"
+  },
+  {
+    "id": "sea_charting.170",
+    "name": "Porth Gwenith",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Gwenith · Diving (Level 66 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18744,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_PORTH_GWENITH_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Gwenith"
+  },
+  {
+    "id": "sea_charting.171",
+    "name": "Piscatoris Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Piscatoris Sea · Diving (Level 66 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18745,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_PISCATORIS_SEA_COMPLETE"
+    },
+    "group": "Western Ocean — Piscatoris Sea"
+  },
+  {
+    "id": "sea_charting.172",
+    "name": "Gulf Of Kourend",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Gulf of Kourend · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18746,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_GULF_OF_KOUREND_COMPLETE"
+    },
+    "group": "Western Ocean — Gulf of Kourend"
+  },
+  {
+    "id": "sea_charting.173",
+    "name": "Porth Gwenith",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Gwenith · Current (Level 66 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18747,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_PORTH_GWENITH_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Gwenith"
+  },
+  {
+    "id": "sea_charting.174",
+    "name": "Pilgrims Passage",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Pilgrims' Passage · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18748,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_PILGRIMS_PASSAGE_COMPLETE"
+    },
+    "group": "Western Ocean — Pilgrims' Passage"
+  },
+  {
+    "id": "sea_charting.175",
+    "name": "Gulf Of Kourend",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Gulf of Kourend · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18749,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_GULF_OF_KOUREND_COMPLETE"
+    },
+    "group": "Western Ocean — Gulf of Kourend"
+  },
+  {
+    "id": "sea_charting.176",
+    "name": "Winters Edge",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Winter's Edge · Current (Level 78 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18750,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_WINTERS_EDGE_COMPLETE"
+    },
+    "group": "Northern Ocean — Winter's Edge"
+  },
+  {
+    "id": "sea_charting.177",
+    "name": "Fishing Colony",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Piscatoris Sea · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18751,
+      "name": "SAILING_CHARTING_SPYGLASS_FISHING_COLONY_COMPLETE"
+    },
+    "group": "Western Ocean — Piscatoris Sea"
+  },
+  {
+    "id": "sea_charting.178",
+    "name": "Tithe Farm",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Hosidian Sea · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18752,
+      "name": "SAILING_CHARTING_SPYGLASS_TITHE_FARM_COMPLETE"
+    },
+    "group": "Western Ocean — Hosidian Sea"
+  },
+  {
+    "id": "sea_charting.179",
+    "name": "Port Piscarilius",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Gulf of Kourend · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18753,
+      "name": "SAILING_CHARTING_SPYGLASS_PORT_PISCARILIUS_COMPLETE"
+    },
+    "group": "Western Ocean — Gulf of Kourend"
+  },
+  {
+    "id": "sea_charting.180",
+    "name": "River Of Souls",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Everwinter Sea · Spyglass (Level 78 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18754,
+      "name": "SAILING_CHARTING_SPYGLASS_RIVER_OF_SOULS_COMPLETE"
+    },
+    "group": "Northern Ocean — Everwinter Sea"
+  },
+  {
+    "id": "sea_charting.181",
+    "name": "Sea Spray",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Vagabonds Rest · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18755,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SEA_SPRAY_COMPLETE"
+    },
+    "group": "Western Ocean — Vagabonds Rest"
+  },
+  {
+    "id": "sea_charting.182",
+    "name": "Bankers Draught",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Hosidian Sea · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18756,
+      "name": "SAILING_CHARTING_DRINK_CRATE_BANKERS_DRAUGHT_COMPLETE"
+    },
+    "group": "Western Ocean — Hosidian Sea"
+  },
+  {
+    "id": "sea_charting.183",
+    "name": "Headless Unicornman",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Gulf of Kourend · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18757,
+      "name": "SAILING_CHARTING_DRINK_CRATE_HEADLESS_UNICORNMAN_COMPLETE"
+    },
+    "group": "Western Ocean — Gulf of Kourend"
+  },
+  {
+    "id": "sea_charting.184",
+    "name": "Soul Juice",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Winter's Edge · Crate (Level 78 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18758,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SOUL_JUICE_COMPLETE"
+    },
+    "group": "Northern Ocean — Winter's Edge"
+  },
+  {
+    "id": "sea_charting.185",
+    "name": "Crystal Dinghy",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Porth Gwenith · Generic (Level 66 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18759,
+      "name": "SAILING_CHARTING_GENERIC_CRYSTAL_DINGHY_COMPLETE"
+    },
+    "group": "Western Ocean — Porth Gwenith"
+  },
+  {
+    "id": "sea_charting.186",
+    "name": "Hunter Outfits",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Vagabonds Rest · Generic (Level 66 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18760,
+      "name": "SAILING_CHARTING_GENERIC_HUNTER_OUTFITS_COMPLETE"
+    },
+    "group": "Western Ocean — Vagabonds Rest"
+  },
+  {
+    "id": "sea_charting.187",
+    "name": "Kraken Slime",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Piscatoris Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18761,
+      "name": "SAILING_CHARTING_GENERIC_KRAKEN_SLIME_COMPLETE"
+    },
+    "group": "Western Ocean — Piscatoris Sea"
+  },
+  {
+    "id": "sea_charting.188",
+    "name": "Discarded Plough",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Hosidian Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18762,
+      "name": "SAILING_CHARTING_GENERIC_DISCARDED_PLOUGH_COMPLETE"
+    },
+    "group": "Western Ocean — Hosidian Sea"
+  },
+  {
+    "id": "sea_charting.189",
+    "name": "Broken Crane",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Gulf of Kourend · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18763,
+      "name": "SAILING_CHARTING_GENERIC_BROKEN_CRANE_COMPLETE"
+    },
+    "group": "Western Ocean — Gulf of Kourend"
+  },
+  {
+    "id": "sea_charting.190",
+    "name": "Toad Spawn",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Everwinter Sea · Generic (Level 78 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18764,
+      "name": "SAILING_CHARTING_GENERIC_TOAD_SPAWN_COMPLETE"
+    },
+    "group": "Northern Ocean — Everwinter Sea"
+  },
+  {
+    "id": "sea_charting.191",
+    "name": "Menaphos Pyramid",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Menaphite Sea · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18765,
+      "name": "SAILING_CHARTING_SPYGLASS_MENAPHOS_PYRAMID_COMPLETE"
+    },
+    "group": "Ardent Ocean — Menaphite Sea"
+  },
+  {
+    "id": "sea_charting.192",
+    "name": "Menaphite Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Menaphite Sea · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18766,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_MENAPHITE_SEA_COMPLETE"
+    },
+    "group": "Ardent Ocean — Menaphite Sea"
+  },
+  {
+    "id": "sea_charting.193",
+    "name": "Sand Pit",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Menaphite Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18767,
+      "name": "SAILING_CHARTING_GENERIC_SAND_PIT_COMPLETE"
+    },
+    "group": "Ardent Ocean — Menaphite Sea"
+  },
+  {
+    "id": "sea_charting.194",
+    "name": "Menaphite Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Menaphite Sea · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18768,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_MENAPHITE_SEA_COMPLETE"
+    },
+    "group": "Ardent Ocean — Menaphite Sea"
+  },
+  {
+    "id": "sea_charting.195",
+    "name": "Crocodile Tears",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Menaphite Sea · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18769,
+      "name": "SAILING_CHARTING_DRINK_CRATE_CROCODILE_TEARS_COMPLETE"
+    },
+    "group": "Ardent Ocean — Menaphite Sea"
+  },
+  {
+    "id": "sea_charting.196",
+    "name": "Crab Eyes",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremensund · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18770,
+      "name": "SAILING_CHARTING_GENERIC_CRAB_EYES_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremensund"
+  },
+  {
+    "id": "sea_charting.197",
+    "name": "Tree Roots",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Grandroot Bay · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18771,
+      "name": "SAILING_CHARTING_GENERIC_TREE_ROOTS_COMPLETE"
+    },
+    "group": "Northern Ocean — Grandroot Bay"
+  },
+  {
+    "id": "sea_charting.198",
+    "name": "Ghrim Sign",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · V's Belt · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18772,
+      "name": "SAILING_CHARTING_GENERIC_GHRIM_SIGN_COMPLETE"
+    },
+    "group": "Northern Ocean — V's Belt"
+  },
+  {
+    "id": "sea_charting.199",
+    "name": "Neds Book",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremennik Strait · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18773,
+      "name": "SAILING_CHARTING_GENERIC_NEDS_BOOK_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremennik Strait"
+  },
+  {
+    "id": "sea_charting.200",
+    "name": "Kebbit Burrow",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Idestia Strait · Generic (Level 78 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18774,
+      "name": "SAILING_CHARTING_GENERIC_KEBBIT_BURROW_COMPLETE"
+    },
+    "group": "Northern Ocean — Idestia Strait"
+  },
+  {
+    "id": "sea_charting.201",
+    "name": "Magic Wards",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Lunar Bay · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18775,
+      "name": "SAILING_CHARTING_GENERIC_MAGIC_WARDS_COMPLETE"
+    },
+    "group": "Northern Ocean — Lunar Bay"
+  },
+  {
+    "id": "sea_charting.202",
+    "name": "Dead Livid",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Winter's Edge · Generic (Level 78 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18776,
+      "name": "SAILING_CHARTING_GENERIC_DEAD_LIVID_COMPLETE"
+    },
+    "group": "Northern Ocean — Winter's Edge"
+  },
+  {
+    "id": "sea_charting.203",
+    "name": "Lunar Brooms",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Lunar Sea · Generic (Level 78 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18777,
+      "name": "SAILING_CHARTING_GENERIC_LUNAR_BROOMS_COMPLETE"
+    },
+    "group": "Northern Ocean — Lunar Sea"
+  },
+  {
+    "id": "sea_charting.204",
+    "name": "Fearless Fremennik",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Kannski Tides · Generic (Level 78 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18778,
+      "name": "SAILING_CHARTING_GENERIC_FEARLESS_FREMENNIK_COMPLETE"
+    },
+    "group": "Northern Ocean — Kannski Tides"
+  },
+  {
+    "id": "sea_charting.205",
+    "name": "Discarded Sled",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Weissmere · Generic (Level 78 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18779,
+      "name": "SAILING_CHARTING_GENERIC_DISCARDED_SLED_COMPLETE"
+    },
+    "group": "Northern Ocean — Weissmere"
+  },
+  {
+    "id": "sea_charting.206",
+    "name": "Shark Corpse",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Stoneheart Sea · Generic (Level 78 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18780,
+      "name": "SAILING_CHARTING_GENERIC_SHARK_CORPSE_COMPLETE"
+    },
+    "group": "Northern Ocean — Stoneheart Sea"
+  },
+  {
+    "id": "sea_charting.207",
+    "name": "Kgp Periscope",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Shiverwake Expanse · Generic (Level 78 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18781,
+      "name": "SAILING_CHARTING_GENERIC_KGP_PERISCOPE_COMPLETE"
+    },
+    "group": "Northern Ocean — Shiverwake Expanse"
+  },
+  {
+    "id": "sea_charting.208",
+    "name": "Ice Ship",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Weiss Melt · Generic (Level 78 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18782,
+      "name": "SAILING_CHARTING_GENERIC_ICE_SHIP_COMPLETE"
+    },
+    "group": "Northern Ocean — Weiss Melt"
+  },
+  {
+    "id": "sea_charting.209",
+    "name": "Fremensund",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremensund · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18783,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_FREMENSUND_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremensund"
+  },
+  {
+    "id": "sea_charting.210",
+    "name": "Grandroot Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Grandroot Bay · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18784,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_GRANDROOT_BAY_COMPLETE"
+    },
+    "group": "Northern Ocean — Grandroot Bay"
+  },
+  {
+    "id": "sea_charting.211",
+    "name": "Vs Belt",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · V's Belt · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18785,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_VS_BELT_COMPLETE"
+    },
+    "group": "Northern Ocean — V's Belt"
+  },
+  {
+    "id": "sea_charting.212",
+    "name": "Fremennik Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremennik Strait · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18786,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_FREMENNIK_STRAIT_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremennik Strait"
+  },
+  {
+    "id": "sea_charting.213",
+    "name": "Idestia Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Idestia Strait · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18787,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_IDESTIA_STRAIT_COMPLETE"
+    },
+    "group": "Northern Ocean — Idestia Strait"
+  },
+  {
+    "id": "sea_charting.214",
+    "name": "Lunar Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Lunar Bay · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18788,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_LUNAR_BAY_COMPLETE"
+    },
+    "group": "Northern Ocean — Lunar Bay"
+  },
+  {
+    "id": "sea_charting.215",
+    "name": "Everwinter Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Everwinter Sea · Current (Level 78 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18789,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_EVERWINTER_SEA_COMPLETE"
+    },
+    "group": "Northern Ocean — Everwinter Sea"
+  },
+  {
+    "id": "sea_charting.216",
+    "name": "Kannski Tides",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Kannski Tides · Current (Level 78 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18790,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_KANNSKI_TIDES_COMPLETE"
+    },
+    "group": "Northern Ocean — Kannski Tides"
+  },
+  {
+    "id": "sea_charting.217",
+    "name": "Weissmere",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Weissmere · Current (Level 78 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18791,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_WEISSMERE_COMPLETE"
+    },
+    "group": "Northern Ocean — Weissmere"
+  },
+  {
+    "id": "sea_charting.218",
+    "name": "Stoneheart Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Stoneheart Sea · Current (Level 78 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18792,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_STONEHEART_SEA_COMPLETE"
+    },
+    "group": "Northern Ocean — Stoneheart Sea"
+  },
+  {
+    "id": "sea_charting.219",
+    "name": "Weiss Melt",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Weiss Melt · Current (Level 78 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18793,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_WEISS_MELT_COMPLETE"
+    },
+    "group": "Northern Ocean — Weiss Melt"
+  },
+  {
+    "id": "sea_charting.220",
+    "name": "Fremensund",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremensund · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18794,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_FREMENSUND_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremensund"
+  },
+  {
+    "id": "sea_charting.221",
+    "name": "Grandroot Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Grandroot Bay · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18795,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_GRANDROOT_BAY_COMPLETE"
+    },
+    "group": "Northern Ocean — Grandroot Bay"
+  },
+  {
+    "id": "sea_charting.222",
+    "name": "Fremennik Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremennik Strait · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18796,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_FREMENNIK_STRAIT_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremennik Strait"
+  },
+  {
+    "id": "sea_charting.223",
+    "name": "Idestia Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Idestia Strait · Weather (Level 78 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18797,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_IDESTIA_STRAIT_COMPLETE"
+    },
+    "group": "Northern Ocean — Idestia Strait"
+  },
+  {
+    "id": "sea_charting.224",
+    "name": "Everwinter Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Everwinter Sea · Weather (Level 78 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18798,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_EVERWINTER_SEA_COMPLETE"
+    },
+    "group": "Northern Ocean — Everwinter Sea"
+  },
+  {
+    "id": "sea_charting.225",
+    "name": "Stoneheart Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Stoneheart Sea · Weather (Level 78 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18799,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_STONEHEART_SEA_COMPLETE"
+    },
+    "group": "Northern Ocean — Stoneheart Sea"
+  },
+  {
+    "id": "sea_charting.226",
+    "name": "Shiverwake Expanse",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Shiverwake Expanse · Weather (Level 78 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18800,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_SHIVERWAKE_EXPANSE_COMPLETE"
+    },
+    "group": "Northern Ocean — Shiverwake Expanse"
+  },
+  {
+    "id": "sea_charting.227",
+    "name": "Weiss Melt",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Weiss Melt · Weather (Level 78 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18801,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_WEISS_MELT_COMPLETE"
+    },
+    "group": "Northern Ocean — Weiss Melt"
+  },
+  {
+    "id": "sea_charting.228",
+    "name": "Fremensund",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremensund · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18802,
+      "name": "SAILING_CHARTING_SPYGLASS_FREMENSUND_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremensund"
+  },
+  {
+    "id": "sea_charting.229",
+    "name": "Grandroot Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Grandroot Bay · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18803,
+      "name": "SAILING_CHARTING_SPYGLASS_GRANDROOT_BAY_COMPLETE"
+    },
+    "group": "Northern Ocean — Grandroot Bay"
+  },
+  {
+    "id": "sea_charting.230",
+    "name": "Vs Belt",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · V's Belt · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18804,
+      "name": "SAILING_CHARTING_SPYGLASS_VS_BELT_COMPLETE"
+    },
+    "group": "Northern Ocean — V's Belt"
+  },
+  {
+    "id": "sea_charting.231",
+    "name": "Fremennik Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremennik Strait · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18805,
+      "name": "SAILING_CHARTING_SPYGLASS_FREMENNIK_STRAIT_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremennik Strait"
+  },
+  {
+    "id": "sea_charting.232",
+    "name": "Idestia Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Idestia Strait · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18806,
+      "name": "SAILING_CHARTING_SPYGLASS_IDESTIA_STRAIT_COMPLETE"
+    },
+    "group": "Northern Ocean — Idestia Strait"
+  },
+  {
+    "id": "sea_charting.233",
+    "name": "Lunar Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Lunar Bay · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18807,
+      "name": "SAILING_CHARTING_SPYGLASS_LUNAR_BAY_COMPLETE"
+    },
+    "group": "Northern Ocean — Lunar Bay"
+  },
+  {
+    "id": "sea_charting.234",
+    "name": "Winters Edge",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Winter's Edge · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18808,
+      "name": "SAILING_CHARTING_SPYGLASS_WINTERS_EDGE_COMPLETE"
+    },
+    "group": "Northern Ocean — Winter's Edge"
+  },
+  {
+    "id": "sea_charting.235",
+    "name": "Lunar Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Lunar Sea · Spyglass (Level 78 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18809,
+      "name": "SAILING_CHARTING_SPYGLASS_LUNAR_SEA_COMPLETE"
+    },
+    "group": "Northern Ocean — Lunar Sea"
+  },
+  {
+    "id": "sea_charting.236",
+    "name": "Kannski Tides",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Kannski Tides · Spyglass (Level 78 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18810,
+      "name": "SAILING_CHARTING_SPYGLASS_KANNSKI_TIDES_COMPLETE"
+    },
+    "group": "Northern Ocean — Kannski Tides"
+  },
+  {
+    "id": "sea_charting.237",
+    "name": "Weissmere",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Weissmere · Spyglass (Level 78 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18811,
+      "name": "SAILING_CHARTING_SPYGLASS_WEISSMERE_COMPLETE"
+    },
+    "group": "Northern Ocean — Weissmere"
+  },
+  {
+    "id": "sea_charting.238",
+    "name": "Stoneheart Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Stoneheart Sea · Spyglass (Level 78 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18812,
+      "name": "SAILING_CHARTING_SPYGLASS_STONEHEART_SEA_COMPLETE"
+    },
+    "group": "Northern Ocean — Stoneheart Sea"
+  },
+  {
+    "id": "sea_charting.239",
+    "name": "Shiverwake Expanse",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Shiverwake Expanse · Spyglass (Level 78 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18813,
+      "name": "SAILING_CHARTING_SPYGLASS_SHIVERWAKE_EXPANSE_COMPLETE"
+    },
+    "group": "Northern Ocean — Shiverwake Expanse"
+  },
+  {
+    "id": "sea_charting.240",
+    "name": "Weiss Melt",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Weiss Melt · Spyglass (Level 78 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18814,
+      "name": "SAILING_CHARTING_SPYGLASS_WEISS_MELT_COMPLETE"
+    },
+    "group": "Northern Ocean — Weiss Melt"
+  },
+  {
+    "id": "sea_charting.241",
+    "name": "Fremensund",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremensund · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18815,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_FREMENSUND_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremensund"
+  },
+  {
+    "id": "sea_charting.242",
+    "name": "Grandroot Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Grandroot Bay · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18816,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_GRANDROOT_BAY_COMPLETE"
+    },
+    "group": "Northern Ocean — Grandroot Bay"
+  },
+  {
+    "id": "sea_charting.243",
+    "name": "Vs Belt",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · V's Belt · Diving (Level 78 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18817,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_VS_BELT_COMPLETE"
+    },
+    "group": "Northern Ocean — V's Belt"
+  },
+  {
+    "id": "sea_charting.244",
+    "name": "Idestia Strait",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Idestia Strait · Diving (Level 78 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18818,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_IDESTIA_STRAIT_COMPLETE"
+    },
+    "group": "Northern Ocean — Idestia Strait"
+  },
+  {
+    "id": "sea_charting.245",
+    "name": "Lunar Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Lunar Bay · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18819,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_LUNAR_BAY_COMPLETE"
+    },
+    "group": "Northern Ocean — Lunar Bay"
+  },
+  {
+    "id": "sea_charting.246",
+    "name": "Winters Edge",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Winter's Edge · Diving (Level 78 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18820,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_WINTERS_EDGE_COMPLETE"
+    },
+    "group": "Northern Ocean — Winter's Edge"
+  },
+  {
+    "id": "sea_charting.247",
+    "name": "Lunar Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Lunar Sea · Diving (Level 78 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18821,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_LUNAR_SEA_COMPLETE"
+    },
+    "group": "Northern Ocean — Lunar Sea"
+  },
+  {
+    "id": "sea_charting.248",
+    "name": "Everwinter Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Everwinter Sea · Diving (Level 78 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18822,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_EVERWINTER_SEA_COMPLETE"
+    },
+    "group": "Northern Ocean — Everwinter Sea"
+  },
+  {
+    "id": "sea_charting.249",
+    "name": "Kannski Tides",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Kannski Tides · Diving (Level 78 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18823,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_KANNSKI_TIDES_COMPLETE"
+    },
+    "group": "Northern Ocean — Kannski Tides"
+  },
+  {
+    "id": "sea_charting.250",
+    "name": "Weissmere",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Weissmere · Diving (Level 78 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18824,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_WEISSMERE_COMPLETE"
+    },
+    "group": "Northern Ocean — Weissmere"
+  },
+  {
+    "id": "sea_charting.251",
+    "name": "Stoneheart Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Stoneheart Sea · Diving (Level 78 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18825,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_STONEHEART_SEA_COMPLETE"
+    },
+    "group": "Northern Ocean — Stoneheart Sea"
+  },
+  {
+    "id": "sea_charting.252",
+    "name": "Shiverwake Expanse",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Shiverwake Expanse · Diving (Level 78 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18826,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_SHIVERWAKE_EXPANSE_COMPLETE"
+    },
+    "group": "Northern Ocean — Shiverwake Expanse"
+  },
+  {
+    "id": "sea_charting.253",
+    "name": "Fishier Stout",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremensund · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18827,
+      "name": "SAILING_CHARTING_DRINK_CRATE_FISHIER_STOUT_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremensund"
+  },
+  {
+    "id": "sea_charting.254",
+    "name": "Toad Cider",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Grandroot Bay · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18828,
+      "name": "SAILING_CHARTING_DRINK_CRATE_TOAD_CIDER_COMPLETE"
+    },
+    "group": "Northern Ocean — Grandroot Bay"
+  },
+  {
+    "id": "sea_charting.255",
+    "name": "Blue Lagoon",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · V's Belt · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18829,
+      "name": "SAILING_CHARTING_DRINK_CRATE_BLUE_LAGOON_COMPLETE"
+    },
+    "group": "Northern Ocean — V's Belt"
+  },
+  {
+    "id": "sea_charting.256",
+    "name": "Fishtongue Tonic",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Fremennik Strait · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18830,
+      "name": "SAILING_CHARTING_DRINK_CRATE_FISHTONGUE_TONIC_COMPLETE"
+    },
+    "group": "Northern Ocean — Fremennik Strait"
+  },
+  {
+    "id": "sea_charting.257",
+    "name": "Endless Night",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Idestia Strait · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18831,
+      "name": "SAILING_CHARTING_DRINK_CRATE_ENDLESS_NIGHT_COMPLETE"
+    },
+    "group": "Northern Ocean — Idestia Strait"
+  },
+  {
+    "id": "sea_charting.258",
+    "name": "Exiles Welcome",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Lunar Bay · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18832,
+      "name": "SAILING_CHARTING_DRINK_CRATE_EXILES_WELCOME_COMPLETE"
+    },
+    "group": "Northern Ocean — Lunar Bay"
+  },
+  {
+    "id": "sea_charting.259",
+    "name": "Suqah Cola",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Lunar Sea · Crate (Level 78 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18833,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SUQAH_COLA_COMPLETE"
+    },
+    "group": "Northern Ocean — Lunar Sea"
+  },
+  {
+    "id": "sea_charting.260",
+    "name": "Winter Sun",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Everwinter Sea · Crate (Level 78 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18834,
+      "name": "SAILING_CHARTING_DRINK_CRATE_WINTER_SUN_COMPLETE"
+    },
+    "group": "Northern Ocean — Everwinter Sea"
+  },
+  {
+    "id": "sea_charting.261",
+    "name": "Black Lobster",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Kannski Tides · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18835,
+      "name": "SAILING_CHARTING_DRINK_CRATE_BLACK_LOBSTER_COMPLETE"
+    },
+    "group": "Northern Ocean — Kannski Tides"
+  },
+  {
+    "id": "sea_charting.262",
+    "name": "Dwarvern Wizard",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Weissmere · Crate (Level 78 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18836,
+      "name": "SAILING_CHARTING_DRINK_CRATE_DWARVERN_WIZARD_COMPLETE"
+    },
+    "group": "Northern Ocean — Weissmere"
+  },
+  {
+    "id": "sea_charting.263",
+    "name": "Kgp Martini",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Stoneheart Sea · Crate (Level 78 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18837,
+      "name": "SAILING_CHARTING_DRINK_CRATE_KGP_MARTINI_COMPLETE"
+    },
+    "group": "Northern Ocean — Stoneheart Sea"
+  },
+  {
+    "id": "sea_charting.264",
+    "name": "Corpse Reviver",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Shiverwake Expanse · Crate (Level 78 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18838,
+      "name": "SAILING_CHARTING_DRINK_CRATE_CORPSE_REVIVER_COMPLETE"
+    },
+    "group": "Northern Ocean — Shiverwake Expanse"
+  },
+  {
+    "id": "sea_charting.265",
+    "name": "Weiss Meltwater",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Northern Ocean · Weiss Melt · Crate (Level 78 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18839,
+      "name": "SAILING_CHARTING_DRINK_CRATE_WEISS_MELTWATER_COMPLETE"
+    },
+    "group": "Northern Ocean — Weiss Melt"
+  },
+  {
+    "id": "sea_charting.266",
+    "name": "Turtle Belt",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Turtle Belt · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18840,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_TURTLE_BELT_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Turtle Belt"
+  },
+  {
+    "id": "sea_charting.267",
+    "name": "Bay Of Elidinis",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Bay of Elidinis · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18841,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_BAY_OF_ELIDINIS_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Bay of Elidinis"
+  },
+  {
+    "id": "sea_charting.268",
+    "name": "Tortugan Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Tortugan Sea · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18842,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_TORTUGAN_SEA_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Tortugan Sea"
+  },
+  {
+    "id": "sea_charting.269",
+    "name": "Pearl Bank",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Pearl Bank · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18843,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_PEARL_BANK_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Pearl Bank"
+  },
+  {
+    "id": "sea_charting.270",
+    "name": "Tortugan Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Tortugan Sea · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18844,
+      "name": "SAILING_CHARTING_SPYGLASS_TORTUGAN_SEA_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Tortugan Sea"
+  },
+  {
+    "id": "sea_charting.271",
+    "name": "Sea Of Shells",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Sea of Shells · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18845,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_SEA_OF_SHELLS_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Sea of Shells"
+  },
+  {
+    "id": "sea_charting.272",
+    "name": "Bay Of Elidinis",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Bay of Elidinis · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18846,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_BAY_OF_ELIDINIS_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Bay of Elidinis"
+  },
+  {
+    "id": "sea_charting.273",
+    "name": "Pearl Bank",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Pearl Bank · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18847,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_PEARL_BANK_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Pearl Bank"
+  },
+  {
+    "id": "sea_charting.274",
+    "name": "The Lonely Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · The Lonely Sea · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18848,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_THE_LONELY_SEA_COMPLETE"
+    },
+    "group": "Unquiet Ocean — The Lonely Sea"
+  },
+  {
+    "id": "sea_charting.275",
+    "name": "Bird Nest",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Sea of Shells · Generic (Level 47 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18849,
+      "name": "SAILING_CHARTING_GENERIC_BIRD_NEST_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Sea of Shells"
+  },
+  {
+    "id": "sea_charting.276",
+    "name": "Golem Corpse",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Bay of Elidinis · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18850,
+      "name": "SAILING_CHARTING_GENERIC_GOLEM_CORPSE_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Bay of Elidinis"
+  },
+  {
+    "id": "sea_charting.277",
+    "name": "Ship Bottle",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Pearl Bank · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18851,
+      "name": "SAILING_CHARTING_GENERIC_SHIP_BOTTLE_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Pearl Bank"
+  },
+  {
+    "id": "sea_charting.278",
+    "name": "Reddest Rum",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Red Reef · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18852,
+      "name": "SAILING_CHARTING_DRINK_CRATE_REDDEST_RUM_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Red Reef"
+  },
+  {
+    "id": "sea_charting.279",
+    "name": "Life Water",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Bay of Elidinis · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18853,
+      "name": "SAILING_CHARTING_DRINK_CRATE_LIFE_WATER_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Bay of Elidinis"
+  },
+  {
+    "id": "sea_charting.280",
+    "name": "Possible Albumen",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · Pearl Bank · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18854,
+      "name": "SAILING_CHARTING_DRINK_CRATE_POSSIBLE_ALBUMEN_COMPLETE"
+    },
+    "group": "Unquiet Ocean — Pearl Bank"
+  },
+  {
+    "id": "sea_charting.281",
+    "name": "Alone At Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Unquiet Ocean · The Lonely Sea · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18855,
+      "name": "SAILING_CHARTING_DRINK_CRATE_ALONE_AT_SEA_COMPLETE"
+    },
+    "group": "Unquiet Ocean — The Lonely Sea"
+  },
+  {
+    "id": "sea_charting.282",
+    "name": "Aureum Coast",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Aureum Coast · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18856,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_AUREUM_COAST_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Aureum Coast"
+  },
+  {
+    "id": "sea_charting.283",
+    "name": "The Everdeep",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · The Everdeep · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18857,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_THE_EVERDEEP_COMPLETE"
+    },
+    "group": "Shrouded Ocean — The Everdeep"
+  },
+  {
+    "id": "sea_charting.284",
+    "name": "Southern Expanse",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Southern Expanse · Weather (Level 72 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18858,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_SOUTHERN_EXPANSE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Southern Expanse"
+  },
+  {
+    "id": "sea_charting.285",
+    "name": "Fortis Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Fortis Bay · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18859,
+      "name": "SAILING_CHARTING_SPYGLASS_FORTIS_BAY_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Fortis Bay"
+  },
+  {
+    "id": "sea_charting.286",
+    "name": "Aureum Coast",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Aureum Coast · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18860,
+      "name": "SAILING_CHARTING_SPYGLASS_AUREUM_COAST_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Aureum Coast"
+  },
+  {
+    "id": "sea_charting.287",
+    "name": "Wyrms Waters",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Wyrm's Waters · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18861,
+      "name": "SAILING_CHARTING_SPYGLASS_WYRMS_WATERS_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Wyrm's Waters"
+  },
+  {
+    "id": "sea_charting.288",
+    "name": "The Everdeep",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · The Everdeep · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18862,
+      "name": "SAILING_CHARTING_SPYGLASS_THE_EVERDEEP_COMPLETE"
+    },
+    "group": "Shrouded Ocean — The Everdeep"
+  },
+  {
+    "id": "sea_charting.289",
+    "name": "Sapphire Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Sapphire Sea · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18863,
+      "name": "SAILING_CHARTING_SPYGLASS_SAPPHIRE_SEA_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Sapphire Sea"
+  },
+  {
+    "id": "sea_charting.290",
+    "name": "Alco Sol",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Fortis Bay · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18864,
+      "name": "SAILING_CHARTING_DRINK_CRATE_ALCO_SOL_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Fortis Bay"
+  },
+  {
+    "id": "sea_charting.291",
+    "name": "Portal Perry",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Aureum Coast · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18865,
+      "name": "SAILING_CHARTING_DRINK_CRATE_PORTAL_PERRY_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Aureum Coast"
+  },
+  {
+    "id": "sea_charting.292",
+    "name": "Congratulation Wine",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Wyrm's Waters · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18866,
+      "name": "SAILING_CHARTING_DRINK_CRATE_CONGRATULATION_WINE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Wyrm's Waters"
+  },
+  {
+    "id": "sea_charting.293",
+    "name": "Fish Stoutier",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · The Skullhorde · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18867,
+      "name": "SAILING_CHARTING_DRINK_CRATE_FISH_STOUTIER_COMPLETE"
+    },
+    "group": "Shrouded Ocean — The Skullhorde"
+  },
+  {
+    "id": "sea_charting.294",
+    "name": "Crystal Vodka",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · The Everdeep · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18868,
+      "name": "SAILING_CHARTING_DRINK_CRATE_CRYSTAL_VODKA_COMPLETE"
+    },
+    "group": "Shrouded Ocean — The Everdeep"
+  },
+  {
+    "id": "sea_charting.295",
+    "name": "Comp Kvass",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Sapphire Sea · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18869,
+      "name": "SAILING_CHARTING_DRINK_CRATE_COMP_KVASS_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Sapphire Sea"
+  },
+  {
+    "id": "sea_charting.296",
+    "name": "Puzzlers Poteen",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Southern Expanse · Crate (Level 72 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18870,
+      "name": "SAILING_CHARTING_DRINK_CRATE_PUZZLERS_POTEEN_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Southern Expanse"
+  },
+  {
+    "id": "sea_charting.297",
+    "name": "Seagull Nest",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Fortis Bay · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18871,
+      "name": "SAILING_CHARTING_GENERIC_SEAGULL_NEST_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Fortis Bay"
+  },
+  {
+    "id": "sea_charting.298",
+    "name": "Wreck Weight",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Aureum Coast · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18872,
+      "name": "SAILING_CHARTING_GENERIC_WRECK_WEIGHT_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Aureum Coast"
+  },
+  {
+    "id": "sea_charting.299",
+    "name": "Atoll Dictionary",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Wyrm's Waters · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18873,
+      "name": "SAILING_CHARTING_GENERIC_ATOLL_DICTIONARY_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Wyrm's Waters"
+  },
+  {
+    "id": "sea_charting.300",
+    "name": "Scary Shadow",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · The Everdeep · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18874,
+      "name": "SAILING_CHARTING_GENERIC_SCARY_SHADOW_COMPLETE"
+    },
+    "group": "Shrouded Ocean — The Everdeep"
+  },
+  {
+    "id": "sea_charting.301",
+    "name": "Sea Sapphires",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Sapphire Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18875,
+      "name": "SAILING_CHARTING_GENERIC_SEA_SAPPHIRES_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Sapphire Sea"
+  },
+  {
+    "id": "sea_charting.302",
+    "name": "Nothing Sign",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Southern Expanse · Generic (Level 72 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18876,
+      "name": "SAILING_CHARTING_GENERIC_NOTHING_SIGN_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Southern Expanse"
+  },
+  {
+    "id": "sea_charting.303",
+    "name": "Fortis Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Fortis Bay · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18877,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_FORTIS_BAY_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Fortis Bay"
+  },
+  {
+    "id": "sea_charting.304",
+    "name": "Wyrms Waters",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Wyrm's Waters · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18878,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_WYRMS_WATERS_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Wyrm's Waters"
+  },
+  {
+    "id": "sea_charting.305",
+    "name": "The Skullhorde",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · The Skullhorde · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18879,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_THE_SKULLHORDE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — The Skullhorde"
+  },
+  {
+    "id": "sea_charting.306",
+    "name": "Sapphire Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Sapphire Sea · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18880,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_SAPPHIRE_SEA_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Sapphire Sea"
+  },
+  {
+    "id": "sea_charting.307",
+    "name": "Fortis Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Fortis Bay · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18881,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_FORTIS_BAY_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Fortis Bay"
+  },
+  {
+    "id": "sea_charting.308",
+    "name": "Aureum Coast",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Aureum Coast · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18882,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_AUREUM_COAST_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Aureum Coast"
+  },
+  {
+    "id": "sea_charting.309",
+    "name": "Wyrms Waters",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Wyrm's Waters · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18883,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_WYRMS_WATERS_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Wyrm's Waters"
+  },
+  {
+    "id": "sea_charting.310",
+    "name": "The Skullhorde",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · The Skullhorde · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18884,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_THE_SKULLHORDE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — The Skullhorde"
+  },
+  {
+    "id": "sea_charting.311",
+    "name": "Sea Of Souls",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Sea of Souls · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18885,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_SEA_OF_SOULS_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Sea of Souls"
+  },
+  {
+    "id": "sea_charting.312",
+    "name": "The Everdeep",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · The Everdeep · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18886,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_THE_EVERDEEP_COMPLETE"
+    },
+    "group": "Shrouded Ocean — The Everdeep"
+  },
+  {
+    "id": "sea_charting.313",
+    "name": "Southern Expanse",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Shrouded Ocean · Southern Expanse · Diving (Level 72 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18887,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_SOUTHERN_EXPANSE_COMPLETE"
+    },
+    "group": "Shrouded Ocean — Southern Expanse"
+  },
+  {
+    "id": "sea_charting.314",
+    "name": "Crabclaw Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crabclaw Bay · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18888,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_CRABCLAW_BAY_COMPLETE"
+    },
+    "group": "Western Ocean — Crabclaw Bay"
+  },
+  {
+    "id": "sea_charting.315",
+    "name": "Litus Lucis",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Litus Lucis · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18889,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_LITUS_LUCIS_COMPLETE"
+    },
+    "group": "Western Ocean — Litus Lucis"
+  },
+  {
+    "id": "sea_charting.316",
+    "name": "Great Sound",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Great Sound · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18890,
+      "name": "SAILING_CHARTING_SPYGLASS_GREAT_SOUND_COMPLETE"
+    },
+    "group": "Western Ocean — Great Sound"
+  },
+  {
+    "id": "sea_charting.317",
+    "name": "Crabclaw Bay 1",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crabclaw Bay · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18891,
+      "name": "SAILING_CHARTING_SPYGLASS_CRABCLAW_BAY_1_COMPLETE"
+    },
+    "group": "Western Ocean — Crabclaw Bay"
+  },
+  {
+    "id": "sea_charting.318",
+    "name": "Crabclaw Bay 2",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crabclaw Bay · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18892,
+      "name": "SAILING_CHARTING_SPYGLASS_CRABCLAW_BAY_2_COMPLETE"
+    },
+    "group": "Western Ocean — Crabclaw Bay"
+  },
+  {
+    "id": "sea_charting.319",
+    "name": "Crystal Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crystal Sea · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18893,
+      "name": "SAILING_CHARTING_SPYGLASS_CRYSTAL_SEA_COMPLETE"
+    },
+    "group": "Western Ocean — Crystal Sea"
+  },
+  {
+    "id": "sea_charting.320",
+    "name": "Vagabonds Rest",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Vagabonds Rest · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18894,
+      "name": "SAILING_CHARTING_SPYGLASS_VAGABONDS_REST_COMPLETE"
+    },
+    "group": "Western Ocean — Vagabonds Rest"
+  },
+  {
+    "id": "sea_charting.321",
+    "name": "Crabclaw Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crabclaw Bay · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18895,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_CRABCLAW_BAY_COMPLETE"
+    },
+    "group": "Western Ocean — Crabclaw Bay"
+  },
+  {
+    "id": "sea_charting.322",
+    "name": "Hosidian Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Hosidian Sea · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18896,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_HOSIDIAN_SEA_COMPLETE"
+    },
+    "group": "Western Ocean — Hosidian Sea"
+  },
+  {
+    "id": "sea_charting.323",
+    "name": "Pilgrims Passage",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Pilgrims' Passage · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18897,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_PILGRIMS_PASSAGE_COMPLETE"
+    },
+    "group": "Western Ocean — Pilgrims' Passage"
+  },
+  {
+    "id": "sea_charting.324",
+    "name": "Litus Lucis",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Litus Lucis · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18898,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_LITUS_LUCIS_COMPLETE"
+    },
+    "group": "Western Ocean — Litus Lucis"
+  },
+  {
+    "id": "sea_charting.325",
+    "name": "Vagabonds Rest",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Vagabonds Rest · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18899,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_VAGABONDS_REST_COMPLETE"
+    },
+    "group": "Western Ocean — Vagabonds Rest"
+  },
+  {
+    "id": "sea_charting.326",
+    "name": "Moonshadow",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Moonshadow · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18900,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_MOONSHADOW_COMPLETE"
+    },
+    "group": "Western Ocean — Moonshadow"
+  },
+  {
+    "id": "sea_charting.327",
+    "name": "Great Sound",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Great Sound · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18901,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_GREAT_SOUND_COMPLETE"
+    },
+    "group": "Western Ocean — Great Sound"
+  },
+  {
+    "id": "sea_charting.328",
+    "name": "Litus Lucis",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Litus Lucis · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18902,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_LITUS_LUCIS_COMPLETE"
+    },
+    "group": "Western Ocean — Litus Lucis"
+  },
+  {
+    "id": "sea_charting.329",
+    "name": "Crystal Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crystal Sea · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18903,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_CRYSTAL_SEA_COMPLETE"
+    },
+    "group": "Western Ocean — Crystal Sea"
+  },
+  {
+    "id": "sea_charting.330",
+    "name": "Moonshadow",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Moonshadow · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18904,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_MOONSHADOW_COMPLETE"
+    },
+    "group": "Western Ocean — Moonshadow"
+  },
+  {
+    "id": "sea_charting.331",
+    "name": "Wild Whisky",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Great Sound · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18905,
+      "name": "SAILING_CHARTING_DRINK_CRATE_WILD_WHISKY_COMPLETE"
+    },
+    "group": "Western Ocean — Great Sound"
+  },
+  {
+    "id": "sea_charting.332",
+    "name": "Roberts Port",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Pilgrims' Passage · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18906,
+      "name": "SAILING_CHARTING_DRINK_CRATE_ROBERTS_PORT_COMPLETE"
+    },
+    "group": "Western Ocean — Pilgrims' Passage"
+  },
+  {
+    "id": "sea_charting.333",
+    "name": "Sea Shandy",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Litus Lucis · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18907,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SEA_SHANDY_COMPLETE"
+    },
+    "group": "Western Ocean — Litus Lucis"
+  },
+  {
+    "id": "sea_charting.334",
+    "name": "Monkfish Stout",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Piscatoris Sea · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18908,
+      "name": "SAILING_CHARTING_DRINK_CRATE_MONKFISH_STOUT_COMPLETE"
+    },
+    "group": "Western Ocean — Piscatoris Sea"
+  },
+  {
+    "id": "sea_charting.335",
+    "name": "Lunarshine",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Moonshadow · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18909,
+      "name": "SAILING_CHARTING_DRINK_CRATE_LUNARSHINE_COMPLETE"
+    },
+    "group": "Western Ocean — Moonshadow"
+  },
+  {
+    "id": "sea_charting.336",
+    "name": "Beginning Sign",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Great Sound · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18910,
+      "name": "SAILING_CHARTING_GENERIC_BEGINNING_SIGN_COMPLETE"
+    },
+    "group": "Western Ocean — Great Sound"
+  },
+  {
+    "id": "sea_charting.337",
+    "name": "Barracuda Advert",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Great Sound · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18911,
+      "name": "SAILING_CHARTING_GENERIC_BARRACUDA_ADVERT_COMPLETE"
+    },
+    "group": "Western Ocean — Great Sound"
+  },
+  {
+    "id": "sea_charting.338",
+    "name": "Sabotaged Mooring",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crabclaw Bay · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18912,
+      "name": "SAILING_CHARTING_GENERIC_SABOTAGED_MOORING_COMPLETE"
+    },
+    "group": "Western Ocean — Crabclaw Bay"
+  },
+  {
+    "id": "sea_charting.339",
+    "name": "Chinchompa Table",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Pilgrims' Passage · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18913,
+      "name": "SAILING_CHARTING_GENERIC_CHINCHOMPA_TABLE_COMPLETE"
+    },
+    "group": "Western Ocean — Pilgrims' Passage"
+  },
+  {
+    "id": "sea_charting.340",
+    "name": "Kraken Skeleton",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Litus Lucis · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18914,
+      "name": "SAILING_CHARTING_GENERIC_KRAKEN_SKELETON_COMPLETE"
+    },
+    "group": "Western Ocean — Litus Lucis"
+  },
+  {
+    "id": "sea_charting.341",
+    "name": "Jail Book",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Crystal Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18915,
+      "name": "SAILING_CHARTING_GENERIC_JAIL_BOOK_COMPLETE"
+    },
+    "group": "Western Ocean — Crystal Sea"
+  },
+  {
+    "id": "sea_charting.342",
+    "name": "Lunar Wreck",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Western Ocean · Moonshadow · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18916,
+      "name": "SAILING_CHARTING_GENERIC_LUNAR_WRECK_COMPLETE"
+    },
+    "group": "Western Ocean — Moonshadow"
+  },
+  {
+    "id": "sea_charting.343",
+    "name": "Sunset Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Sunset Bay · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18917,
+      "name": "SAILING_CHARTING_SPYGLASS_SUNSET_BAY_COMPLETE"
+    },
+    "group": "Sunset Ocean — Sunset Bay"
+  },
+  {
+    "id": "sea_charting.344",
+    "name": "Misty Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Misty Sea · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18918,
+      "name": "SAILING_CHARTING_SPYGLASS_MISTY_SEA_COMPLETE"
+    },
+    "group": "Sunset Ocean — Misty Sea"
+  },
+  {
+    "id": "sea_charting.345",
+    "name": "Dusks Maw",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Dusk's Maw · Weather (Level 57 Sailing, 250 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18919,
+      "name": "SAILING_CHARTING_WEATHER_TROLL_DUSKS_MAW_COMPLETE"
+    },
+    "group": "Sunset Ocean — Dusk's Maw"
+  },
+  {
+    "id": "sea_charting.346",
+    "name": "Sunset Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Sunset Bay · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18920,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_SUNSET_BAY_COMPLETE"
+    },
+    "group": "Sunset Ocean — Sunset Bay"
+  },
+  {
+    "id": "sea_charting.347",
+    "name": "Dusks Maw",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Dusk's Maw · Current (Level 22 Sailing, 125 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18921,
+      "name": "SAILING_CHARTING_CURRENT_DUCK_DUSKS_MAW_COMPLETE"
+    },
+    "group": "Sunset Ocean — Dusk's Maw"
+  },
+  {
+    "id": "sea_charting.348",
+    "name": "Sunset Bay",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Sunset Bay · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18922,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_SUNSET_BAY_COMPLETE"
+    },
+    "group": "Sunset Ocean — Sunset Bay"
+  },
+  {
+    "id": "sea_charting.349",
+    "name": "Misty Sea",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Misty Sea · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18923,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_MISTY_SEA_COMPLETE"
+    },
+    "group": "Sunset Ocean — Misty Sea"
+  },
+  {
+    "id": "sea_charting.350",
+    "name": "Dusks Maw",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Dusk's Maw · Diving (Level 38 Sailing, 175 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18924,
+      "name": "SAILING_CHARTING_MERMAID_GUIDE_DUSKS_MAW_COMPLETE"
+    },
+    "group": "Sunset Ocean — Dusk's Maw"
+  },
+  {
+    "id": "sea_charting.351",
+    "name": "Prop Wreck",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Sunset Bay · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18925,
+      "name": "SAILING_CHARTING_GENERIC_PROP_WRECK_COMPLETE"
+    },
+    "group": "Sunset Ocean — Sunset Bay"
+  },
+  {
+    "id": "sea_charting.352",
+    "name": "Fishing Nets",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Misty Sea · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18926,
+      "name": "SAILING_CHARTING_GENERIC_FISHING_NETS_COMPLETE"
+    },
+    "group": "Sunset Ocean — Misty Sea"
+  },
+  {
+    "id": "sea_charting.353",
+    "name": "Crab Hole",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Dusk's Maw · Generic (Level 1 Sailing, 35 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18927,
+      "name": "SAILING_CHARTING_GENERIC_CRAB_HOLE_COMPLETE"
+    },
+    "group": "Sunset Ocean — Dusk's Maw"
+  },
+  {
+    "id": "sea_charting.354",
+    "name": "Drunk Impling",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Sunset Bay · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18928,
+      "name": "SAILING_CHARTING_DRINK_CRATE_DRUNK_IMPLING_COMPLETE"
+    },
+    "group": "Sunset Ocean — Sunset Bay"
+  },
+  {
+    "id": "sea_charting.355",
+    "name": "Mystery Cider",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Misty Sea · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18929,
+      "name": "SAILING_CHARTING_DRINK_CRATE_MYSTERY_CIDER_COMPLETE"
+    },
+    "group": "Sunset Ocean — Misty Sea"
+  },
+  {
+    "id": "sea_charting.356",
+    "name": "Sailing Cat",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Sunset Ocean · Dusk's Maw · Crate (Level 12 Sailing, 75 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18930,
+      "name": "SAILING_CHARTING_DRINK_CRATE_SAILING_CAT_COMPLETE"
+    },
+    "group": "Sunset Ocean — Dusk's Maw"
+  },
+  {
+    "id": "sea_charting.357",
+    "name": "Charting Tutor",
+    "category": "Sea Charting",
+    "kind": "unlock",
+    "description": "Ardent Ocean · Kharidian Sea · Spyglass (Level 1 Sailing, 50 XP)",
+    "wiki": "Sea charting",
+    "rule": {
+      "kind": "flag",
+      "id": 18931,
+      "name": "SAILING_CHARTING_SPYGLASS_CHARTING_TUTOR_COMPLETE"
+    },
+    "group": "Ardent Ocean — Kharidian Sea"
   }
 ]

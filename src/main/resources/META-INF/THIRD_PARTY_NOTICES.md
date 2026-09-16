@@ -419,6 +419,37 @@ The original completion-history implementation uses RuneLite's public ChatMessag
 The original RuneFolio disclosure UI uses Java Swing and RuneLite's ConfigItem.warning API. API behavior was checked in https://github.com/runelite/runelite/blob/master/runelite-client/src/main/java/net/runelite/client/config/ConfigItem.java and https://github.com/runelite/runelite/blob/master/runelite-client/src/main/java/net/runelite/client/plugins/config/ConfigPanel.java . RuneLite's BSD-2-Clause source headers were inspected; no implementation code was copied or adapted for this change. Existing upstream notices remain applicable and unchanged.
 
 
+## Sea charting task catalog — 2026-09-16
+
+Upstream: https://github.com/JaredEzz/sea-charting-quest-helper (BSD-2-Clause; commit `b4ac85ceef6d44db89e5a11cd4491fbf6a1b44a5`, found via the RuneLite Plugin Hub manifest).
+
+`lib/unlocks-catalog.json` (website) and `src/main/resources/unlocks-catalog.json` (plugin) gained 358 new "Sea Charting" entries (`sea_charting.0`-`sea_charting.357`), each keyed to a Jagex `VarbitID.SAILING_CHARTING_*_COMPLETE` game-data constant (per the RuneLite identifier reference already pinned above, `runelite-api/.../gameval/VarbitID.java`) and to a wiki-sourced sea/ocean and task-name label. That task-to-varbit and task-to-sea/ocean mapping was compiled by cross-referencing `SeaChartTask.java` and `SeaChartRegion.java` from the repository above, itself explicitly documented there as "mechanically compiled from the public sea-chart-task table in the 'Sailing' RuneLite plugin by LlemonDuck (https://github.com/LlemonDuck/sailing, BSD-2-Clause)" for the underlying varbit/level/type data, and independently cross-checked there against the OSRS Wiki's own `sea=`/`ocean=` task tags for the sea/ocean grouping. As with that source's own stated position, these are Jagex's public gameval identifiers and wiki-sourced facts, not creative expression belonging to either upstream plugin -- no source code, task-description prose or UI/collector implementation from `sea-charting-quest-helper` or `LlemonDuck/sailing` is included; RuneFolio's own catalog descriptions, evidence protocol and `RuneFolioUnlockCollector.java` polling are the existing independently-implemented ones already covered above, reused unmodified since these entries use the catalog's existing "flag" rule kind. Task display names and per-task level requirements were cross-checked against a full copy of the OSRS Wiki's "Sea charting" task table supplied directly by the account owner (retrieved by them from https://oldschool.runescape.wiki/w/Sea_charting on 2026-09-16); wiki article text is CC BY-NC-SA 3.0 with additional terms, and only game facts (level, tool, XP, sea/ocean grouping), not article prose, are used. `sea-charting-quest-helper`'s BSD notice is retained below.
+
+BSD 2-Clause License
+
+Copyright (c) 2026, JaredEzz and NicolasLaurent321
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 ## Plugin Hub preflight tooling
 
 CI invokes the unmodified RuneLite plugin-hub-tooling v3 release bundle (SHA-256 eb0961b7cd0a1e4a351fb0f684731be1a9049167bfb49a2d91a760fea2933fd2). Sources: https://github.com/runelite/plugin-hub-tooling/tree/v3 and https://github.com/runelite/plugin-hub/blob/master/.github/workflows/build.yml . The upstream root BSD-2-Clause license and applicable Abex file headers were inspected. The bundle is downloaded only for CI, retains its upstream files, and is not vendored or distributed with the plugin. RuneFolio's wrapper is original orchestration; no upstream implementation is copied. Existing BSD notices above remain intact.
