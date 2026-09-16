@@ -13,7 +13,12 @@ repositories {
     mavenCentral()
 }
 
-def runeLiteVersion = "latest.release"
+// Pinned for deterministic builds; RuneLite's client is a floating dependency
+// otherwise, which caused this exact test suite to disagree with itself
+// across machines/caches on 2026-09-16 (see RuneFolioCatalogContractTest).
+// Bump deliberately when adopting new RuneLite content/API, alongside any
+// affected test literals in the same commit.
+def runeLiteVersion = "1.12.39"
 def pluginMainClass = "app.runefolio.sync.RuneFolioPluginTest"
 
 dependencies {
