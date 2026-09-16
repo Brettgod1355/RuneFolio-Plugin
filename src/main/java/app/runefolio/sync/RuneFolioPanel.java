@@ -46,6 +46,7 @@ class RuneFolioPanel extends PluginPanel
     private static final DateTimeFormatter SYNC_TIME_FORMAT =
         DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
 
+    private final JLabel title = new JLabel("RuneFolio");
     private final JLabel characterValue = new JLabel("Log in to RuneLite");
     private final JTextArea statusValue = new JTextArea();
     private final JTextField codeField = new JTextField();
@@ -107,18 +108,12 @@ class RuneFolioPanel extends PluginPanel
         brandIcon.setToolTipText("RuneFolio");
         brand.add(brandIcon);
 
-        JLabel title = new JLabel("RuneFolio");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
         title.setForeground(GOLD);
         brand.add(title);
-
-        JLabel version = new JLabel("v" + RuneFolioApiClient.CLIENT_VERSION);
-        version.setFont(version.getFont().deriveFont(Font.PLAIN, 11f));
-        version.setForeground(MUTED_TEXT);
-        brand.add(version);
         content.add(brand);
 
-        JLabel subtitle = new JLabel("Private alpha · Sync client");
+        JLabel subtitle = new JLabel("v" + RuneFolioApiClient.CLIENT_VERSION + " · Private alpha · Sync client");
         subtitle.setForeground(MUTED_TEXT);
         subtitle.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
         content.add(subtitle);
@@ -368,6 +363,13 @@ class RuneFolioPanel extends PluginPanel
         accountConnectButton.setEnabled(!connecting);
         accountConnectButton.setText(connecting ? "Waiting for browser..." : "Log in to RuneFolio");
         accountDisconnectButton.setEnabled(!connecting);
+    }
+
+    void setProStatus(boolean pro)
+    {
+        title.setText(pro ? "RuneFolio Pro" : "RuneFolio");
+        revalidate();
+        repaint();
     }
 
     void setCharacterName(String characterName)

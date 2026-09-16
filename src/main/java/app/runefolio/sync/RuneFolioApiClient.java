@@ -18,7 +18,7 @@ final class RuneFolioApiClient
 {
     private static final String API_BASE = "https://runefolio.app/api";
     private static final int PROTOCOL_VERSION = 1;
-    static final String CLIENT_VERSION = "0.3.35";
+    static final String CLIENT_VERSION = "0.3.36";
 
     private RuneFolioApiClient()
     {
@@ -62,7 +62,8 @@ final class RuneFolioApiClient
         String setupUrl = response.has("setupUrl") && !response.get("setupUrl").isJsonNull()
             ? response.get("setupUrl").getAsString()
             : null;
-        return new AccountHeartbeatResult(characterConnected, setupUrl);
+        boolean pro = response.has("pro") && response.get("pro").getAsBoolean();
+        return new AccountHeartbeatResult(characterConnected, setupUrl, pro);
     }
 
     static void disconnectAccount(String connectionToken) throws IOException
@@ -81,7 +82,8 @@ final class RuneFolioApiClient
         JsonObject character = response.getAsJsonObject("character");
         return new ConnectionResult(
             response.get("connectionToken").getAsString(),
-            character.get("name").getAsString()
+            character.get("name").getAsString(),
+            response.has("pro") && response.get("pro").getAsBoolean()
         );
     }
 
@@ -92,7 +94,8 @@ final class RuneFolioApiClient
         addIdentity(body, identityKey, previousName);
         JsonObject response = post("/plugin-links/heartbeat", body, connectionToken);
         JsonObject character = response.getAsJsonObject("character");
-        return new ConnectionResult(connectionToken, character.get("name").getAsString());
+        return new ConnectionResult(connectionToken, character.get("name").getAsString(),
+            response.has("pro") && response.get("pro").getAsBoolean());
     }
 
     private static void addIdentity(JsonObject body, String identityKey, String previousName)
@@ -352,11 +355,13 @@ final class RuneFolioApiClient
     {
         private final String connectionToken;
         private final String characterName;
+        private final boolean pro;
 
-        ConnectionResult(String connectionToken, String characterName)
+        ConnectionResult(String connectionToken, String characterName, boolean pro)
         {
             this.connectionToken = connectionToken;
             this.characterName = characterName;
+            this.pro = pro;
         }
 
         String getConnectionToken()
@@ -369,17 +374,24 @@ final class RuneFolioApiClient
             return characterName;
         }
 
+        boolean isPro()
+        {
+            return pro;
+        }
+
     }
 
     static final class AccountHeartbeatResult
     {
         private final boolean characterConnected;
         private final String setupUrl;
+        private final boolean pro;
 
-        AccountHeartbeatResult(boolean characterConnected, String setupUrl)
+        AccountHeartbeatResult(boolean characterConnected, String setupUrl, boolean pro)
         {
             this.characterConnected = characterConnected;
             this.setupUrl = setupUrl;
+            this.pro = pro;
         }
 
         boolean isCharacterConnected()
@@ -390,6 +402,11 @@ final class RuneFolioApiClient
         String getSetupUrl()
         {
             return setupUrl;
+        }
+
+        boolean isPro()
+        {
+            return pro;
         }
     }
 
