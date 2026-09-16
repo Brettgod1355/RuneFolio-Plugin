@@ -282,7 +282,16 @@ public class RuneFolioScreenshotSpoolTest
     {
         Path parent = temporary.newFolder().toPath(), target = temporary.newFolder().toPath();
         Path link = parent.resolve("queue");
-        Files.createSymbolicLink(link, target);
+        try
+        {
+            Files.createSymbolicLink(link, target);
+        }
+        catch (UnsupportedOperationException | java.nio.file.FileSystemException noSymlinkPrivilege)
+        {
+            // Creating a symlink needs an OS privilege (e.g. Windows Developer Mode) this
+            // environment may not grant; skip rather than fail on an unrelated limitation.
+            org.junit.Assume.assumeNoException(noSymlinkPrivilege);
+        }
         try { spool(link).save(entry(TOKEN, "Example"), jpeg()); fail("Symlink accepted"); }
         catch (IOException expected) { }
         try (java.util.stream.Stream<Path> files = Files.list(target)) { assertEquals(0, files.count()); }
