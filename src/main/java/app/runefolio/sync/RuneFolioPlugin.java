@@ -147,6 +147,7 @@ public class RuneFolioPlugin extends Plugin
     private volatile String accountConnectionToken;
     private volatile String connectionToken;
     private volatile String connectedCharacterName;
+    private volatile boolean accountIsPro;
     private volatile String activeConnectionConfigKey;
     private volatile boolean activeConnectionIsLegacy;
     private volatile String lastKnownPlayerName;
@@ -449,11 +450,13 @@ public class RuneFolioPlugin extends Plugin
                     connectedCharacterName = null;
                     activeConnectionConfigKey = null;
                     activeConnectionIsLegacy = false;
+                    accountIsPro = false;
 
                     SwingUtilities.invokeLater(() ->
                     {
                         panel.setAccountConnecting(false);
                         panel.setAccountConnected(true);
+                        panel.setProStatus(false);
                         panel.setStatus("Connected to your RuneFolio account. Log in to a character to sync.");
                     });
                     clientThread.invokeLater(() ->
@@ -510,6 +513,7 @@ public class RuneFolioPlugin extends Plugin
                 {
                     panel.setAccountConnecting(false);
                     panel.setAccountConnected(false);
+                    panel.setProStatus(false);
                     panel.setStatus("RuneFolio account disconnected. Temporary character codes are still available.");
                 });
                 clientThread.invokeLater(() ->
@@ -571,12 +575,14 @@ public class RuneFolioPlugin extends Plugin
                 connectedCharacterName = result.getCharacterName();
                 activeConnectionConfigKey = configKey;
                 activeConnectionIsLegacy = false;
+                accountIsPro = result.isPro();
                 configManager.setConfiguration(CONFIG_GROUP, configKey, connectionToken);
                 SwingUtilities.invokeLater(() ->
                 {
                     panel.clearCode();
                     panel.setConnecting(false);
                     panel.setCharacterName(playerName);
+                    panel.setProStatus(result.isPro());
                     showConnectionStatus(playerName, result.getCharacterName());
                     loginSyncPending = true;
                     verifySavedConnection();
@@ -641,10 +647,12 @@ public class RuneFolioPlugin extends Plugin
                         activeConnectionConfigKey = null;
                         activeConnectionIsLegacy = false;
                         loginSyncPending = false;
+                        accountIsPro = false;
                     }
                     SwingUtilities.invokeLater(() ->
                     {
                         panel.setCharacterName(playerName);
+                        panel.setProStatus(false);
                         panel.setStatus(playerName + " is not connected to RuneFolio. Enter a temporary code for this character.");
                     });
                     return;
@@ -652,6 +660,7 @@ public class RuneFolioPlugin extends Plugin
 
                 rememberIdentity(identityKey, linkedCharacter, savedToken);
                 connectedCharacterName = linkedCharacter;
+                accountIsPro = result.isPro();
                 if (legacyToken)
                 {
                     String characterConfigKey = connectionTokenKey(playerName);
@@ -664,6 +673,7 @@ public class RuneFolioPlugin extends Plugin
                 SwingUtilities.invokeLater(() ->
                 {
                     panel.setCharacterName(playerName);
+                    panel.setProStatus(result.isPro());
                     showConnectionStatus(playerName, linkedCharacter);
                 });
 
@@ -712,6 +722,8 @@ public class RuneFolioPlugin extends Plugin
                 {
                     connectedCharacterName = null;
                     loginSyncPending = false;
+                    accountIsPro = false;
+                    SwingUtilities.invokeLater(() -> panel.setProStatus(false));
                     showCharacterSetupRequired(playerName, heartbeat.getSetupUrl());
                     return;
                 }
@@ -721,6 +733,7 @@ public class RuneFolioPlugin extends Plugin
                     rememberIdentity(identityKey, playerName, null);
                     connectedCharacterName = playerName;
                 }
+                accountIsPro = heartbeat.isPro();
                 boolean needsFirstSync = playerName != null
                     && !playerName.isBlank()
                     && !namesMatch(playerName, lastSuccessfullySyncedCharacterName);
@@ -732,6 +745,7 @@ public class RuneFolioPlugin extends Plugin
                     panel.hideCharacterSetup();
                     panel.setAccountConnected(true);
                     panel.setCharacterName(playerName);
+                    panel.setProStatus(heartbeat.isPro());
                     panel.setStatus(playerName == null || playerName.isBlank()
                         ? "Connected to your RuneFolio account. Log in to a character to sync."
                         : (needsFirstSync
@@ -760,6 +774,7 @@ public class RuneFolioPlugin extends Plugin
                     SwingUtilities.invokeLater(() ->
                     {
                         panel.setAccountConnected(false);
+                        panel.setProStatus(false);
                         panel.hideCharacterSetup();
                         panel.setStatus("RuneFolio account connection revoked. Log in again or use a temporary code.");
                     });
@@ -2449,6 +2464,7 @@ public class RuneFolioPlugin extends Plugin
         String playerName = currentPlayerName();
         panel.setCharacterName(playerName);
         panel.setAccountConnected(isAccountMode());
+        panel.setProStatus(accountIsPro);
 
         if (playerName == null || playerName.isBlank())
         {
@@ -2539,6 +2555,7 @@ public class RuneFolioPlugin extends Plugin
         lastSuccessfullySyncedCharacterName = null;
         configManager.unsetConfiguration(CONFIG_GROUP, ACCOUNT_CONNECTION_TOKEN_KEY);
         connectedCharacterName = null;
+        accountIsPro = false;
         pendingCharacterSetupName = null;
         pendingCharacterSetupUrl = null;
         setupPollCharacter = null;
