@@ -21,7 +21,7 @@ public class RuneFolioDataSharingTest
             AtomicInteger clears = new AtomicInteger();
             RuneFolioPanel panel = new RuneFolioPanel(() -> true, accepted::get);
             panel.setClearScreenshotsAction(clears::incrementAndGet);
-            JButton clear = (JButton) find(panel, JButton.class, "Clear local screenshot queue");
+            JButton clear = (JButton) find(panel, JButton.class, "Clear screenshot queue");
             assertNotNull(clear);
             clear.doClick();
             assertEquals(0, clears.get());
