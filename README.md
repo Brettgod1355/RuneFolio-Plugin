@@ -9,7 +9,7 @@ RuneFolio Sync connects RuneLite to your [RuneFolio](https://runefolio.app) acco
 1. Install the plugin and open the RuneFolio panel in the sidebar (look for the gold "R").
 2. Choose how to connect:
    - **Log in to RuneFolio** (recommended) — opens your browser to sign in or create an account once. Every character you log into afterward syncs automatically.
-   - **Connect character** — enter a temporary code generated on the website to link a single character without creating an account.
+   - **Connect character** — generate a one-time code from your RuneFolio account on the website, then enter it here to sync just that one character. You still need a RuneFolio account to generate the code; this just avoids linking a whole RuneLite installation to your account, which is useful on a computer you don't own or don't want every character on it syncing from — such as a friend's.
 3. Log in to your character. RuneFolio Sync sends an initial snapshot automatically and keeps syncing as you play.
 4. Open [runefolio.app](https://runefolio.app) to see your synced progress.
 
@@ -45,7 +45,7 @@ Updates are queued locally and retried automatically if your connection drops, s
 ## Requirements
 
 - RuneLite's built-in **Loot Tracker** plugin must stay enabled for loot and completion tracking to work.
-- A RuneFolio account (free to create) or a temporary connection code from one.
+- A RuneFolio account (free to create) — either logged into directly, or used to generate a one-time code for connecting a single character without a full account login.
 
 ## License and credits
 
