@@ -141,6 +141,9 @@ public class RuneFolioPlugin extends Plugin
     @Inject
     private com.google.gson.Gson gson;
 
+    @Inject
+    private okhttp3.OkHttpClient okHttpClient;
+
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
     private final ScheduledExecutorService syncExecutor = Executors.newSingleThreadScheduledExecutor();
     private final RuneFolioScreenshotQueue screenshotQueue = new RuneFolioScreenshotQueue();
@@ -274,7 +277,7 @@ public class RuneFolioPlugin extends Plugin
             nextManifestRefreshMillis = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
             try
             {
-                RuneFolioCollectorManifest manifest = RuneFolioCollectorManifest.fetch();
+                RuneFolioCollectorManifest manifest = RuneFolioCollectorManifest.fetch(okHttpClient);
                 if (manifest != null)
                 {
                     clientThread.invokeLater(() -> RuneFolioCollectorManifest.install(manifest));
@@ -436,7 +439,7 @@ public class RuneFolioPlugin extends Plugin
             try
             {
                 RuneFolioApiClient.AccountLoginRequest login =
-                    RuneFolioApiClient.startAccountLogin();
+                    RuneFolioApiClient.startAccountLogin(okHttpClient);
                 SwingUtilities.invokeLater(() ->
                 {
                     panel.openBrowser(login.getVerificationUrl());
@@ -447,6 +450,7 @@ public class RuneFolioPlugin extends Plugin
                 {
                     Thread.sleep(2_000);
                     RuneFolioApiClient.AccountPollResult result = RuneFolioApiClient.pollAccountLogin(
+                        okHttpClient,
                         login.getRequestId(),
                         login.getPollToken()
                     );
@@ -522,7 +526,7 @@ public class RuneFolioPlugin extends Plugin
         {
             try
             {
-                RuneFolioApiClient.disconnectAccount(savedToken);
+                RuneFolioApiClient.disconnectAccount(okHttpClient, savedToken);
                 clearAccountConnection();
                 SwingUtilities.invokeLater(() ->
                 {
@@ -576,6 +580,7 @@ public class RuneFolioPlugin extends Plugin
             try
             {
                 RuneFolioApiClient.ConnectionResult result = RuneFolioApiClient.exchange(
+                    okHttpClient,
                     code,
                     playerName,
                     "RuneLite · " + playerName
@@ -643,7 +648,7 @@ public class RuneFolioPlugin extends Plugin
         {
             try
             {
-                RuneFolioApiClient.ConnectionResult result = RuneFolioApiClient.heartbeat(savedToken, playerName, identityKey, previousName);
+                RuneFolioApiClient.ConnectionResult result = RuneFolioApiClient.heartbeat(okHttpClient, savedToken, playerName, identityKey, previousName);
                 if (session != characterSession.get() || !savedToken.equals(connectionToken))
                 {
                     return;
@@ -726,7 +731,7 @@ public class RuneFolioPlugin extends Plugin
             try
             {
                 RuneFolioApiClient.AccountHeartbeatResult heartbeat =
-                    RuneFolioApiClient.accountHeartbeat(savedToken, playerName, identityKey, previousName);
+                    RuneFolioApiClient.accountHeartbeat(okHttpClient, savedToken, playerName, identityKey, previousName);
                 boolean characterConnected = heartbeat.isCharacterConnected();
                 if (session != characterSession.get() || !savedToken.equals(accountConnectionToken))
                 {
@@ -901,7 +906,7 @@ public class RuneFolioPlugin extends Plugin
             try
             {
                 RuneFolioApiClient.AccountHeartbeatResult heartbeat =
-                    RuneFolioApiClient.accountHeartbeat(token, playerName, identityKey, previousName);
+                    RuneFolioApiClient.accountHeartbeat(okHttpClient, token, playerName, identityKey, previousName);
                 if (session != characterSession.get() || !java.util.Objects.equals(token, accountConnectionToken))
                 {
                     return;
@@ -1220,7 +1225,7 @@ public class RuneFolioPlugin extends Plugin
                 return;
             }
 
-            RuneFolioApiClient.BatchSyncResult result = RuneFolioApiClient.syncEvents(savedToken, events);
+            RuneFolioApiClient.BatchSyncResult result = RuneFolioApiClient.syncEvents(okHttpClient, savedToken, events);
             syncQueue.acknowledge(result.getAcknowledgedEventIds());
 
             if (result.shouldRevoke())
@@ -2043,7 +2048,7 @@ public class RuneFolioPlugin extends Plugin
                     : "A screenshot operation is active in another client. Try clearing again shortly."));
             }
             screenshotSpool.drainOnce(this::screenshotConnectionTokens, (token, entry, jpeg) ->
-                RuneFolioApiClient.uploadScreenshot(token, entry.characterName, UUID.fromString(entry.eventId),
+                RuneFolioApiClient.uploadScreenshot(okHttpClient, token, entry.characterName, UUID.fromString(entry.eventId),
                     entry.identityKey, entry.category, entry.caption, entry.occurredAt, jpeg));
             RuneFolioScreenshotSpool.Stats stats = screenshotSpool.stats();
             if (stats != null)

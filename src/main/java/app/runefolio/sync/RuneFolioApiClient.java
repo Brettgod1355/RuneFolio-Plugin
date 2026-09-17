@@ -5,14 +5,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 final class RuneFolioApiClient
 {
@@ -24,11 +27,11 @@ final class RuneFolioApiClient
     {
     }
 
-    static AccountLoginRequest startAccountLogin() throws IOException
+    static AccountLoginRequest startAccountLogin(OkHttpClient client) throws IOException
     {
         JsonObject body = new JsonObject();
         body.addProperty("deviceLabel", "RuneLite on this computer");
-        JsonObject response = post("/plugin-auth/start", body, null);
+        JsonObject response = post(client, "/plugin-auth/start", body, null);
         return new AccountLoginRequest(
             response.get("requestId").getAsString(),
             response.get("pollToken").getAsString(),
@@ -36,18 +39,18 @@ final class RuneFolioApiClient
         );
     }
 
-    static AccountPollResult pollAccountLogin(String requestId, String pollToken) throws IOException
+    static AccountPollResult pollAccountLogin(OkHttpClient client, String requestId, String pollToken) throws IOException
     {
         JsonObject body = new JsonObject();
         body.addProperty("requestId", requestId);
         body.addProperty("pollToken", pollToken);
-        JsonObject response = post("/plugin-auth/poll", body, null);
+        JsonObject response = post(client, "/plugin-auth/poll", body, null);
         String status = response.has("status") ? response.get("status").getAsString() : "pending";
         String token = response.has("connectionToken") ? response.get("connectionToken").getAsString() : null;
         return new AccountPollResult(status, token);
     }
 
-    static AccountHeartbeatResult accountHeartbeat(String connectionToken, String characterName, String identityKey, String previousName) throws IOException
+    static AccountHeartbeatResult accountHeartbeat(OkHttpClient client, String connectionToken, String characterName, String identityKey, String previousName) throws IOException
     {
         JsonObject body = new JsonObject();
         if (characterName != null && !characterName.isBlank())
@@ -55,7 +58,7 @@ final class RuneFolioApiClient
             body.addProperty("characterName", characterName);
         }
         addIdentity(body, identityKey, previousName);
-        JsonObject response = post("/plugin-account/heartbeat", body, connectionToken);
+        JsonObject response = post(client, "/plugin-account/heartbeat", body, connectionToken);
         boolean characterConnected = !response.has("characterConnected")
             || response.get("characterConnected").isJsonNull()
             || response.get("characterConnected").getAsBoolean();
@@ -66,19 +69,19 @@ final class RuneFolioApiClient
         return new AccountHeartbeatResult(characterConnected, setupUrl, pro);
     }
 
-    static void disconnectAccount(String connectionToken) throws IOException
+    static void disconnectAccount(OkHttpClient client, String connectionToken) throws IOException
     {
-        post("/plugin-account/disconnect", new JsonObject(), connectionToken);
+        post(client, "/plugin-account/disconnect", new JsonObject(), connectionToken);
     }
 
-    static ConnectionResult exchange(String temporaryCode, String characterName, String connectionLabel) throws IOException
+    static ConnectionResult exchange(OkHttpClient client, String temporaryCode, String characterName, String connectionLabel) throws IOException
     {
         JsonObject body = new JsonObject();
         body.addProperty("code", temporaryCode);
         body.addProperty("characterName", characterName);
         body.addProperty("connectionLabel", connectionLabel);
 
-        JsonObject response = post("/plugin-links/exchange", body, null);
+        JsonObject response = post(client, "/plugin-links/exchange", body, null);
         JsonObject character = response.getAsJsonObject("character");
         return new ConnectionResult(
             response.get("connectionToken").getAsString(),
@@ -87,12 +90,12 @@ final class RuneFolioApiClient
         );
     }
 
-    static ConnectionResult heartbeat(String connectionToken, String characterName, String identityKey, String previousName) throws IOException
+    static ConnectionResult heartbeat(OkHttpClient client, String connectionToken, String characterName, String identityKey, String previousName) throws IOException
     {
         JsonObject body = new JsonObject();
         body.addProperty("characterName", characterName);
         addIdentity(body, identityKey, previousName);
-        JsonObject response = post("/plugin-links/heartbeat", body, connectionToken);
+        JsonObject response = post(client, "/plugin-links/heartbeat", body, connectionToken);
         JsonObject character = response.getAsJsonObject("character");
         return new ConnectionResult(connectionToken, character.get("name").getAsString(),
             response.has("pro") && response.get("pro").getAsBoolean());
@@ -108,6 +111,7 @@ final class RuneFolioApiClient
     }
 
     static BatchSyncResult syncEvents(
+        OkHttpClient client,
         String connectionToken,
         List<RuneFolioSyncEvent> events
     ) throws IOException
@@ -123,7 +127,7 @@ final class RuneFolioApiClient
         }
         body.add("events", eventArray);
 
-        JsonObject response = post("/plugin-sync", body, connectionToken);
+        JsonObject response = post(client, "/plugin-sync", body, connectionToken);
         List<String> successful = new ArrayList<>();
         addStrings(response, "acceptedEventIds", successful);
         addStrings(response, "duplicateEventIds", successful);
@@ -154,6 +158,7 @@ final class RuneFolioApiClient
     }
 
     static void uploadScreenshot(
+        OkHttpClient client,
         String connectionToken,
         String characterName,
         UUID eventId,
@@ -178,37 +183,28 @@ final class RuneFolioApiClient
         body.write(jpeg);
         writeAscii(body, "\r\n--" + boundary + "--\r\n");
 
-        HttpURLConnection connection = (HttpURLConnection) new URL(API_BASE + "/plugin-screenshots").openConnection();
-        try
+        RequestBody requestBody = RequestBody.create(
+            MediaType.parse("multipart/form-data; boundary=" + boundary), body.toByteArray());
+        Request request = new Request.Builder()
+            .url(API_BASE + "/plugin-screenshots")
+            .post(requestBody)
+            .header("Accept", "application/json")
+            .header("Authorization", "Bearer " + connectionToken)
+            .build();
+        OkHttpClient scoped = client.newBuilder()
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .build();
+        try (Response response = scoped.newCall(request).execute())
         {
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestMethod("POST");
-            connection.setConnectTimeout(10_000);
-            connection.setReadTimeout(20_000);
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setRequestProperty("Authorization", "Bearer " + connectionToken);
-            byte[] payload = body.toByteArray();
-            connection.setFixedLengthStreamingMode(payload.length);
-            try (OutputStream output = connection.getOutputStream())
+            if (!response.isSuccessful())
             {
-                output.write(payload);
+                throw new RuneFolioScreenshotSpool.UploadException(response.code(),
+                    screenshotRetryAfterMillis(response.header("Retry-After"), System.currentTimeMillis()));
             }
-
-            int status = connection.getResponseCode();
-            if (status < 200 || status >= 300)
-            {
-                InputStream error = connection.getErrorStream();
-                if (error != null) error.close();
-                throw new RuneFolioScreenshotSpool.UploadException(status,
-                    screenshotRetryAfterMillis(connection.getHeaderField("Retry-After"), System.currentTimeMillis()));
-            }
-            verifyScreenshotAcknowledgement(readJsonResponse(connection.getInputStream()), eventId);
-        }
-        finally
-        {
-            connection.disconnect();
+            verifyScreenshotAcknowledgement(readJsonResponse(response.body()), eventId);
         }
     }
 
@@ -268,32 +264,28 @@ final class RuneFolioApiClient
         }
     }
 
-    private static JsonObject post(String path, JsonObject body, String connectionToken) throws IOException
+    private static JsonObject post(OkHttpClient client, String path, JsonObject body, String connectionToken) throws IOException
     {
-        HttpURLConnection connection = (HttpURLConnection) new URL(API_BASE + path).openConnection();
-        try
+        RequestBody requestBody = RequestBody.create(
+            MediaType.parse("application/json"), body.toString().getBytes(StandardCharsets.UTF_8));
+        Request.Builder builder = new Request.Builder()
+            .url(API_BASE + path)
+            .post(requestBody)
+            .header("Accept", "application/json");
+        if (connectionToken != null)
         {
-            connection.setRequestMethod("POST");
-            connection.setConnectTimeout(10_000);
-            connection.setReadTimeout(10_000);
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            if (connectionToken != null)
-            {
-                connection.setRequestProperty("Authorization", "Bearer " + connectionToken);
-            }
+            builder.header("Authorization", "Bearer " + connectionToken);
+        }
+        OkHttpClient scoped = client.newBuilder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .build();
 
-            byte[] payload = body.toString().getBytes(StandardCharsets.UTF_8);
-            connection.getOutputStream().write(payload);
+        try (Response response = scoped.newCall(builder.build()).execute())
+        {
+            JsonObject json = readJsonResponse(response.body());
 
-            int status = connection.getResponseCode();
-            InputStream stream = status >= 200 && status < 300
-                ? connection.getInputStream()
-                : connection.getErrorStream();
-            JsonObject json = readJsonResponse(stream);
-
-            if (status < 200 || status >= 300)
+            if (!response.isSuccessful())
             {
                 String message = json.has("message")
                     ? json.get("message").getAsString()
@@ -303,15 +295,11 @@ final class RuneFolioApiClient
 
             return json;
         }
-        finally
-        {
-            connection.disconnect();
-        }
     }
 
-    private static JsonObject readJsonResponse(InputStream stream) throws IOException
+    private static JsonObject readJsonResponse(ResponseBody body) throws IOException
     {
-        String response = stream == null ? "" : new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+        String response = body == null ? "" : body.string();
         try
         {
             return response.isBlank() ? new JsonObject() : new JsonParser().parse(response).getAsJsonObject();
