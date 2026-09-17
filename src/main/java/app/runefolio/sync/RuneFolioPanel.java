@@ -1,6 +1,7 @@
 package app.runefolio.sync;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -13,6 +14,9 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.BooleanSupplier;
 import javax.inject.Singleton;
@@ -20,13 +24,16 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicButtonUI;
 import lombok.extern.slf4j.Slf4j;
@@ -91,6 +98,13 @@ class RuneFolioPanel extends PluginPanel
     private boolean temporaryConnecting;
     private final BooleanSupplier confirmConnection;
     private final BooleanSupplier confirmClearScreenshots;
+    private final CardLayout cards = new CardLayout();
+    private final JPanel body = new JPanel(cards);
+    private final JButton gearButton = new JButton("⚙");
+    private final Map<String, JCheckBox> toggleBoxes = new LinkedHashMap<>();
+    private JSpinner thresholdSpinner;
+    private boolean settingsOpen;
+    private boolean syncingSettings;
 
     RuneFolioPanel()
     {
@@ -110,14 +124,12 @@ class RuneFolioPanel extends PluginPanel
         setLayout(new BorderLayout());
         setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-        JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBackground(ColorScheme.DARK_GRAY_COLOR);
-        content.setBorder(BorderFactory.createEmptyBorder(14, 12, 14, 12));
+        JPanel header = new JPanel(new BorderLayout(6, 0));
+        header.setOpaque(false);
+        header.setBorder(BorderFactory.createEmptyBorder(14, 12, 0, 12));
 
         JPanel brand = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         brand.setOpaque(false);
-        brand.setAlignmentX(LEFT_ALIGNMENT);
         JLabel brandIcon = new JLabel(new ImageIcon(RuneFolioBrand.createIcon(28)));
         brandIcon.setToolTipText("RuneFolio");
         brand.add(brandIcon);
@@ -125,7 +137,30 @@ class RuneFolioPanel extends PluginPanel
         title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
         title.setForeground(GOLD);
         brand.add(title);
-        content.add(brand);
+        header.add(brand, BorderLayout.CENTER);
+
+        gearButton.setFont(gearButton.getFont().deriveFont(Font.PLAIN, 18f));
+        gearButton.setMargin(new Insets(0, 0, 0, 0));
+        gearButton.setPreferredSize(new Dimension(28, 28));
+        SwingUtil.removeButtonDecorations(gearButton);
+        gearButton.setUI(new BasicButtonUI());
+        gearButton.setForeground(GOLD);
+        gearButton.setBackground(ColorScheme.DARK_GRAY_COLOR);
+        gearButton.setFocusPainted(false);
+        gearButton.setToolTipText("RuneFolio settings");
+        gearButton.getAccessibleContext().setAccessibleName("RuneFolio settings");
+        gearButton.addActionListener(event ->
+        {
+            settingsOpen = !settingsOpen;
+            showCard();
+        });
+        header.add(gearButton, BorderLayout.EAST);
+        add(header, BorderLayout.NORTH);
+
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(ColorScheme.DARK_GRAY_COLOR);
+        content.setBorder(BorderFactory.createEmptyBorder(6, 12, 14, 12));
 
         JLabel subtitle = new JLabel("v" + RuneFolioApiClient.CLIENT_VERSION + " · Sync client");
         subtitle.setForeground(MUTED_TEXT);
@@ -289,7 +324,207 @@ class RuneFolioPanel extends PluginPanel
 
         setAccountExpanded(true);
         setTemporaryExpanded(false);
-        add(content, BorderLayout.NORTH);
+
+        body.setOpaque(false);
+        body.add(content, "main");
+        add(body, BorderLayout.CENTER);
+    }
+
+    private void showCard()
+    {
+        cards.show(body, settingsOpen ? "settings" : "main");
+        gearButton.setText(settingsOpen ? "⬅" : "⚙");
+        gearButton.setToolTipText(settingsOpen ? "Back to RuneFolio" : "RuneFolio settings");
+    }
+
+    /**
+     * Builds the mirrored settings page. There is no public RuneLite API to open a plugin's
+     * real config panel from a sidebar button (the class that owns it, TopLevelConfigPanel,
+     * is package-private), so this reproduces the same toggles here and writes through the
+     * same {@link net.runelite.client.config.ConfigManager} keys the real panel uses.
+     */
+    void configure(BiConsumer<String, Object> setting)
+    {
+        JPanel settings = new JPanel();
+        settings.setLayout(new BoxLayout(settings, BoxLayout.Y_AXIS));
+        settings.setBackground(ColorScheme.DARK_GRAY_COLOR);
+        settings.setBorder(BorderFactory.createEmptyBorder(10, 12, 14, 12));
+
+        JTextArea settingsNotice = new JTextArea(
+            "Mirrors this plugin's real RuneLite settings (sidebar wrench icon → RuneFolio). Changing either one updates the other."
+        );
+        configureWrappedText(settingsNotice, MUTED_TEXT, 46);
+        settingsNotice.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        settings.add(settingsNotice);
+
+        settings.add(sectionLabel("SYNC"));
+        settings.add(Box.createRigidArea(new Dimension(0, 6)));
+        addToggle(settings, setting, "autoOpenCharacterSetup", "Open setup for new characters",
+            "Automatically open RuneFolio in your browser when an unrecognized character logs in.", null);
+        addToggle(settings, setting, "showCollectionLogSyncButton", "Collection Log sync button",
+            "Show a smart RuneFolio sync button in an unused bottom-right area of the in-game Collection Log.", null);
+        addToggle(settings, setting, "syncLootDrops", "Sync loot drops",
+            "Automatically send loot recorded by RuneLite's enabled Loot Tracker to your RuneFolio history.", RuneFolioDataSharing.LOOT);
+        addToggle(settings, setting, "hideSidePanel", "Hide RuneFolio side panel",
+            "Hide the RuneFolio button from the RuneLite side panel without disabling background syncing.", null);
+        addToggle(settings, setting, "syncBankWealth", "Sync bank and wealth",
+            "Opt-in: send bank, inventory and equipment items and estimated values while your bank is open.", RuneFolioDataSharing.BANK);
+        addToggle(settings, setting, "syncCompletionHistory", "Sync completion history",
+            "Send observed boss/raid, clue and Slayer completions and available result details to RuneFolio.", RuneFolioDataSharing.COMPLETIONS);
+        addToggle(settings, setting, "syncPvpHistory", "Sync PvP history",
+            "Opt-in: send your observed finishing blows, opponent names, timestamps and observed loot.", RuneFolioDataSharing.PVP);
+        addToggle(settings, setting, "syncAccountUnlocks", "Sync account unlocks",
+            "Send supported account unlock flags and observations of checklist items. No full bank contents are sent by this setting.", RuneFolioDataSharing.UNLOCKS);
+
+        settings.add(Box.createRigidArea(new Dimension(0, 10)));
+        settings.add(sectionLabel("SCREENSHOTS"));
+        settings.add(Box.createRigidArea(new Dimension(0, 6)));
+        addToggle(settings, setting, "uploadScreenshots", "Upload screenshots",
+            "Save compressed screenshots locally for staggered upload (500 pictures / 256 MiB). Off by default.", RuneFolioDataSharing.SCREENSHOTS);
+        addToggle(settings, setting, "hideChatInScreenshots", "Hide chat and private messages",
+            "Temporarily hide the chat area and private-message overlay while RuneFolio captures a frame.", null);
+        addToggle(settings, setting, "screenshotLevelUps", "Level ups",
+            "Upload screenshots of level-up interfaces.", null);
+        addToggle(settings, setting, "screenshotQuestCompletions", "Quest completions",
+            "Upload screenshots of quest-completion interfaces.", null);
+        addToggle(settings, setting, "screenshotDiaryCompletions", "Diary tasks",
+            "Upload screenshots when an Achievement Diary task is completed.", null);
+        addToggle(settings, setting, "screenshotCombatAchievements", "Combat Achievements",
+            "Upload screenshots when a Combat Achievement is completed.", null);
+        addToggle(settings, setting, "screenshotCollectionLogUnlocks", "Collection Log unlocks",
+            "Upload screenshots when a new Collection Log item is announced.", null);
+        addToggle(settings, setting, "screenshotPets", "Pets",
+            "Upload screenshots when the game announces a newly received pet.", null);
+        addToggle(settings, setting, "screenshotValuableDrops", "High-value drops",
+            "Upload a screenshot when a RuneLite loot event reaches the configured GE value.", null);
+
+        JPanel thresholdRow = new JPanel(new BorderLayout(6, 0));
+        thresholdRow.setOpaque(false);
+        thresholdRow.setAlignmentX(LEFT_ALIGNMENT);
+        thresholdRow.setMaximumSize(new Dimension(CONTENT_WIDTH, 26));
+        JLabel thresholdLabel = new JLabel("High-value threshold (GP)");
+        thresholdLabel.setForeground(PRIMARY_TEXT);
+        thresholdLabel.setToolTipText("Minimum total GE value of a loot event to upload a screenshot.");
+        thresholdRow.add(thresholdLabel, BorderLayout.WEST);
+        thresholdSpinner = new JSpinner(new SpinnerNumberModel(1_000_000, 0, Integer.MAX_VALUE, 100_000));
+        ((JSpinner.DefaultEditor) thresholdSpinner.getEditor()).getTextField().setColumns(8);
+        thresholdSpinner.addChangeListener(event ->
+        {
+            if (!syncingSettings)
+            {
+                setting.accept("screenshotValuableDropThreshold", thresholdSpinner.getValue());
+            }
+        });
+        thresholdRow.add(thresholdSpinner, BorderLayout.EAST);
+        settings.add(thresholdRow);
+        settings.add(Box.createRigidArea(new Dimension(0, 6)));
+
+        addToggle(settings, setting, "screenshotUntradeableDrops", "Untradeable drops",
+            "Upload a screenshot when a RuneLite loot event contains an untradeable item.", null);
+        addToggle(settings, setting, "screenshotClueRewards", "Clue reward screens",
+            "Capture new clue rewards reported by native Loot Tracker.", null);
+        addToggle(settings, setting, "screenshotRaidChestRewards", "Raid and chest rewards",
+            "Capture supported raid/chest rewards reported by native Loot Tracker.", null);
+        addToggle(settings, setting, "screenshotPvpKills", "PvP kills",
+            "Capture your observed finishing blows. PvP history is a separate opt-in.", null);
+        addToggle(settings, setting, "screenshotLootKeys", "Wilderness loot-key screens",
+            "Capture the visible loot-key reward screen reported by native Loot Tracker.", null);
+
+        JPanel settingsPage = new JPanel(new BorderLayout());
+        settingsPage.setBackground(ColorScheme.DARK_GRAY_COLOR);
+        settingsPage.add(settings, BorderLayout.NORTH);
+        JScrollPane settingsScroll = new JScrollPane(settingsPage);
+        settingsScroll.setBorder(BorderFactory.createEmptyBorder());
+        settingsScroll.getVerticalScrollBar().setUnitIncrement(16);
+        body.add(settingsScroll, "settings");
+    }
+
+    private void addToggle(JPanel parent, BiConsumer<String, Object> setting, String key, String label,
+        String description, String warning)
+    {
+        JCheckBox box = new JCheckBox(label);
+        box.setOpaque(false);
+        box.setForeground(PRIMARY_TEXT);
+        box.setAlignmentX(LEFT_ALIGNMENT);
+        box.setToolTipText(description);
+        box.addActionListener(event ->
+        {
+            if (syncingSettings)
+            {
+                return;
+            }
+            boolean newValue = box.isSelected();
+            if (warning != null && JOptionPane.showOptionDialog(this, warning, "Are you sure?",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                new String[]{"Yes", "No"}, "No") != JOptionPane.YES_OPTION)
+            {
+                syncingSettings = true;
+                try
+                {
+                    box.setSelected(!newValue);
+                }
+                finally
+                {
+                    syncingSettings = false;
+                }
+                return;
+            }
+            setting.accept(key, newValue);
+        });
+        toggleBoxes.put(key, box);
+        parent.add(box);
+        parent.add(Box.createRigidArea(new Dimension(0, 2)));
+    }
+
+    void syncSettings(RuneFolioConfig config)
+    {
+        if (toggleBoxes.isEmpty())
+        {
+            return;
+        }
+        syncingSettings = true;
+        try
+        {
+            setToggle("autoOpenCharacterSetup", config.autoOpenCharacterSetup());
+            setToggle("showCollectionLogSyncButton", config.showCollectionLogSyncButton());
+            setToggle("syncLootDrops", config.syncLootDrops());
+            setToggle("hideSidePanel", config.hideSidePanel());
+            setToggle("syncBankWealth", config.syncBankWealth());
+            setToggle("syncCompletionHistory", config.syncCompletionHistory());
+            setToggle("syncPvpHistory", config.syncPvpHistory());
+            setToggle("syncAccountUnlocks", config.syncAccountUnlocks());
+            setToggle("uploadScreenshots", config.uploadScreenshots());
+            setToggle("hideChatInScreenshots", config.hideChatInScreenshots());
+            setToggle("screenshotLevelUps", config.screenshotLevelUps());
+            setToggle("screenshotQuestCompletions", config.screenshotQuestCompletions());
+            setToggle("screenshotDiaryCompletions", config.screenshotDiaryCompletions());
+            setToggle("screenshotCombatAchievements", config.screenshotCombatAchievements());
+            setToggle("screenshotCollectionLogUnlocks", config.screenshotCollectionLogUnlocks());
+            setToggle("screenshotPets", config.screenshotPets());
+            setToggle("screenshotValuableDrops", config.screenshotValuableDrops());
+            setToggle("screenshotUntradeableDrops", config.screenshotUntradeableDrops());
+            setToggle("screenshotClueRewards", config.screenshotClueRewards());
+            setToggle("screenshotRaidChestRewards", config.screenshotRaidChestRewards());
+            setToggle("screenshotPvpKills", config.screenshotPvpKills());
+            setToggle("screenshotLootKeys", config.screenshotLootKeys());
+            if (thresholdSpinner != null)
+            {
+                thresholdSpinner.setValue(config.screenshotValuableDropThreshold());
+            }
+        }
+        finally
+        {
+            syncingSettings = false;
+        }
+    }
+
+    private void setToggle(String key, boolean value)
+    {
+        JCheckBox box = toggleBoxes.get(key);
+        if (box != null)
+        {
+            box.setSelected(value);
+        }
     }
 
     void setTemporaryConnectAction(Consumer<String> action)
