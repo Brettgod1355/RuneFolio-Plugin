@@ -3,15 +3,18 @@ package app.runefolio.sync;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import net.runelite.api.Quest;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /** Data-only configuration: cannot add scripts, URLs, varps or executable behavior. */
 final class RuneFolioCollectorManifest
@@ -56,17 +59,24 @@ final class RuneFolioCollectorManifest
             && value.getAsString().matches("[0-9]{1,4}");
     }
 
-    static RuneFolioCollectorManifest fetch() throws IOException
+    static RuneFolioCollectorManifest fetch(OkHttpClient client) throws IOException
     {
-        HttpURLConnection connection = (HttpURLConnection) new URL("https://runefolio.app/api/collector-manifest").openConnection();
-        connection.setInstanceFollowRedirects(false);
-        connection.setConnectTimeout(5000);
-        connection.setReadTimeout(5000);
-        connection.setRequestProperty("Accept", "application/json");
-        try
+        OkHttpClient scoped = client.newBuilder()
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.SECONDS)
+            .build();
+        Request request = new Request.Builder()
+            .url("https://runefolio.app/api/collector-manifest")
+            .header("Accept", "application/json")
+            .build();
+        try (Response response = scoped.newCall(request).execute())
         {
-            if (connection.getResponseCode() != 200 || connection.getContentLengthLong() > 65536) return null;
-            try (InputStream input = connection.getInputStream(); ByteArrayOutputStream bytes = new ByteArrayOutputStream())
+            if (!response.isSuccessful()) return null;
+            ResponseBody responseBody = response.body();
+            if (responseBody == null || responseBody.contentLength() > 65536) return null;
+            try (InputStream input = responseBody.byteStream(); ByteArrayOutputStream bytes = new ByteArrayOutputStream())
             {
                 byte[] buffer = new byte[4096];
                 int read;
@@ -80,7 +90,6 @@ final class RuneFolioCollectorManifest
             }
         }
         catch (RuntimeException invalid) { return null; }
-        finally { connection.disconnect(); }
     }
 
     static void install(RuneFolioCollectorManifest manifest) { if (manifest != null) current = manifest; }
