@@ -55,7 +55,11 @@ class RuneFolioPanel extends PluginPanel
     private static final Color MUTED_TEXT = new Color(190, 184, 166);
     private static final Color SUCCESS_TEXT = new Color(131, 194, 113);
     private static final Color ERROR_TEXT = new Color(230, 119, 107);
-    private static final int CONTENT_WIDTH = 330;
+    // PluginPanel.PANEL_WIDTH (225) minus this panel's own 12px left/right padding - was
+    // 330, which never matched the sidebar's real rendered width. This is a maximum-size
+    // cap, not a guarantee: rows combining a label with a right-aligned value (see
+    // createMetricRow) still need short enough text to fit within it in practice.
+    private static final int CONTENT_WIDTH = PluginPanel.PANEL_WIDTH - 24;
     private static final DateTimeFormatter SYNC_TIME_FORMAT =
         DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
     private static final ImageIcon DISCORD_ICON;
@@ -235,9 +239,9 @@ class RuneFolioPanel extends PluginPanel
         syncActivity.setOpaque(false);
         syncActivity.setAlignmentX(LEFT_ALIGNMENT);
         syncActivity.setMaximumSize(new Dimension(CONTENT_WIDTH, 110));
-        syncActivity.add(createMetricRow("Last successful sync", lastSyncValue));
-        syncActivity.add(createMetricRow("Pending events", pendingEventsValue));
-        syncActivity.add(createMetricRow("Local screenshots", screenshotQueueValue));
+        syncActivity.add(createMetricRow("Last sync", "Last successful sync", lastSyncValue));
+        syncActivity.add(createMetricRow("Pending", "Pending events waiting to sync", pendingEventsValue));
+        syncActivity.add(createMetricRow("Screenshots", "Local screenshots saved, waiting to upload", screenshotQueueValue));
         syncActivity.setBorder(BorderFactory.createEmptyBorder(5, 0, 8, 0));
         content.add(syncActivity);
 
@@ -261,7 +265,8 @@ class RuneFolioPanel extends PluginPanel
         sharingInfo.addActionListener(event -> JOptionPane.showMessageDialog(this, disclosureText(),
             "RuneFolio data sharing", JOptionPane.INFORMATION_MESSAGE));
         content.add(sharingInfo);
-        JButton clearScreenshots = new JButton("Clear local screenshot queue");
+        JButton clearScreenshots = new JButton("Clear screenshot queue");
+        clearScreenshots.setToolTipText("Deletes screenshots saved locally on this computer, waiting to upload. Website images are unchanged.");
         clearScreenshots.setAlignmentX(LEFT_ALIGNMENT);
         clearScreenshots.addActionListener(event -> {
             if (clearScreenshotsAction != null && confirmClearScreenshots.getAsBoolean())
@@ -755,12 +760,12 @@ class RuneFolioPanel extends PluginPanel
         details.setMaximumSize(new Dimension(CONTENT_WIDTH, Integer.MAX_VALUE));
     }
 
-    private JPanel createMetricRow(String labelText, JLabel value)
+    private JPanel createMetricRow(String labelText, String tooltip, JLabel value)
     {
-        return createMetricRow(labelText, value, 21);
+        return createMetricRow(labelText, tooltip, value, 21);
     }
 
-    private JPanel createMetricRow(String labelText, JLabel value, int height)
+    private JPanel createMetricRow(String labelText, String tooltip, JLabel value, int height)
     {
         JPanel row = new JPanel(new BorderLayout(8, 0));
         row.setOpaque(false);
@@ -768,6 +773,7 @@ class RuneFolioPanel extends PluginPanel
         row.setMaximumSize(new Dimension(CONTENT_WIDTH, height));
         JLabel label = new JLabel(labelText);
         label.setForeground(MUTED_TEXT);
+        label.setToolTipText(tooltip);
         row.add(label, BorderLayout.WEST);
         row.add(value, BorderLayout.EAST);
         return row;
