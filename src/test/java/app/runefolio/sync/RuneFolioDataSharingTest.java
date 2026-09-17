@@ -47,10 +47,12 @@ public class RuneFolioDataSharingTest
         assertFalse(config.syncBankWealth());
         assertFalse(config.uploadScreenshots());
         assertFalse(config.syncPvpHistory());
-        assertFalse(config.screenshotClueRewards());
-        assertFalse(config.screenshotRaidChestRewards());
-        assertFalse(config.screenshotPvpKills());
-        assertFalse(config.screenshotLootKeys());
+        // The master uploadScreenshots switch is opt-in; once a user turns it on,
+        // every capture sub-category (including these reward screens) is on by default.
+        assertTrue(config.screenshotClueRewards());
+        assertTrue(config.screenshotRaidChestRewards());
+        assertTrue(config.screenshotPvpKills());
+        assertTrue(config.screenshotLootKeys());
         ConfigItem pvp = RuneFolioConfig.class.getMethod("syncPvpHistory").getAnnotation(ConfigItem.class);
         assertTrue(pvp.warning().contains("https://runefolio.app"));
         assertTrue(pvp.warning().contains("defeated player names"));

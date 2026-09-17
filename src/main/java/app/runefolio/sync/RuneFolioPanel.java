@@ -105,6 +105,7 @@ class RuneFolioPanel extends PluginPanel
     private JSpinner thresholdSpinner;
     private boolean settingsOpen;
     private boolean syncingSettings;
+    private Dimension bodyPreferredSize;
 
     RuneFolioPanel()
     {
@@ -325,8 +326,21 @@ class RuneFolioPanel extends PluginPanel
         setAccountExpanded(true);
         setTemporaryExpanded(false);
 
+        // Not wrapped by RuneLite's own PluginPanel scrolling (super(false) above), so without
+        // a bounded viewport here, expanding a section grows this panel's real size and RuneLite
+        // resizes the client window to fit it instead of scrolling. Measure the panel's natural
+        // resting height (account expanded, temporary code collapsed - the default state) once,
+        // and use that as a fixed viewport size shared by both cards, so anything taller (both
+        // sections open, or the settings card) scrolls in place instead.
+        bodyPreferredSize = content.getPreferredSize();
+
         body.setOpaque(false);
-        body.add(content, "main");
+        JScrollPane mainScroll = new JScrollPane(content,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        mainScroll.setBorder(BorderFactory.createEmptyBorder());
+        mainScroll.getVerticalScrollBar().setUnitIncrement(16);
+        mainScroll.setPreferredSize(bodyPreferredSize);
+        body.add(mainScroll, "main");
         add(body, BorderLayout.CENTER);
     }
 
@@ -398,25 +412,43 @@ class RuneFolioPanel extends PluginPanel
         addToggle(settings, setting, "screenshotValuableDrops", "High-value drops",
             "Upload a screenshot when a RuneLite loot event reaches the configured GE value.", null);
 
-        JPanel thresholdRow = new JPanel(new BorderLayout(6, 0));
-        thresholdRow.setOpaque(false);
-        thresholdRow.setAlignmentX(LEFT_ALIGNMENT);
-        thresholdRow.setMaximumSize(new Dimension(CONTENT_WIDTH, 26));
-        JLabel thresholdLabel = new JLabel("High-value threshold (GP)");
+        JLabel thresholdLabel = new JLabel("High-value drops above (GP)");
         thresholdLabel.setForeground(PRIMARY_TEXT);
-        thresholdLabel.setToolTipText("Minimum total GE value of a loot event to upload a screenshot.");
-        thresholdRow.add(thresholdLabel, BorderLayout.WEST);
+        thresholdLabel.setAlignmentX(LEFT_ALIGNMENT);
+        thresholdLabel.setToolTipText("Minimum total GE value of a loot event to upload a screenshot. Minimum 500,000.");
+        thresholdLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+        settings.add(thresholdLabel);
+
         thresholdSpinner = new JSpinner(new SpinnerNumberModel(1_000_000, 0, Integer.MAX_VALUE, 100_000));
+        thresholdSpinner.setAlignmentX(LEFT_ALIGNMENT);
+        thresholdSpinner.setMaximumSize(new Dimension(120, thresholdSpinner.getPreferredSize().height));
         ((JSpinner.DefaultEditor) thresholdSpinner.getEditor()).getTextField().setColumns(8);
         thresholdSpinner.addChangeListener(event ->
         {
-            if (!syncingSettings)
+            if (syncingSettings)
             {
-                setting.accept("screenshotValuableDropThreshold", thresholdSpinner.getValue());
+                return;
             }
+            int value = (Integer) thresholdSpinner.getValue();
+            if (value < 500_000)
+            {
+                JOptionPane.showMessageDialog(this,
+                    "The high-value threshold can't go below 500,000 GP. Resetting to 500,000.",
+                    "Minimum threshold", JOptionPane.ERROR_MESSAGE);
+                syncingSettings = true;
+                try
+                {
+                    thresholdSpinner.setValue(500_000);
+                }
+                finally
+                {
+                    syncingSettings = false;
+                }
+                value = 500_000;
+            }
+            setting.accept("screenshotValuableDropThreshold", value);
         });
-        thresholdRow.add(thresholdSpinner, BorderLayout.EAST);
-        settings.add(thresholdRow);
+        settings.add(thresholdSpinner);
         settings.add(Box.createRigidArea(new Dimension(0, 6)));
 
         addToggle(settings, setting, "screenshotUntradeableDrops", "Untradeable drops",
@@ -433,9 +465,17 @@ class RuneFolioPanel extends PluginPanel
         JPanel settingsPage = new JPanel(new BorderLayout());
         settingsPage.setBackground(ColorScheme.DARK_GRAY_COLOR);
         settingsPage.add(settings, BorderLayout.NORTH);
-        JScrollPane settingsScroll = new JScrollPane(settingsPage);
+        JScrollPane settingsScroll = new JScrollPane(settingsPage,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         settingsScroll.setBorder(BorderFactory.createEmptyBorder());
         settingsScroll.getVerticalScrollBar().setUnitIncrement(16);
+        if (bodyPreferredSize != null)
+        {
+            // Match the main card's viewport size so switching cards via the gear doesn't
+            // itself resize the panel (and the settings list is much longer, so it will
+            // scroll here almost always - that's expected).
+            settingsScroll.setPreferredSize(bodyPreferredSize);
+        }
         body.add(settingsScroll, "settings");
     }
 
