@@ -223,6 +223,8 @@ public class RuneFolioPlugin extends Plugin
         panel.setCharacterSetupAction(this::openCharacterSetup);
         panel.setManualSyncAction(() -> requestFullSync("manual"));
         panel.setClearScreenshotsAction(() -> clearScreenshotSpoolRequested.set(true));
+        panel.configure((key, value) -> configManager.setConfiguration(CONFIG_GROUP, key, value));
+        panel.syncSettings(config);
         screenshotUploadExecutor.scheduleWithFixedDelay(this::drainScreenshotSpool,
             5 + java.util.concurrent.ThreadLocalRandom.current().nextInt(11), 5, TimeUnit.SECONDS);
 
@@ -331,6 +333,10 @@ public class RuneFolioPlugin extends Plugin
         if (CONFIG_GROUP.equals(event.getGroup()) && "hideSidePanel".equals(event.getKey()))
         {
             refreshNavigationButton();
+        }
+        if (CONFIG_GROUP.equals(event.getGroup()))
+        {
+            SwingUtilities.invokeLater(() -> panel.syncSettings(config));
         }
     }
 

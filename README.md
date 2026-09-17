@@ -17,24 +17,27 @@ The panel shows **Data sharing information** before you connect, explaining exac
 
 ## What it tracks
 
-**Synced automatically once connected:**
+**Always synced once connected** (no toggle — this is the plugin's core purpose):
 
 - Skill levels and XP, refreshed on login, every 10 minutes, and on logout
 - Quest completion state and quest points
 - Achievement Diary progress — individual task completion across all 492 catalog tasks, read directly from game state so you never have to open a diary journal
 - Combat Achievement completion, by tier and by individual task
 - Collection Log category snapshots, captured as you browse the log — a **Sync Collection Log** button is also added to the in-game interface for an on-demand full update
+
+**On by default, with an off switch:**
+
 - Loot drops, recorded through RuneLite's own Loot Tracker
 - Completed boss/raid kills, clue scrolls, and Slayer tasks, including kill time, personal bests, and party size when the game reports them
+- Account unlocks — a large catalog spanning bank space purchases, quest- and diary-gated content, area access, equipment, and more (checklist flags only, not full bank contents)
 
-**Optional, off by default:**
+**Off by default, opt-in:**
 
 - Bank, inventory, and equipment snapshots with estimated GE/high-alchemy value, captured when you open your bank
-- Account unlocks — a large catalog spanning bank space purchases, quest- and diary-gated content, area access, equipment, and more
 - PvP history — your own observed finishing blows and any linked loot only; never opponent equipment or location, and never combat assistance
-- Screenshots of level-ups, quest completions, diary tasks, Combat Achievements, Collection Log unlocks, pets, and valuable or untradeable drops
+- Screenshots of level-ups, quest completions, diary tasks, Combat Achievements, Collection Log unlocks, pets, and valuable, untradeable, or reward drops
 
-Every optional category has its own toggle in the plugin settings, and RuneLite shows a confirmation dialog explaining exactly what it sends before you turn one on.
+Every category with a toggle shows a RuneLite confirmation dialog explaining exactly what it sends before you turn it on.
 
 ## Where your data goes
 
