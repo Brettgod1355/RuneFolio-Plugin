@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,6 +38,8 @@ import net.runelite.client.ui.PluginPanel;
 class RuneFolioPanel extends PluginPanel
 {
     private static final String RUNE_FOLIO_URL = "https://runefolio.app";
+    private static final String DISCORD_URL = "https://discord.gg/Ar96ueFUuj";
+    private static final String GITHUB_URL = "https://github.com/Brettgod1355/RuneFolio-Plugin";
     private static final Color GOLD = new Color(217, 184, 97);
     private static final Color PRIMARY_TEXT = new Color(232, 228, 216);
     private static final Color MUTED_TEXT = new Color(190, 184, 166);
@@ -111,6 +114,9 @@ class RuneFolioPanel extends PluginPanel
         title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
         title.setForeground(GOLD);
         brand.add(title);
+        brand.add(Box.createHorizontalStrut(6));
+        brand.add(createLinkIconButton(RuneFolioBrand.createDiscordIcon(20), "Join the RuneFolio Discord", DISCORD_URL));
+        brand.add(createLinkIconButton(RuneFolioBrand.createGithubIcon(20), "RuneFolio plugin on GitHub", GITHUB_URL));
         content.add(brand);
 
         JLabel subtitle = new JLabel("v" + RuneFolioApiClient.CLIENT_VERSION + " · Private alpha · Sync client");
@@ -480,6 +486,20 @@ class RuneFolioPanel extends PluginPanel
         label.setForeground(PRIMARY_TEXT);
         label.setHorizontalAlignment(SwingConstants.RIGHT);
         return label;
+    }
+
+    private JButton createLinkIconButton(BufferedImage icon, String tooltip, String url)
+    {
+        JButton button = new JButton(new ImageIcon(icon));
+        button.setToolTipText(tooltip);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setMargin(new Insets(0, 0, 0, 0));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setOpaque(false);
+        button.addActionListener(event -> openBrowser(url));
+        return button;
     }
 
     private JPanel createSectionHeader(
