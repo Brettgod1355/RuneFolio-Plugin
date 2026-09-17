@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.Insets;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,9 +28,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.plaf.basic.BasicButtonUI;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
+import net.runelite.client.util.ImageUtil;
+import net.runelite.client.util.LinkBrowser;
+import net.runelite.client.util.SwingUtil;
 
 @Slf4j
 @Singleton
@@ -48,6 +51,14 @@ class RuneFolioPanel extends PluginPanel
     private static final int CONTENT_WIDTH = 330;
     private static final DateTimeFormatter SYNC_TIME_FORMAT =
         DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
+    private static final ImageIcon DISCORD_ICON;
+    private static final ImageIcon GITHUB_ICON;
+
+    static
+    {
+        DISCORD_ICON = new ImageIcon(ImageUtil.resizeImage(ImageUtil.loadImageResource(RuneFolioPanel.class, "/discord.png"), 16, 16));
+        GITHUB_ICON = new ImageIcon(ImageUtil.resizeImage(ImageUtil.loadImageResource(RuneFolioPanel.class, "/github.png"), 16, 16));
+    }
 
     private final JLabel title = new JLabel("RuneFolio");
     private final JLabel characterValue = new JLabel("Log in to RuneLite");
@@ -115,8 +126,8 @@ class RuneFolioPanel extends PluginPanel
         title.setForeground(GOLD);
         brand.add(title);
         brand.add(Box.createHorizontalStrut(6));
-        brand.add(createLinkIconButton(RuneFolioBrand.createDiscordIcon(20), "Join the RuneFolio Discord", DISCORD_URL));
-        brand.add(createLinkIconButton(RuneFolioBrand.createGithubIcon(20), "RuneFolio plugin on GitHub", GITHUB_URL));
+        brand.add(createLinkIconButton(DISCORD_ICON, "Join the RuneFolio Discord", DISCORD_URL));
+        brand.add(createLinkIconButton(GITHUB_ICON, "RuneFolio plugin on GitHub", GITHUB_URL));
         content.add(brand);
 
         JLabel subtitle = new JLabel("v" + RuneFolioApiClient.CLIENT_VERSION + " · Private alpha · Sync client");
@@ -488,17 +499,14 @@ class RuneFolioPanel extends PluginPanel
         return label;
     }
 
-    private JButton createLinkIconButton(BufferedImage icon, String tooltip, String url)
+    private JButton createLinkIconButton(ImageIcon icon, String tooltip, String url)
     {
-        JButton button = new JButton(new ImageIcon(icon));
+        JButton button = new JButton(icon);
+        SwingUtil.removeButtonDecorations(button);
+        button.setUI(new BasicButtonUI());
         button.setToolTipText(tooltip);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setMargin(new Insets(0, 0, 0, 0));
-        button.setContentAreaFilled(false);
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        button.setOpaque(false);
-        button.addActionListener(event -> openBrowser(url));
+        button.setBackground(ColorScheme.DARK_GRAY_COLOR);
+        button.addActionListener(event -> LinkBrowser.browse(url));
         return button;
     }
 

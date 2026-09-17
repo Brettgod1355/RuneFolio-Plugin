@@ -450,6 +450,12 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+## Sidebar Discord and GitHub link icons (0.3.40)
+
+`src/main/resources/discord.png` and `src/main/resources/github.png` are the official Discord and GitHub logomarks, used to link to the RuneFolio Discord server and this plugin's GitHub repository — the use case each brand's own guidelines explicitly cover. They are vector-traced reproductions of those marks, retrieved from Simple Icons (https://github.com/simple-icons/simple-icons, commit `f2365d33171bd1897a41aaae6c0b6e795bcc0483`, project itself CC0-1.0-licensed at `icons/discord.svg` and `icons/github.svg`). Simple Icons' own disclaimer notes that CC0 covers the project, not necessarily every individual brand mark it traces, and directs users to each brand's own guidelines, linked from its per-icon data: Discord at https://discord.com/branding, GitHub at https://github.com/logos. Both were reviewed 2026-09-17.
+
+Modification: recolored (Discord to its brand blurple `#5865F2`; GitHub to white, matching each brand's own light-on-dark variant, for readability against the plugin's dark panel) and rasterized from SVG to a 64x64 PNG, scaled down to 16x16 at load time via RuneLite's `ImageUtil.resizeImage`. No other alteration. Icon placement/loading pattern (`ImageUtil.loadImageResource` + `resizeImage`, `SwingUtil.removeButtonDecorations`, `LinkBrowser.browse`) follows the same convention used by Quest Helper's `com.questhelper.panel.QuestHelperPanel` (https://github.com/Zoinkwiz/quest-helper, BSD-2-Clause; behavior/API reference only, no Quest Helper code or its own bundled icon files are included).
+
 ## Plugin Hub preflight tooling
 
 CI invokes the unmodified RuneLite plugin-hub-tooling v3 release bundle (SHA-256 eb0961b7cd0a1e4a351fb0f684731be1a9049167bfb49a2d91a760fea2933fd2). Sources: https://github.com/runelite/plugin-hub-tooling/tree/v3 and https://github.com/runelite/plugin-hub/blob/master/.github/workflows/build.yml . The upstream root BSD-2-Clause license and applicable Abex file headers were inspected. The bundle is downloaded only for CI, retains its upstream files, and is not vendored or distributed with the plugin. RuneFolio's wrapper is original orchestration; no upstream implementation is copied. Existing BSD notices above remain intact.
