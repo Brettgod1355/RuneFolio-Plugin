@@ -39,6 +39,7 @@ import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicButtonUI;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
@@ -834,7 +835,10 @@ class RuneFolioPanel extends PluginPanel
 
     private void configureSectionToggle(JButton button)
     {
-        button.setFont(button.getFont().deriveFont(Font.BOLD, 11f));
+        // The same font RuneLite's own ConfigPanel uses for its section names - the
+        // bitmap-derived RuneScape font renders noticeably smaller/cramped when scaled
+        // to an arbitrary literal size instead of its own designed 16pt.
+        button.setFont(FontManager.getRunescapeBoldFont());
         button.setForeground(GOLD);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 4));
@@ -891,7 +895,7 @@ class RuneFolioPanel extends PluginPanel
     private JLabel sectionLabel(String text)
     {
         JLabel label = new JLabel(text);
-        label.setFont(label.getFont().deriveFont(Font.BOLD, 11f));
+        label.setFont(FontManager.getRunescapeBoldFont());
         label.setForeground(GOLD);
         return label;
     }
