@@ -10,6 +10,6 @@
 - [ ] Record unresolved provenance or license questions; do not treat attribution as permission or change the project's license implicitly.
 - [ ] Update the separately maintained private handoff without linking or copying it here.
 
-## Discord changelog
+## Discord changelog message
 
 <!-- Write 20–1300 characters of public, user-facing update notes here. Use short bullets explaining what changed. No URLs, mentions, internal details, or code fences. The bot adds the PR link at the bottom after merge. -->
