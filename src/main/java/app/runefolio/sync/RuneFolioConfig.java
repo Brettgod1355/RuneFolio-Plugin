@@ -18,13 +18,13 @@ public interface RuneFolioConfig extends Config
     default boolean syncPvpHistory() { return false; }
 
     @ConfigItem(keyName = "screenshotClueRewards", name = "Clue reward screens", description = "Capture new clue rewards reported by native Loot Tracker. Enable completion history to link them to clue results.", position = 11, section = screenshotsSection)
-    default boolean screenshotClueRewards() { return false; }
+    default boolean screenshotClueRewards() { return true; }
     @ConfigItem(keyName = "screenshotRaidChestRewards", name = "Raid and chest rewards", description = "Capture supported raid/chest rewards reported by native Loot Tracker.", position = 12, section = screenshotsSection)
-    default boolean screenshotRaidChestRewards() { return false; }
+    default boolean screenshotRaidChestRewards() { return true; }
     @ConfigItem(keyName = "screenshotPvpKills", name = "PvP kills", description = "Capture your observed finishing blows. PvP history is a separate opt-in.", position = 13, section = screenshotsSection)
-    default boolean screenshotPvpKills() { return false; }
+    default boolean screenshotPvpKills() { return true; }
     @ConfigItem(keyName = "screenshotLootKeys", name = "Wilderness loot-key screens", description = "Capture the visible loot-key reward screen reported by native Loot Tracker. A screen can include several keys and does not identify a defeated player.", position = 14, section = screenshotsSection)
-    default boolean screenshotLootKeys() { return false; }
+    default boolean screenshotLootKeys() { return true; }
 
     @ConfigItem(keyName = "syncCompletionHistory", name = "Sync completion history",
         warning = RuneFolioDataSharing.COMPLETIONS,
@@ -198,11 +198,11 @@ public interface RuneFolioConfig extends Config
         return true;
     }
 
-    @Range(min = 0, max = 2_147_483_647)
+    @Range(min = 500_000, max = 2_147_483_647)
     @ConfigItem(
         keyName = "screenshotValuableDropThreshold",
         name = "High-value threshold",
-        description = "Minimum total GE value of a loot event to upload a screenshot.",
+        description = "Minimum total GE value of a loot event to upload a screenshot. Minimum 500,000.",
         position = 9,
         section = screenshotsSection
     )
