@@ -110,7 +110,15 @@ public class RuneFolioPlugin extends Plugin
     @Inject
     private ConfigManager configManager;
 
-    @Inject
+    // Deliberately NOT @Inject: Guice injects plugin fields while
+    // pluginManager.loadCorePlugins()/loadSideLoadPlugins() run, which happens before
+    // RuneLite.start() calls clientUI.init() (RuneLiteLAF.setup()). A Swing component
+    // built that early gets its scrollbar UI installed and its colors/width cached
+    // against the JVM's plain default look, before RuneLite's real theme is ever
+    // installed - permanently, since nothing later revisits an already-built component
+    // that isn't yet part of the visible tree. World Hopper and Loot Tracker avoid this
+    // by constructing their panel manually inside startUp() (after clientUI.init()), so
+    // this does the same.
     private RuneFolioPanel panel;
 
     @Inject
@@ -197,6 +205,7 @@ public class RuneFolioPlugin extends Plugin
     @Override
     protected void startUp()
     {
+        panel = new RuneFolioPanel();
         screenshotSpool = new RuneFolioScreenshotSpool(
             net.runelite.client.RuneLite.RUNELITE_DIR.toPath().resolve("runefolio-screenshot-queue"), gson);
         navigationButton = NavigationButton.builder()
