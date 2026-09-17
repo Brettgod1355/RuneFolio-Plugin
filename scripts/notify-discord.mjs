@@ -11,7 +11,10 @@ export function publicSummary(body) {
   // the capture above runs to the end of the body and would otherwise swallow it, tripping
   // the no-links check below and silently killing every real changelog delivery. Keep only
   // the leading paragraphs before the first one that looks like a footer or violates the rule.
-  const banned = /@|<|>|https?:|```|\[ ?\]|TODO|write .*summary|replace .*text/i;
+  // Only @everyone/@here actually ping from plain text; a real user/role mention
+  // needs the <@id>/<@&id> token, already caught by the bare < below. A literal
+  // "@" otherwise (e.g. "@Inject", "@Override") is not a mention risk at all.
+  const banned = /@(everyone|here)\b|<|>|https?:|```|\[ ?\]|TODO|write .*summary|replace .*text/i;
   const kept = [];
   for (const paragraph of raw.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)) {
     if (banned.test(paragraph) || /^-{3,}$/.test(paragraph)) break;
@@ -28,7 +31,7 @@ export function notification(event, source, repo, runId) {
     if (!pr.merged || pr.base?.ref !== 'main' || pr.base?.repo?.full_name !== repo) return null;
     const summary = publicSummary(pr.body);
     const title = String(pr.title || '').replace(/^(feat|fix|chore|docs|test|ci|ui|perf|refactor)(\([^)]*\))?:\s*/i, '').trim();
-    if (!summary || !title || title.length > 180 || /@|<|>|https?:|```/.test(title)) return { id: randomUUID(), kind: 'error', code: 'missing_changelog', number: pr.number, url: `https://github.com/${repo}/pull/${pr.number}` };
+    if (!summary || !title || title.length > 180 || /@(everyone|here)\b|<|>|https?:|```/i.test(title)) return { id: randomUUID(), kind: 'error', code: 'missing_changelog', number: pr.number, url: `https://github.com/${repo}/pull/${pr.number}` };
     return { id: randomUUID(), kind: 'merge', number: pr.number, sha: pr.merge_commit_sha, title, summary, url: `https://github.com/${repo}/pull/${pr.number}` };
   }
   const run = event.workflow_run;
