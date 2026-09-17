@@ -16,5 +16,5 @@
 - Distinguish copied code from API usage, behavior references and independently implemented ideas. Do not claim independent authorship for adapted code. Check bundled dependencies, generated scaffolding, icons, fonts and game/wiki assets as well as handwritten source.
 - Review older potentially borrowed material when discovered and correct missing notices. Do not label an incomplete provenance review as fully cleared. A project copyright notice never overrides third-party rights; do not choose or change RuneFolio's project-wide license without an explicit owner decision.
 
-- Every PR must include a public `## Discord changelog` section with plain-language changes and required user action. Only this section is published to Discord after merge. Keep it 20–1300 characters with no links, mentions, code fences or private context; the bot appends the PR link.
+- Every PR must include a public `## Discord changelog message` section with plain-language changes and required user action. Only this section is published to Discord after merge. Keep it 20–1300 characters with no links, mentions, code fences or private context; the bot appends the PR link.
 
