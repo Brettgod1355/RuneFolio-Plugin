@@ -125,9 +125,6 @@ class RuneFolioPanel extends PluginPanel
         title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
         title.setForeground(GOLD);
         brand.add(title);
-        brand.add(Box.createHorizontalStrut(6));
-        brand.add(createLinkIconButton(DISCORD_ICON, "Join the RuneFolio Discord", DISCORD_URL));
-        brand.add(createLinkIconButton(GITHUB_ICON, "RuneFolio plugin on GitHub", GITHUB_URL));
         content.add(brand);
 
         JLabel subtitle = new JLabel("v" + RuneFolioApiClient.CLIENT_VERSION + " · Private alpha · Sync client");
@@ -280,6 +277,15 @@ class RuneFolioPanel extends PluginPanel
         configureWrappedText(notice, MUTED_TEXT, 100);
         temporaryDetails.add(notice);
         content.add(temporaryDetails);
+        content.add(Box.createRigidArea(new Dimension(0, 16)));
+
+        JPanel links = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
+        links.setOpaque(false);
+        links.setAlignmentX(LEFT_ALIGNMENT);
+        links.setMaximumSize(new Dimension(CONTENT_WIDTH, 32));
+        links.add(createLinkIconButton(DISCORD_ICON, "Join the RuneFolio Discord", DISCORD_URL));
+        links.add(createLinkIconButton(GITHUB_ICON, "RuneFolio plugin on GitHub", GITHUB_URL));
+        content.add(links);
 
         setAccountExpanded(true);
         setTemporaryExpanded(false);
