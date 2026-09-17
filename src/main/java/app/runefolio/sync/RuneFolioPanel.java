@@ -3,6 +3,7 @@ package app.runefolio.sync;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -39,7 +40,6 @@ import javax.swing.plaf.basic.BasicButtonUI;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
-import net.runelite.client.ui.laf.RuneLiteScrollBarUI;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
 import net.runelite.client.util.SwingUtil;
@@ -104,13 +104,29 @@ class RuneFolioPanel extends PluginPanel
     private final BooleanSupplier confirmConnection;
     private final BooleanSupplier confirmClearScreenshots;
     private final CardLayout cards = new CardLayout();
-    private final JPanel body = new JPanel(cards);
+    // CardLayout's own getPreferredSize() is the max of every card, including whichever
+    // one is currently hidden - report only the visible card's size instead, so switching
+    // to the (much longer) settings card doesn't inflate the main card's reported height.
+    private final JPanel body = new JPanel(cards)
+    {
+        @Override
+        public Dimension getPreferredSize()
+        {
+            for (Component child : getComponents())
+            {
+                if (child.isVisible())
+                {
+                    return child.getPreferredSize();
+                }
+            }
+            return super.getPreferredSize();
+        }
+    };
     private final JButton gearButton = new JButton("⚙");
     private final Map<String, JCheckBox> toggleBoxes = new LinkedHashMap<>();
     private JSpinner thresholdSpinner;
     private boolean settingsOpen;
     private boolean syncingSettings;
-    private Dimension bodyPreferredSize;
 
     RuneFolioPanel()
     {
@@ -124,7 +140,7 @@ class RuneFolioPanel extends PluginPanel
 
     RuneFolioPanel(BooleanSupplier confirmation, BooleanSupplier clearConfirmation)
     {
-        super(false);
+        super();
         confirmConnection = confirmation == null ? this::showConnectionDisclosure : confirmation;
         confirmClearScreenshots = clearConfirmation == null ? this::showClearScreenshotConfirmation : clearConfirmation;
         setLayout(new BorderLayout());
@@ -332,25 +348,12 @@ class RuneFolioPanel extends PluginPanel
         setAccountExpanded(true);
         setTemporaryExpanded(false);
 
-        // Not wrapped by RuneLite's own PluginPanel scrolling (super(false) above), so without
-        // a bounded viewport here, expanding a section grows this panel's real size and RuneLite
-        // resizes the client window to fit it instead of scrolling. Measure the panel's natural
-        // resting height (account expanded, temporary code collapsed - the default state) once,
-        // and use that as a fixed viewport size shared by both cards, so anything taller (both
-        // sections open, or the settings card) scrolls in place instead.
-        bodyPreferredSize = content.getPreferredSize();
-
+        // Scrolling is handled entirely by RuneLite's own built-in PluginPanel wrapping
+        // (the default super() above), the same mechanism World Hopper, Loot Tracker and
+        // Quest Helper rely on - so this panel carries no scrollbar code of its own and
+        // can't drift from what every other plugin already looks like.
         body.setOpaque(false);
-        JScrollPane mainScroll = new JScrollPane(content,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        mainScroll.setBorder(BorderFactory.createEmptyBorder());
-        // Force RuneLite's own scrollbar class rather than trusting it's already the
-        // active UIManager default - a theme/skin plugin or LAF timing quirk could
-        // otherwise leave this on a generic (wider, lighter) Swing scrollbar.
-        mainScroll.getVerticalScrollBar().setUI(new RuneLiteScrollBarUI());
-        mainScroll.getVerticalScrollBar().setUnitIncrement(16);
-        mainScroll.setPreferredSize(bodyPreferredSize);
-        body.add(mainScroll, "main");
+        body.add(content, "main");
         add(body, BorderLayout.CENTER);
     }
 
@@ -475,19 +478,7 @@ class RuneFolioPanel extends PluginPanel
         JPanel settingsPage = new JPanel(new BorderLayout());
         settingsPage.setBackground(ColorScheme.DARK_GRAY_COLOR);
         settingsPage.add(settings, BorderLayout.NORTH);
-        JScrollPane settingsScroll = new JScrollPane(settingsPage,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        settingsScroll.setBorder(BorderFactory.createEmptyBorder());
-        settingsScroll.getVerticalScrollBar().setUI(new RuneLiteScrollBarUI());
-        settingsScroll.getVerticalScrollBar().setUnitIncrement(16);
-        if (bodyPreferredSize != null)
-        {
-            // Match the main card's viewport size so switching cards via the gear doesn't
-            // itself resize the panel (and the settings list is much longer, so it will
-            // scroll here almost always - that's expected).
-            settingsScroll.setPreferredSize(bodyPreferredSize);
-        }
-        body.add(settingsScroll, "settings");
+        body.add(settingsPage, "settings");
     }
 
     private void addToggle(JPanel parent, BiConsumer<String, Object> setting, String key, String label,
