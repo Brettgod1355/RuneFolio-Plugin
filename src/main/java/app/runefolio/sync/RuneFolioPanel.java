@@ -127,7 +127,7 @@ class RuneFolioPanel extends PluginPanel
         brand.add(title);
         content.add(brand);
 
-        JLabel subtitle = new JLabel("v" + RuneFolioApiClient.CLIENT_VERSION + " · Private alpha · Sync client");
+        JLabel subtitle = new JLabel("v" + RuneFolioApiClient.CLIENT_VERSION + " · Sync client");
         subtitle.setForeground(MUTED_TEXT);
         subtitle.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
         content.add(subtitle);
@@ -390,7 +390,8 @@ class RuneFolioPanel extends PluginPanel
 
     void setProStatus(boolean pro)
     {
-        title.setText(pro ? "RuneFolio Pro" : "RuneFolio");
+        // Sidebar title no longer distinguishes Pro; callers still report status for future use.
+        title.setText("RuneFolio");
         revalidate();
         repaint();
     }

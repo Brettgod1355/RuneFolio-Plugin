@@ -64,7 +64,7 @@ import net.runelite.client.ui.NavigationButton;
 @Slf4j
 @PluginDescriptor(
     name = "RuneFolio Sync",
-    description = "Private-alpha RuneFolio character connection client",
+    description = "RuneFolio character connection client",
     tags = {"runefolio", "progress", "tracker", "loot"}
 )
 public class RuneFolioPlugin extends Plugin
