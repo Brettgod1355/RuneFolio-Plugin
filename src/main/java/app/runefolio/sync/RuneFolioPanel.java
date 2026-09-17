@@ -39,6 +39,7 @@ import javax.swing.plaf.basic.BasicButtonUI;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
+import net.runelite.client.ui.laf.RuneLiteScrollBarUI;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
 import net.runelite.client.util.SwingUtil;
@@ -343,6 +344,10 @@ class RuneFolioPanel extends PluginPanel
         JScrollPane mainScroll = new JScrollPane(content,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         mainScroll.setBorder(BorderFactory.createEmptyBorder());
+        // Force RuneLite's own scrollbar class rather than trusting it's already the
+        // active UIManager default - a theme/skin plugin or LAF timing quirk could
+        // otherwise leave this on a generic (wider, lighter) Swing scrollbar.
+        mainScroll.getVerticalScrollBar().setUI(new RuneLiteScrollBarUI());
         mainScroll.getVerticalScrollBar().setUnitIncrement(16);
         mainScroll.setPreferredSize(bodyPreferredSize);
         body.add(mainScroll, "main");
@@ -473,6 +478,7 @@ class RuneFolioPanel extends PluginPanel
         JScrollPane settingsScroll = new JScrollPane(settingsPage,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         settingsScroll.setBorder(BorderFactory.createEmptyBorder());
+        settingsScroll.getVerticalScrollBar().setUI(new RuneLiteScrollBarUI());
         settingsScroll.getVerticalScrollBar().setUnitIncrement(16);
         if (bodyPreferredSize != null)
         {
