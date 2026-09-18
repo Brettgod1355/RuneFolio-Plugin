@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# The RuneLite Plugin Hub's automated reviewer (a private bot, separate from the
-# open-source packager's disallowed-apis.txt) rejected each of these on the
-# runefolio-sync submission (runelite/plugin-hub#16712). Nothing else in CI
-# checks for them, so guard against any of them regressing here.
+# The RuneLite Plugin Hub's reviewers rejected each of the API groups below on
+# the runefolio-sync submission (runelite/plugin-hub#16712), and the Hub wiki
+# forbids the language features at the end outright
+# (https://github.com/runelite/runelite/wiki/Rejected-or-Rolled-Back-Features,
+# "Forbidden language features"). Nothing else in CI checks for them, so guard
+# against any of them regressing here.
 #
 # Only plugin sources are scanned; tests may use raw java.io/java.nio freely.
 # Lines that are entirely a comment are ignored so a rule can be described
@@ -39,6 +41,15 @@ forbid '\.sleep[[:space:]]*\(|LockSupport\.park' \
     'Thread.sleep is not allowed; use a ScheduledExecutorService.'
 forbid '\.interrupt[[:space:]]*\(\)|isInterrupted[[:space:]]*\(\)|Thread\.interrupted[[:space:]]*\(\)|\.cancel[[:space:]]*\([[:space:]]*true[[:space:]]*\)' \
     'Thread interrupt is not allowed; use an explicit cancellation flag.'
+# The Hub wiki's "Forbidden language features": reflection, JNI, subprocesses, runtime code loading.
+forbid 'java\.lang\.reflect|java\.lang\.invoke|\.getDeclared(Methods?|Fields?|Constructors?|Annotations?)[[:space:]]*\(|\.get(Methods?|Fields?|Constructors?|Annotations?)[[:space:]]*\(|Class\.forName|\.setAccessible[[:space:]]*\(|Proxy\.newProxyInstance|\.newInstance[[:space:]]*\(|MethodHandles|\.invoke[[:space:]]*\(' \
+    'Reflection is not allowed on the Plugin Hub; call things directly and keep explicit lists.'
+forbid 'System\.load(Library)?[[:space:]]*\(|Runtime\.load(Library)?[[:space:]]*\(|(^|[[:space:]])native([[:space:]]+[A-Za-z_][A-Za-z0-9_$<>,]*(\[\])*){1,3}[[:space:]]*\(' \
+    'JNI is not allowed on the Plugin Hub.'
+forbid 'Runtime\.getRuntime[[:space:]]*\(\)[[:space:]]*\.exec|\bProcessBuilder\b|\.exec[[:space:]]*\(' \
+    'Running external programs is not allowed on the Plugin Hub.'
+forbid 'URLClassLoader|\.defineClass[[:space:]]*\(|javax\.script|ScriptEngine|jdk\.jshell|\.loadClass[[:space:]]*\(' \
+    'Loading or running code fetched at runtime is not allowed on the Plugin Hub.'
 
 if [ "$status" -ne 0 ]; then
     echo "Plugin Hub disallowed APIs found above." >&2
