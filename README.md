@@ -8,9 +8,9 @@ RuneFolio Sync connects RuneLite to your [RuneFolio](https://runefolio.app) acco
 
 1. Install the plugin and open the RuneFolio panel in the sidebar (look for the gold "R").
 2. Choose how to connect:
-   - **Log in to RuneFolio** (recommended) — opens your browser to sign in or create an account once. Every character you log into afterward syncs automatically.
+   - **Log in to RuneFolio** (recommended) — opens your browser to sign in or create an account once. Each character you log into afterward is added to your account with a one-time confirmation, then syncs automatically.
    - **Connect character** — generate a one-time code from your RuneFolio account on the website, then enter it here to sync just that one character. You still need a RuneFolio account to generate the code; this just avoids linking a whole RuneLite installation to your account, which is useful on a computer you don't own or don't want every character on it syncing from — such as a friend's.
-3. Log in to your character. RuneFolio Sync sends an initial snapshot automatically and keeps syncing as you play.
+3. Log in to your character. If it isn't on your RuneFolio account yet (account-login mode only), the plugin reminds you in the chat box and, the first time it sees that character in each login session, opens the RuneFolio character-setup page in your browser — this is on by default and can be turned off with **Open setup for new characters** in the plugin settings. Once the character is added, RuneFolio Sync sends an initial snapshot automatically and keeps syncing as you play.
 4. Open [runefolio.app](https://runefolio.app) to see your synced progress.
 
 The panel shows **Data sharing information** before you connect, explaining exactly what's sent and to whom — worth a read first.
@@ -27,7 +27,7 @@ The panel shows **Data sharing information** before you connect, explaining exac
 
 **On by default, with an off switch:**
 
-- Loot drops, recorded through RuneLite's own Loot Tracker
+- Loot drops, recorded through RuneLite's own Loot Tracker (loot from a defeated player is attributed to their name only when PvP history is enabled)
 - Completed boss/raid kills, clue scrolls, and Slayer tasks, including kill time, personal bests, and party size when the game reports them
 - Account unlocks — a large catalog spanning bank space purchases, quest- and diary-gated content, area access, equipment, and more (checklist flags only, not full bank contents)
 
@@ -35,7 +35,7 @@ The panel shows **Data sharing information** before you connect, explaining exac
 
 - Bank, inventory, and equipment snapshots with estimated GE/high-alchemy value, captured when you open your bank
 - PvP history — your own observed finishing blows and any linked loot only; never opponent equipment or location, and never combat assistance
-- Screenshots of level-ups, quest completions, diary tasks, Combat Achievements, Collection Log unlocks, pets, and valuable, untradeable, or reward drops
+- Screenshots of level-ups, quest completions, diary tasks, Combat Achievements, Collection Log unlocks, pets, valuable or untradeable drops, clue / raid / chest reward screens, Wilderness loot-key screens, and your own PvP finishing blows (the screenshot only; PvP history is a separate opt-in). Each moment has its own toggle under Screenshots, and the chat area is hidden while capturing by default.
 
 Every category with a toggle shows a RuneLite confirmation dialog explaining exactly what it sends before you turn it on.
 
@@ -43,7 +43,7 @@ Every category with a toggle shows a RuneLite confirmation dialog explaining exa
 
 RuneFolio Sync sends data only to `https://runefolio.app`, over HTTPS. It never asks for or stores your Jagex or RuneScape credentials — connecting happens entirely through your browser or a revocable one-time character code. The RuneFolio account you connect (or whoever issued a temporary code) controls how that data is shared on the website; nothing is public by default.
 
-Updates are queued locally and retried automatically if your connection drops, so nothing is lost. When screenshots are enabled, they're compressed and held in your RuneLite settings folder until they've uploaded successfully.
+Updates are queued locally (up to 1,000 pending events) and retried automatically if your connection drops. If the queue fills during a long outage, newer updates are skipped until it drains; your skills and progress are re-sent by the next scheduled full sync, but individual drops, completions and PvP results skipped while it was full are not. When screenshots are enabled, they're compressed and held in your RuneLite settings folder (up to 500 images / 256 MiB) until they've uploaded successfully; new captures may be skipped when that space is full.
 
 ## Requirements
 
@@ -60,4 +60,4 @@ Found a bug or have a suggestion? Join the [Discord](https://discord.gg/Ar96ueFU
 
 ## Contributing
 
-Clone the repository and open it as a Gradle project (JDK 17, Java 11 target). The `run` Gradle task launches a development RuneLite client with the plugin preloaded. Every pull request runs the test suite and the official RuneLite Plugin Hub packager as a pre-submission check.
+Clone the repository and open it as a Gradle project with JDK 11 or newer (CI uses Temurin 11 and Gradle 8.10.2; the build targets Java 11 via `--release 11`). The `run` Gradle task launches a development RuneLite client with the plugin preloaded. Every pull request runs the test suite and the official RuneLite Plugin Hub packager as a pre-submission check.

@@ -46,10 +46,24 @@ final class RuneFolioDiaryTaskTracker
     }
 
     @Subscribe
-    public void onRuneScapeProfileChanged(RuneScapeProfileChanged event) { reset(); }
+    public void onRuneScapeProfileChanged(RuneScapeProfileChanged event)
+    {
+        reset();
+    }
 
     @Subscribe
-    public void onGameStateChanged(GameStateChanged event) { reset(); }
+    public void onGameStateChanged(GameStateChanged event)
+    {
+        // A scene load, and the LOGGED_IN that follows it, keep the same character;
+        // the preceding login-screen, hop or reconnect state already marked dirty.
+        GameState state = event.getGameState();
+        if (state == GameState.LOADING || state == GameState.LOGGED_IN)
+        {
+            readyTicks = 0;
+            return;
+        }
+        reset();
+    }
 
     private void reset()
     {
@@ -72,7 +86,13 @@ final class RuneFolioDiaryTaskTracker
     @Subscribe
     public void onGameTick(GameTick event)
     {
-        if (client.getGameState() != GameState.LOGGED_IN || client.getLocalPlayer() == null
+        GameState state = client.getGameState();
+        if (state == GameState.LOADING)
+        {
+            readyTicks = 0;
+            return;
+        }
+        if (state != GameState.LOGGED_IN || client.getLocalPlayer() == null
             || !RuneFolioWorldPolicy.supports(client.getWorldType()))
         {
             reset();

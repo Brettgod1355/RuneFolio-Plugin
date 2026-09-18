@@ -219,9 +219,9 @@ public class RuneFolioScreenshotCaptureTest
             });
             set("connectionToken", "synthetic-test-placeholder");
             set("connectedCharacterName", "Example");
-            Field field = RuneFolioPlugin.class.getDeclaredField("screenshotQueue");
-            field.setAccessible(true);
-            queue = (RuneFolioScreenshotQueue) field.get(plugin);
+            set("running", true);
+            queue = new RuneFolioScreenshotQueue();
+            set("screenshotQueue", queue);
         }
 
         private Widget widget(int id)

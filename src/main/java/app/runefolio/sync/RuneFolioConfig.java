@@ -70,7 +70,7 @@ public interface RuneFolioConfig extends Config
         keyName = "syncLootDrops",
         warning = RuneFolioDataSharing.LOOT,
         name = "Sync loot drops",
-        description = "Automatically send loot recorded by RuneLite's enabled Loot Tracker to your RuneFolio history",
+        description = "Automatically send loot recorded by RuneLite's enabled Loot Tracker to your RuneFolio history. Loot from a defeated player is attributed to their name only when Sync PvP history is enabled",
         position = 2
     )
     default boolean syncLootDrops()

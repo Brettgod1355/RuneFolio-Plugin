@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +17,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.BooleanSupplier;
-import javax.inject.Singleton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -42,21 +42,19 @@ import net.runelite.client.util.LinkBrowser;
 import net.runelite.client.util.SwingUtil;
 
 @Slf4j
-@Singleton
 class RuneFolioPanel extends PluginPanel
 {
     private static final String RUNE_FOLIO_URL = "https://runefolio.app";
     private static final String DISCORD_URL = "https://discord.gg/Ar96ueFUuj";
     private static final String GITHUB_URL = "https://github.com/Brettgod1355/RuneFolio-Plugin";
     private static final Color GOLD = new Color(217, 184, 97);
-    private static final Color PRIMARY_TEXT = new Color(232, 228, 216);
+    static final Color PRIMARY_TEXT = new Color(232, 228, 216);
     private static final Color MUTED_TEXT = new Color(190, 184, 166);
-    private static final Color SUCCESS_TEXT = new Color(131, 194, 113);
-    private static final Color ERROR_TEXT = new Color(230, 119, 107);
-    // PluginPanel.PANEL_WIDTH (225) minus this panel's own 12px left/right padding - was
-    // 330, which never matched the sidebar's real rendered width. This is a maximum-size
-    // cap, not a guarantee: rows combining a label with a right-aligned value (see
-    // createMetricRow) still need short enough text to fit within it in practice.
+    static final Color SUCCESS_TEXT = new Color(131, 194, 113);
+    static final Color ERROR_TEXT = new Color(230, 119, 107);
+    static final int MIN_VALUABLE_DROP_THRESHOLD = 500_000;
+    // PANEL_WIDTH minus this panel's 12px left/right padding. A maximum-size cap, not a
+    // guarantee: metric rows (see createMetricRow) still need short enough text to fit.
     private static final int CONTENT_WIDTH = PluginPanel.PANEL_WIDTH - 24;
     private static final DateTimeFormatter SYNC_TIME_FORMAT =
         DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
@@ -69,7 +67,6 @@ class RuneFolioPanel extends PluginPanel
         GITHUB_ICON = new ImageIcon(ImageUtil.resizeImage(ImageUtil.loadImageResource(RuneFolioPanel.class, "/github.png"), 16, 16));
     }
 
-    private final JLabel title = new JLabel("RuneFolio");
     private final JLabel characterValue = new JLabel("Log in to RuneLite");
     private final JTextArea statusValue = new JTextArea();
     private final JTextField codeField = new JTextField();
@@ -120,7 +117,7 @@ class RuneFolioPanel extends PluginPanel
         }
     };
     private final JButton gearButton = new JButton("⚙");
-    private final Map<String, JCheckBox> toggleBoxes = new LinkedHashMap<>();
+    final Map<String, JCheckBox> toggleBoxes = new LinkedHashMap<>();
     private JSpinner thresholdSpinner;
     private boolean settingsOpen;
     private boolean syncingSettings;
@@ -153,6 +150,7 @@ class RuneFolioPanel extends PluginPanel
         brandIcon.setToolTipText("RuneFolio");
         brand.add(brandIcon);
 
+        JLabel title = new JLabel("RuneFolio");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
         title.setForeground(GOLD);
         brand.add(title);
@@ -345,10 +343,8 @@ class RuneFolioPanel extends PluginPanel
         setAccountExpanded(true);
         setTemporaryExpanded(false);
 
-        // Scrolling is handled entirely by RuneLite's own built-in PluginPanel wrapping
-        // (the default super() above), the same mechanism World Hopper, Loot Tracker and
-        // Quest Helper rely on - so this panel carries no scrollbar code of its own and
-        // can't drift from what every other plugin already looks like.
+        // Scrolling comes from PluginPanel's default wrapping in super(); this panel adds
+        // no scrollbar of its own.
         body.setOpaque(false);
         body.add(content, "main");
         add(body, BorderLayout.CENTER);
@@ -384,27 +380,27 @@ class RuneFolioPanel extends PluginPanel
         settings.add(sectionLabel("SYNC"));
         settings.add(Box.createRigidArea(new Dimension(0, 6)));
         addToggle(settings, setting, "autoOpenCharacterSetup", "Open setup for new characters",
-            "Automatically open RuneFolio in your browser when an unrecognized character logs in.", null);
+            "Automatically open RuneFolio in your browser when an unrecognized character logs in", null);
         addToggle(settings, setting, "showCollectionLogSyncButton", "Collection Log sync button",
-            "Show a smart RuneFolio sync button in an unused bottom-right area of the in-game Collection Log.", null);
+            "Show a smart RuneFolio sync button in an unused bottom-right area of the in-game Collection Log", null);
         addToggle(settings, setting, "syncLootDrops", "Sync loot drops",
-            "Automatically send loot recorded by RuneLite's enabled Loot Tracker to your RuneFolio history.", RuneFolioDataSharing.LOOT);
+            "Automatically send loot recorded by RuneLite's enabled Loot Tracker to your RuneFolio history. Loot from a defeated player is attributed to their name only when Sync PvP history is enabled", RuneFolioDataSharing.LOOT);
         addToggle(settings, setting, "hideSidePanel", "Hide RuneFolio side panel",
-            "Hide the RuneFolio button from the RuneLite side panel without disabling background syncing.", null);
+            "Hide the RuneFolio button from the RuneLite side panel without disabling background syncing", null);
         addToggle(settings, setting, "syncBankWealth", "Sync bank and wealth",
-            "Opt-in: send bank, inventory and equipment items and estimated values while your bank is open.", RuneFolioDataSharing.BANK);
+            "Opt-in: send bank, inventory and equipment items and estimated values while your bank is open. Pending snapshots are saved locally for retries.", RuneFolioDataSharing.BANK);
         addToggle(settings, setting, "syncCompletionHistory", "Sync completion history",
-            "Send observed boss/raid, clue and Slayer completions and available result details to RuneFolio.", RuneFolioDataSharing.COMPLETIONS);
+            "Send observed boss/raid, clue and Slayer completions and available result details to RuneFolio. Clue rewards use the enabled native Loot Tracker.", RuneFolioDataSharing.COMPLETIONS);
         addToggle(settings, setting, "syncPvpHistory", "Sync PvP history",
-            "Opt-in: send your observed finishing blows, opponent names, timestamps and observed loot.", RuneFolioDataSharing.PVP);
+            "Opt-in: send your observed finishing blows, opponent names, timestamps and observed loot. Native Loot Tracker supplies unassigned loot-key contents. No opponent gear or location is collected.", RuneFolioDataSharing.PVP);
         addToggle(settings, setting, "syncAccountUnlocks", "Sync account unlocks",
-            "Send supported account unlock flags and observations of checklist items. No full bank contents are sent by this setting.", RuneFolioDataSharing.UNLOCKS);
+            "Send supported account unlock flags and observations of checklist items, including Sea Charting task completion. No full bank contents are sent by this setting. Unknown entries can be confirmed on the website.", RuneFolioDataSharing.UNLOCKS);
 
         settings.add(Box.createRigidArea(new Dimension(0, 10)));
         settings.add(sectionLabel("SCREENSHOTS"));
         settings.add(Box.createRigidArea(new Dimension(0, 6)));
         addToggle(settings, setting, "uploadScreenshots", "Upload screenshots",
-            "Save compressed screenshots locally for staggered upload (500 pictures / 256 MiB). Off by default.", RuneFolioDataSharing.SCREENSHOTS);
+            "Save compressed screenshots locally for staggered upload (" + RuneFolioDataSharing.SPOOL_LIMITS + "). Images may contain personal information. Turning off stops new captures, not pending uploads. Disabled by default.", RuneFolioDataSharing.SCREENSHOTS);
         addToggle(settings, setting, "hideChatInScreenshots", "Hide chat and private messages",
             "Temporarily hide the chat area and private-message overlay while RuneFolio captures a frame.", null);
         addToggle(settings, setting, "screenshotLevelUps", "Level ups",
@@ -429,7 +425,7 @@ class RuneFolioPanel extends PluginPanel
         thresholdLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
         settings.add(thresholdLabel);
 
-        thresholdSpinner = new JSpinner(new SpinnerNumberModel(1_000_000, 0, Integer.MAX_VALUE, 100_000));
+        thresholdSpinner = new JSpinner(new SpinnerNumberModel(1_000_000, MIN_VALUABLE_DROP_THRESHOLD, Integer.MAX_VALUE, 100_000));
         thresholdSpinner.setAlignmentX(LEFT_ALIGNMENT);
         thresholdSpinner.setMaximumSize(new Dimension(120, thresholdSpinner.getPreferredSize().height));
         ((JSpinner.DefaultEditor) thresholdSpinner.getEditor()).getTextField().setColumns(8);
@@ -439,22 +435,18 @@ class RuneFolioPanel extends PluginPanel
             {
                 return;
             }
-            int value = (Integer) thresholdSpinner.getValue();
-            if (value < 500_000)
+            int value = Math.max(MIN_VALUABLE_DROP_THRESHOLD, (Integer) thresholdSpinner.getValue());
+            if (!Integer.valueOf(value).equals(thresholdSpinner.getValue()))
             {
-                JOptionPane.showMessageDialog(this,
-                    "The high-value threshold can't go below 500,000 GP. Resetting to 500,000.",
-                    "Minimum threshold", JOptionPane.ERROR_MESSAGE);
                 syncingSettings = true;
                 try
                 {
-                    thresholdSpinner.setValue(500_000);
+                    thresholdSpinner.setValue(value);
                 }
                 finally
                 {
                     syncingSettings = false;
                 }
-                value = 500_000;
             }
             setting.accept("screenshotValuableDropThreshold", value);
         });
@@ -464,13 +456,13 @@ class RuneFolioPanel extends PluginPanel
         addToggle(settings, setting, "screenshotUntradeableDrops", "Untradeable drops",
             "Upload a screenshot when a RuneLite loot event contains an untradeable item.", null);
         addToggle(settings, setting, "screenshotClueRewards", "Clue reward screens",
-            "Capture new clue rewards reported by native Loot Tracker.", null);
+            "Capture new clue rewards reported by native Loot Tracker. Enable completion history to link them to clue results.", null);
         addToggle(settings, setting, "screenshotRaidChestRewards", "Raid and chest rewards",
             "Capture supported raid/chest rewards reported by native Loot Tracker.", null);
         addToggle(settings, setting, "screenshotPvpKills", "PvP kills",
             "Capture your observed finishing blows. PvP history is a separate opt-in.", null);
         addToggle(settings, setting, "screenshotLootKeys", "Wilderness loot-key screens",
-            "Capture the visible loot-key reward screen reported by native Loot Tracker.", null);
+            "Capture the visible loot-key reward screen reported by native Loot Tracker. A screen can include several keys and does not identify a defeated player.", null);
 
         JPanel settingsPage = new JPanel(new BorderLayout());
         settingsPage.setBackground(ColorScheme.DARK_GRAY_COLOR);
@@ -548,7 +540,7 @@ class RuneFolioPanel extends PluginPanel
             setToggle("screenshotLootKeys", config.screenshotLootKeys());
             if (thresholdSpinner != null)
             {
-                thresholdSpinner.setValue(config.screenshotValuableDropThreshold());
+                thresholdSpinner.setValue(Math.max(MIN_VALUABLE_DROP_THRESHOLD, config.screenshotValuableDropThreshold()));
             }
         }
         finally
@@ -605,7 +597,7 @@ class RuneFolioPanel extends PluginPanel
     void setScreenshotQueueState(String status)
     {
         screenshotQueueValue.setText(status);
-        screenshotQueueValue.setToolTipText("Saved locally until acknowledged; held files need attention. Clear only if no longer needed.");
+        screenshotQueueValue.setToolTipText("Saved locally until uploaded. Held files were rejected permanently or are unreadable and are never retried. Clear screenshot queue deletes both saved and held files.");
         revalidate();
         repaint();
     }
@@ -662,14 +654,6 @@ class RuneFolioPanel extends PluginPanel
         accountDisconnectButton.setEnabled(!connecting);
     }
 
-    void setProStatus(boolean pro)
-    {
-        // Sidebar title no longer distinguishes Pro; callers still report status for future use.
-        title.setText("RuneFolio");
-        revalidate();
-        repaint();
-    }
-
     void setCharacterName(String characterName)
     {
         characterValue.setText(characterName == null || characterName.isBlank() ? "Log in to RuneLite" : characterName);
@@ -677,10 +661,7 @@ class RuneFolioPanel extends PluginPanel
 
     void setStatus(String status)
     {
-        String safeStatus = status == null ? "" : status
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;");
+        String safeStatus = status == null ? "" : status;
         String statusLower = safeStatus.toLowerCase();
         statusValue.setForeground((statusLower.startsWith("connected") || statusLower.contains("sync sent"))
             ? SUCCESS_TEXT
@@ -707,9 +688,43 @@ class RuneFolioPanel extends PluginPanel
         codeField.setText("");
     }
 
-    void openBrowser(String url)
+    static boolean isOpenableLink(String url)
     {
-        LinkBrowser.browse(url);
+        if (url == null || url.isBlank())
+        {
+            return false;
+        }
+        try
+        {
+            String scheme = URI.create(url).getScheme();
+            return "http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme);
+        }
+        catch (IllegalArgumentException invalid)
+        {
+            return false;
+        }
+    }
+
+    boolean openBrowser(String url)
+    {
+        if (isOpenableLink(url))
+        {
+            try
+            {
+                LinkBrowser.browse(url);
+                return true;
+            }
+            catch (IllegalArgumentException e)
+            {
+                log.warn("Refusing to open invalid link {}", url, e);
+            }
+        }
+        else
+        {
+            log.warn("Refusing to open invalid link {}", url);
+        }
+        setStatus("RuneFolio returned an invalid link; open runefolio.app manually.");
+        return false;
     }
 
     private void setAccountExpanded(boolean expanded)

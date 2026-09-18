@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -190,7 +192,7 @@ final class RuneFolioSyncEvent
 
     boolean supersedes(RuneFolioSyncEvent other)
     {
-        if (!java.util.Objects.equals(identityKey, other.identityKey)) return false;
+        if (!Objects.equals(identityKey, other.identityKey)) return false;
         if ("bank.snapshot".equals(type))
             return type.equals(other.type) && normalise(characterName).equals(normalise(other.characterName))
                 && occurredAt.substring(0, 10).equals(other.occurredAt.substring(0, 10))
@@ -267,6 +269,6 @@ final class RuneFolioSyncEvent
 
     private static String normalise(String value)
     {
-        return value.trim().replaceAll("\\s+", " ").toLowerCase();
+        return value.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
     }
 }

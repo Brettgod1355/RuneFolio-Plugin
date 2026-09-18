@@ -1,5 +1,11 @@
 package app.runefolio.sync;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
+import java.util.Objects;
+
 /** Local rename evidence only; never authorizes server ownership changes. */
 final class RuneFolioNameChange
 {
@@ -8,34 +14,36 @@ final class RuneFolioNameChange
         if (accountHash == -1 || accountHash == 0) return null;
         try
         {
-            byte[] digest = java.security.MessageDigest.getInstance("SHA-256").digest(
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(
                 ("runefolio-character-v1:" + Long.toUnsignedString(accountHash))
-                    .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    .getBytes(StandardCharsets.UTF_8));
             StringBuilder result = new StringBuilder(64);
-            for (byte value : digest) result.append(String.format(java.util.Locale.ROOT, "%02x", value & 0xff));
+            for (byte value : digest) result.append(String.format(Locale.ROOT, "%02x", value & 0xff));
             return result.toString();
         }
-        catch (java.security.NoSuchAlgorithmException exception)
+        catch (NoSuchAlgorithmException exception)
         {
             throw new IllegalStateException("SHA-256 is unavailable", exception);
         }
     }
 
-    static boolean isCandidate(boolean localPlayer, long previousHash, long currentHash,
-        String previousName, String currentName)
+    /**
+     * True when the tracked character is no longer the one observed on this tick,
+     * by display name or by account identity. Nothing is tracked while either name is null.
+     */
+    static boolean characterChanged(String lastName, String observedName, String activeIdentity, String observedIdentity)
     {
-        return localPlayer && previousHash != -1 && previousHash != 0 && previousHash == currentHash
-            && valid(previousName) && valid(currentName)
-            && !normalize(previousName).equals(normalize(currentName));
+        return lastName != null && observedName != null
+            && (!namesMatch(lastName, observedName) || !Objects.equals(activeIdentity, observedIdentity));
     }
 
-    private static boolean valid(String value)
+    static boolean namesMatch(String first, String second)
     {
-        return value != null && value.trim().matches("[A-Za-z0-9 _-]{1,12}");
+        return first != null && second != null && normaliseName(first).equals(normaliseName(second));
     }
 
-    private static String normalize(String value)
+    static String normaliseName(String value)
     {
-        return value.trim().replace('_', ' ').toLowerCase(java.util.Locale.ROOT);
+        return value.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
     }
 }

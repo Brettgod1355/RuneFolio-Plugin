@@ -255,18 +255,91 @@ public class RuneFolioScreenshotSpoolTest
         Path root = temporary.newFolder().toPath();
         ExecutorService workers = Executors.newFixedThreadPool(4);
         byte[] jpeg = jpeg();
+        AtomicInteger accepted = new AtomicInteger();
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
         try
         {
-            List<Future<Boolean>> results = new ArrayList<>();
-            for (int i = 0; i < 12; i++) results.add(workers.submit(() ->
-                new RuneFolioScreenshotSpool(net.runelite.client.util.Filepath.Unchecked.getRooted(root),
-                    new com.google.gson.Gson(), now::get, () -> 0, 100_000, 5).save(entry(TOKEN, "Example"), jpeg)));
-            int accepted = 0;
-            for (Future<Boolean> result : results) if (result.get(5, TimeUnit.SECONDS)) accepted++;
-            assertEquals(5, accepted);
+            List<Future<?>> results = new ArrayList<>();
+            for (int i = 0; i < 4; i++) results.add(workers.submit(() -> {
+                RuneFolioScreenshotSpool spool = new RuneFolioScreenshotSpool(
+                    net.runelite.client.util.Filepath.Unchecked.getRooted(root), new com.google.gson.Gson(), now::get, () -> 0, 100_000, 5);
+                while (accepted.get() < 5 && System.nanoTime() < deadline)
+                    if (spool.save(entry(TOKEN, "Example"), jpeg)) accepted.incrementAndGet();
+                return null;
+            }));
+            for (Future<?> result : results) result.get(35, TimeUnit.SECONDS);
+            assertEquals(5, accepted.get());
             assertEquals(5, spool(root).stats().saved);
+            RuneFolioScreenshotSpool bounded = new RuneFolioScreenshotSpool(
+                net.runelite.client.util.Filepath.Unchecked.getRooted(root), new com.google.gson.Gson(), now::get, () -> 0, 100_000, 5);
+            assertFalse(bounded.save(entry(TOKEN, "Example"), jpeg));
         }
         finally { workers.shutdownNow(); }
+    }
+
+    @Test
+    public void transientStatusesStayQueued() throws Exception
+    {
+        Path root = temporary.newFolder().toPath();
+        RuneFolioScreenshotSpool spool = spool(root);
+        for (int status : new int[] {408, 425, 429, 500, 502, 503})
+        {
+            assertTrue(spool.save(entry(TOKEN, "Example"), jpeg()));
+            now.addAndGet(1_000_000);
+            spool.drainOnce(() -> List.of(TOKEN), (token, entry, bytes) -> { throw new RuneFolioScreenshotSpool.UploadException(status, 0); });
+            assertEquals("HTTP " + status + " must stay queued", 1, spool.stats().saved);
+            assertEquals("HTTP " + status + " must not be held", 0, spool.stats().held);
+            now.addAndGet(1_000_000);
+            spool.drainOnce(() -> List.of(TOKEN), (token, entry, bytes) -> { });
+            assertEquals(0, spool.stats().saved);
+        }
+    }
+
+    @Test
+    public void permanentStatusesAreHeldAndCannotBeResaved() throws Exception
+    {
+        Path root = temporary.newFolder().toPath();
+        RuneFolioScreenshotSpool spool = spool(root);
+        int held = 0;
+        // 413 stays permanent on purpose: an image the server deems too large would otherwise retry forever.
+        for (int status : new int[] {400, 401, 403, 404, 413, 422, 499})
+        {
+            RuneFolioScreenshotSpool.Entry rejected = entry(TOKEN, "Example");
+            assertTrue(spool.save(rejected, jpeg()));
+            now.addAndGet(1_000_000);
+            spool.drainOnce(() -> List.of(TOKEN), (token, entry, bytes) -> { throw new RuneFolioScreenshotSpool.UploadException(status, 0); });
+            assertEquals("HTTP " + status + " must be held", ++held, spool.stats().held);
+            assertEquals(0, spool.stats().saved);
+            try
+            {
+                spool.save(rejected, jpeg());
+                fail("HTTP " + status + ": a held event must not be re-queued under the same id");
+            }
+            catch (IOException expected) { }
+            assertEquals(0, spool.stats().saved);
+        }
+    }
+
+    @Test
+    public void backoffCapsAtFifteenMinutes() throws Exception
+    {
+        Path root = temporary.newFolder().toPath();
+        RuneFolioScreenshotSpool spool = spool(root);
+        assertTrue(spool.save(entry(TOKEN, "Example"), jpeg()));
+        AtomicInteger attempts = new AtomicInteger();
+        for (int failure = 0; failure < 7; failure++)
+        {
+            now.addAndGet(900_000);
+            spool.drainOnce(() -> List.of(TOKEN), (token, entry, bytes) -> { attempts.incrementAndGet(); throw new IOException("Synthetic outage"); });
+        }
+        assertEquals(7, attempts.get());
+        assertTrue("the persisted failure count must stay loadable", Files.readString(root.resolve("pacing.json")).contains("\"failures\":6"));
+        now.addAndGet(899_999);
+        spool(root).drainOnce(() -> List.of(TOKEN), (token, entry, bytes) -> fail("Retry before the 15 minute cap elapsed"));
+        assertEquals(1, spool.stats().saved);
+        now.incrementAndGet();
+        spool(root).drainOnce(() -> List.of(TOKEN), (token, entry, bytes) -> { });
+        assertEquals(0, spool.stats().saved);
     }
 
     @Test
@@ -305,5 +378,27 @@ public class RuneFolioScreenshotSpoolTest
         assertEquals(0, spool.stats().saved);
         assertFalse(Files.exists(root.resolve("pacing.tmp")));
         assertFalse(Files.readString(root.resolve("pacing.json")).contains("stale"));
+    }
+
+    @Test
+    public void concurrentSavesWaitForTheQueueInsteadOfDropping() throws Exception
+    {
+        Path root = temporary.newFolder().toPath();
+        RuneFolioScreenshotSpool spool = spool(root);
+        byte[] jpeg = jpeg();
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+        CountDownLatch start = new CountDownLatch(1);
+        List<Future<Boolean>> results = new ArrayList<>();
+        try
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                results.add(pool.submit(() -> { start.await(); return spool.save(entry(TOKEN, "Example"), jpeg); }));
+            }
+            start.countDown();
+            for (Future<Boolean> result : results) assertTrue(result.get(30, TimeUnit.SECONDS));
+        }
+        finally { pool.shutdownNow(); }
+        assertEquals(12, spool.stats().saved);
     }
 }
