@@ -33,13 +33,42 @@ public class RuneFolioBankCollectorTest {
   collector.startUp(state->{sent[0]++;return true;});
   try {
    collector.onGameTick(null);Assert.assertEquals(0,sent[0]);
-   collector.onItemContainerChanged(new net.runelite.api.events.ItemContainerChanged(net.runelite.api.InventoryID.BANK.getId(),container));
+   collector.onItemContainerChanged(new net.runelite.api.events.ItemContainerChanged(net.runelite.api.gameval.InventoryID.BANK,container));
    tick[0]=4;collector.onGameTick(null);Assert.assertEquals(0,sent[0]);
    hidden[0]=false;collector.onGameTick(null);Assert.assertEquals(1,sent[0]);
    collector.onGameTick(null);Assert.assertEquals(1,sent[0]);
    collector.onRuneScapeProfileChanged(null);tick[0]=200;collector.onGameTick(null);Assert.assertEquals(1,sent[0]);
-   enabled[0]=false;collector.onItemContainerChanged(new net.runelite.api.events.ItemContainerChanged(net.runelite.api.InventoryID.BANK.getId(),container));
+   enabled[0]=false;collector.onItemContainerChanged(new net.runelite.api.events.ItemContainerChanged(net.runelite.api.gameval.InventoryID.BANK,container));
    collector.onGameTick(null);Assert.assertEquals(1,sent[0]);
+  } finally {collector.shutDown();}
+ }
+ @Test public void sceneLoadsKeepTheLastSentSnapshotButLoginScreenDropsIt() {
+  int[] tick={1},sent={0};
+  net.runelite.api.ItemContainer container=fake(net.runelite.api.ItemContainer.class,(p,m,a)->m.getName().equals("getItems")?new net.runelite.api.Item[0]:null);
+  net.runelite.api.widgets.Widget widget=fake(net.runelite.api.widgets.Widget.class,(p,m,a)->m.getName().equals("isHidden")?false:null);
+  net.runelite.api.Client client=fake(net.runelite.api.Client.class,(p,m,a)->{
+   switch(m.getName()){
+    case "getGameState":return net.runelite.api.GameState.LOGGED_IN;
+    case "getWorldType":return java.util.EnumSet.noneOf(net.runelite.api.WorldType.class);
+    case "getTickCount":return tick[0];
+    case "getWidget":return widget;
+    case "getItemContainer":return container;
+    default:return null;
+   }
+  });
+  RuneFolioConfig config=new RuneFolioConfig(){@Override public boolean syncBankWealth(){return true;}};
+  RuneFolioBankCollector collector=new RuneFolioBankCollector(client,null,config,new net.runelite.client.eventbus.EventBus());
+  collector.startUp(state->{sent[0]++;return true;});
+  net.runelite.api.events.ItemContainerChanged bank=new net.runelite.api.events.ItemContainerChanged(net.runelite.api.gameval.InventoryID.BANK,container);
+  try {
+   collector.onItemContainerChanged(bank);tick[0]=4;collector.onGameTick(null);Assert.assertEquals(1,sent[0]);
+   net.runelite.api.events.GameStateChanged loading=new net.runelite.api.events.GameStateChanged();loading.setGameState(net.runelite.api.GameState.LOADING);
+   collector.onGameStateChanged(loading);
+   collector.onItemContainerChanged(bank);tick[0]=300;collector.onGameTick(null);Assert.assertEquals(1,sent[0]);
+   net.runelite.api.events.GameStateChanged login=new net.runelite.api.events.GameStateChanged();login.setGameState(net.runelite.api.GameState.LOGIN_SCREEN);
+   collector.onGameStateChanged(login);
+   tick[0]=600;collector.onGameTick(null);Assert.assertEquals(1,sent[0]);
+   collector.onItemContainerChanged(bank);tick[0]=900;collector.onGameTick(null);Assert.assertEquals(2,sent[0]);
   } finally {collector.shutDown();}
  }
  @Test public void valuesCannotOverflow() {
