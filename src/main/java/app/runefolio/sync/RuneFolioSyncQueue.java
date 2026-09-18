@@ -4,20 +4,32 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
 
+/**
+ * Durable outbox of sync events. Every entry is bound to a fingerprint of the connection
+ * token that authorised its capture and can only ever be sent under that same token; the
+ * binding is stored beside the event and never leaves the client.
+ */
 @Slf4j
 final class RuneFolioSyncQueue
 {
     private static final String CONFIG_GROUP = "runefolio";
-    private static final String CONFIG_KEY = "syncQueue.v1";
+    private static final String CONFIG_KEY = "syncQueue.v2";
+    private static final String LEGACY_CONFIG_KEY = "syncQueue.v1";
+    private static final String BINDING_PREFIX = "runefolio-sync-v1:";
     private static final int MAX_EVENTS = 1_000;
     private static final int MAX_QUEUE_BYTES = 4 * 1024 * 1024;
     private static final int MAX_BATCH_BYTES = 1024 * 1024;
@@ -27,9 +39,19 @@ final class RuneFolioSyncQueue
         String get();
 
         void set(String value);
+
+        default String getLegacy()
+        {
+            return null;
+        }
+
+        default void clearLegacy()
+        {
+        }
     }
 
     private final Storage storage;
+    private final Supplier<Set<String>> deliverableBindings;
     // Entries own their event and encoded JSON. Neither callers nor upload snapshots
     // may mutate the cached representation after its byte budget has been checked.
     private final Map<String, Entry> events = new LinkedHashMap<>();
@@ -37,19 +59,24 @@ final class RuneFolioSyncQueue
     private static final class Entry
     {
         private final RuneFolioSyncEvent event;
+        private final String binding;
         private final String json;
         private final int bytes;
 
-        private Entry(RuneFolioSyncEvent source)
+        private Entry(RuneFolioSyncEvent source, String binding)
         {
             JsonObject value = source.toJson();
             event = RuneFolioSyncEvent.fromJson(value);
-            json = value.toString();
+            this.binding = binding;
+            JsonObject stored = new JsonObject();
+            stored.addProperty("b", binding);
+            stored.add("e", value);
+            json = stored.toString();
             bytes = json.getBytes(StandardCharsets.UTF_8).length + 1;
         }
     }
 
-    RuneFolioSyncQueue(ConfigManager configManager)
+    RuneFolioSyncQueue(ConfigManager configManager, Supplier<Set<String>> deliverableBindings)
     {
         this(new Storage()
         {
@@ -64,18 +91,53 @@ final class RuneFolioSyncQueue
             {
                 configManager.setConfiguration(CONFIG_GROUP, CONFIG_KEY, value);
             }
-        });
+
+            @Override
+            public String getLegacy()
+            {
+                return configManager.getConfiguration(CONFIG_GROUP, LEGACY_CONFIG_KEY);
+            }
+
+            @Override
+            public void clearLegacy()
+            {
+                configManager.unsetConfiguration(CONFIG_GROUP, LEGACY_CONFIG_KEY);
+            }
+        }, deliverableBindings);
     }
 
-    RuneFolioSyncQueue(Storage storage)
+    RuneFolioSyncQueue(Storage storage, Supplier<Set<String>> deliverableBindings)
     {
         this.storage = storage;
+        this.deliverableBindings = deliverableBindings;
         load();
     }
 
-    synchronized boolean enqueue(RuneFolioSyncEvent event)
+    /** Fingerprint of a connection token; distinct from the screenshot spool's so the two cannot be cross-matched. */
+    static String binding(String token)
     {
-        Entry entry = new Entry(event);
+        if (token == null || token.isBlank()) throw new IllegalArgumentException("Missing connection token");
+        try
+        {
+            StringBuilder result = new StringBuilder();
+            for (byte value : MessageDigest.getInstance("SHA-256").digest((BINDING_PREFIX + token).getBytes(StandardCharsets.UTF_8)))
+            {
+                result.append("0123456789abcdef".charAt((value & 255) >>> 4));
+                result.append("0123456789abcdef".charAt(value & 15));
+            }
+            return result.toString();
+        }
+        catch (NoSuchAlgorithmException impossible) { throw new IllegalStateException(impossible); }
+    }
+
+    synchronized boolean enqueue(RuneFolioSyncEvent event, String binding)
+    {
+        if (binding == null || binding.isBlank())
+        {
+            log.warn("RuneFolio sync event was captured without a connection; not queued");
+            return false;
+        }
+        Entry entry = new Entry(event, binding);
         if (entry.bytes > MAX_BATCH_BYTES / 2)
         {
             log.warn("RuneFolio sync event exceeds the upload byte limit");
@@ -84,8 +146,11 @@ final class RuneFolioSyncQueue
         Map<String, Entry> candidate = new LinkedHashMap<>(events);
         candidate.values().removeIf(existing -> entry.event.supersedes(existing.event));
         candidate.put(entry.event.getId(), entry);
-        if (candidate.size() > MAX_EVENTS
-            || candidate.values().stream().mapToLong(existing -> existing.bytes).sum() > MAX_QUEUE_BYTES)
+        if (overBudget(candidate))
+        {
+            evictUndeliverable(candidate);
+        }
+        if (overBudget(candidate))
         {
             log.warn("RuneFolio sync queue is full; refusing to discard an existing event");
             return false;
@@ -99,14 +164,39 @@ final class RuneFolioSyncQueue
         return true;
     }
 
-    synchronized List<RuneFolioSyncEvent> snapshot(int limit, Predicate<RuneFolioSyncEvent> filter)
+    private static boolean overBudget(Map<String, Entry> candidate)
+    {
+        return candidate.size() > MAX_EVENTS
+            || candidate.values().stream().mapToLong(existing -> existing.bytes).sum() > MAX_QUEUE_BYTES;
+    }
+
+    /** Drops, oldest first, only entries bound to a connection this client no longer holds. */
+    private void evictUndeliverable(Map<String, Entry> candidate)
+    {
+        Set<String> deliverable = deliverableBindings.get();
+        int evicted = 0;
+        for (Iterator<Entry> iterator = candidate.values().iterator(); iterator.hasNext() && overBudget(candidate); )
+        {
+            if (!deliverable.contains(iterator.next().binding))
+            {
+                iterator.remove();
+                evicted++;
+            }
+        }
+        if (evicted > 0)
+        {
+            log.info("Dropped {} queued RuneFolio events that belonged to a connection this client no longer has", evicted);
+        }
+    }
+
+    synchronized List<RuneFolioSyncEvent> snapshot(int limit, String binding, Predicate<RuneFolioSyncEvent> filter)
     {
         List<RuneFolioSyncEvent> result = new ArrayList<>();
-        if (limit <= 0) return result;
+        if (limit <= 0 || binding == null) return result;
         long bytes = 0;
         for (Entry entry : events.values())
         {
-            if (filter.test(entry.event))
+            if (binding.equals(entry.binding) && filter.test(entry.event))
             {
                 int size = entry.bytes;
                 if (bytes + size > MAX_BATCH_BYTES) break;
@@ -143,6 +233,7 @@ final class RuneFolioSyncQueue
 
     private void load()
     {
+        discardLegacyQueue();
         String saved = storage.get();
         if (saved == null || saved.isBlank())
         {
@@ -161,15 +252,13 @@ final class RuneFolioSyncQueue
             {
                 for (JsonElement element : parsed.getAsJsonArray())
                 {
-                    if (!element.isJsonObject())
-                    {
-                        log.warn("Skipping a queued RuneFolio event that is not a JSON object");
-                        continue;
-                    }
                     try
                     {
-                        RuneFolioSyncEvent event = RuneFolioSyncEvent.fromJson(element.getAsJsonObject());
-                        events.put(event.getId(), new Entry(event));
+                        JsonObject stored = element.getAsJsonObject();
+                        String binding = stored.get("b").getAsString();
+                        if (binding.isBlank()) throw new IllegalArgumentException("blank binding");
+                        RuneFolioSyncEvent event = RuneFolioSyncEvent.fromJson(stored.getAsJsonObject("e"));
+                        events.put(event.getId(), new Entry(event, binding));
                     }
                     catch (RuntimeException exception)
                     {
@@ -183,6 +272,28 @@ final class RuneFolioSyncQueue
             log.warn("Unable to read the saved RuneFolio sync queue ({})", exception.getClass().getSimpleName());
         }
         persist(events);
+    }
+
+    /** Events saved before bindings existed cannot prove which connection authorised them, so they are never sent. */
+    private void discardLegacyQueue()
+    {
+        String legacy = storage.getLegacy();
+        if (legacy == null || legacy.isBlank())
+        {
+            return;
+        }
+        int count = 0;
+        try
+        {
+            JsonElement parsed = new JsonParser().parse(legacy);
+            if (parsed.isJsonArray()) count = parsed.getAsJsonArray().size();
+        }
+        catch (RuntimeException ignored)
+        {
+            // Unreadable legacy data is discarded the same way.
+        }
+        log.warn("Discarding {} queued RuneFolio events saved by an earlier plugin version; the next full sync replaces snapshots", count);
+        storage.clearLegacy();
     }
 
     private void persist(Map<String, Entry> entries)
