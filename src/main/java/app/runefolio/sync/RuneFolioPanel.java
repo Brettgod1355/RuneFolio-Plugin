@@ -274,7 +274,7 @@ class RuneFolioPanel extends PluginPanel
         content.add(openRuneFolio);
         JButton sharingInfo = new JButton("Data sharing information");
         sharingInfo.setAlignmentX(LEFT_ALIGNMENT);
-        sharingInfo.addActionListener(event -> JOptionPane.showMessageDialog(this, disclosureText(),
+        sharingInfo.addActionListener(event -> JOptionPane.showMessageDialog(this, disclosureText(false),
             "RuneFolio data sharing", JOptionPane.INFORMATION_MESSAGE));
         content.add(sharingInfo);
         JButton clearScreenshots = new JButton("Clear screenshot queue");
@@ -859,19 +859,26 @@ class RuneFolioPanel extends PluginPanel
         }
     }
 
-    private JScrollPane disclosureText()
+    JScrollPane disclosureText(boolean askingToConnect)
     {
-        JTextArea text = new JTextArea(RuneFolioDataSharing.CONNECTION, 20, 42);
+        String disclosure = RuneFolioDataSharing.CONNECTION;
+        if (!askingToConnect)
+        {
+            disclosure = disclosure.substring(0, disclosure.length() - RuneFolioDataSharing.CONNECT_QUESTION.length()).stripTrailing();
+        }
+        JTextArea text = new JTextArea(disclosure, 20, 42);
         text.setEditable(false);
         text.setLineWrap(true);
         text.setWrapStyleWord(true);
         text.setCaretPosition(0);
-        return new JScrollPane(text);
+        JScrollPane scroll = new JScrollPane(text);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        return scroll;
     }
 
     private boolean showConnectionDisclosure()
     {
-        return JOptionPane.showOptionDialog(this, disclosureText(), "Connect to RuneFolio",
+        return JOptionPane.showOptionDialog(this, disclosureText(true), "Connect to RuneFolio",
             JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
             new String[]{"Continue", "Cancel"}, "Cancel") == JOptionPane.YES_OPTION;
     }

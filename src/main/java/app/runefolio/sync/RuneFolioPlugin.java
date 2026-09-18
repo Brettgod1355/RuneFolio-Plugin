@@ -1314,9 +1314,11 @@ public class RuneFolioPlugin extends Plugin
             SwingUtilities.invokeLater(() ->
                 panel.setStatus("Sync queued. Sending it to RuneFolio...")
             );
+            String filterIdentity = accountMode ? null : activeIdentityKey;
             submit(syncExecutor, () -> flushQueueWithToken(
                 savedToken,
                 accountMode ? null : playerName,
+                filterIdentity,
                 accountMode
             ));
         });
@@ -1406,13 +1408,7 @@ public class RuneFolioPlugin extends Plugin
             refreshSyncPanel();
             return;
         }
-        flushQueueWithToken(savedToken, accountMode ? null : playerName, accountMode);
-    }
-
-    private void flushQueueWithToken(String savedToken, String characterFilter, boolean accountMode)
-    {
-        flushQueueWithToken(savedToken, characterFilter,
-            savedToken.equals(connectionToken) ? activeIdentityKey : null, accountMode);
+        flushQueueWithToken(savedToken, accountMode ? null : playerName, accountMode ? null : activeIdentityKey, accountMode);
     }
 
     private void flushQueueWithToken(String savedToken, String characterFilter, String filterIdentity, boolean accountMode)
@@ -2729,6 +2725,8 @@ public class RuneFolioPlugin extends Plugin
         boolean accountMode = isAccountMode();
         String savedToken = accountMode ? accountConnectionToken : connectionToken;
         String playerName = lastKnownPlayerName;
+        // Captured now: the character is deactivated right after this and the flush runs later.
+        String filterIdentity = accountMode ? null : activeIdentityKey;
         enqueueKnownSnapshots("logout");
         if (savedToken == null || savedToken.isBlank())
         {
@@ -2738,6 +2736,7 @@ public class RuneFolioPlugin extends Plugin
         submit(syncExecutor, () -> flushQueueWithToken(
             savedToken,
             accountMode ? null : playerName,
+            filterIdentity,
             accountMode
         ));
     }
