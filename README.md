@@ -60,4 +60,4 @@ Found a bug or have a suggestion? Join the [Discord](https://discord.gg/Ar96ueFU
 
 ## Contributing
 
-Clone the repository and open it as a Gradle project (JDK 17, Java 11 target). The `run` Gradle task launches a development RuneLite client with the plugin preloaded. Every pull request runs the test suite and the official RuneLite Plugin Hub packager as a pre-submission check.
+Clone the repository and open it as a Gradle project (JDK 17, Java 11 target). The `run` Gradle task launches a development RuneLite client with the plugin preloaded. Every pull request runs the test suite and the official RuneLite Plugin Hub packager as a pre-submission check, and must bump the plugin version: `runelite-plugin.properties`, `build.gradle` and `RuneFolioApiClient.CLIENT_VERSION` move together, and the pull request title ends with the new version in parentheses, e.g. `(0.3.51)`. `PR_TITLE="<title>" scripts/check-version-bump.sh` runs the same check locally.

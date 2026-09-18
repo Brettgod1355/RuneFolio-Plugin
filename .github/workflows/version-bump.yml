@@ -1,0 +1,27 @@
+name: Version bump
+
+# Every pull request must bump the plugin version and end its title with that
+# version in parentheses; see scripts/check-version-bump.sh. Title edits are
+# included so a corrected title re-runs this check without rebuilding.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the base branch
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: git fetch --no-tags --depth=1 origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+      - name: Require a version bump and a matching title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: bash scripts/check-version-bump.sh "origin/$BASE_REF"
