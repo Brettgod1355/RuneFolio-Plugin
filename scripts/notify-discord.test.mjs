@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { notification, publicSummary } from './notify-discord.mjs';
 test('only explicit public notes are posted; internal body sections and closed-unmerged PRs are excluded', () => {
   const body = '## Summary\nInternal implementation details\n## Discord changelog message\n- The calendar now opens the selected day.\n## Validation\nPrivate diagnostic notes';
@@ -23,4 +24,10 @@ test('CI notifications only accept failed main-branch runs from the correct repo
   const run={id:8,conclusion:'failure',head_branch:'main',head_repository:{full_name:'example/site'}};
   assert.equal(notification({workflow_run:run},'website','example/site','1').code,'ci_failed');
   for(const patch of [{head_branch:'feature'},{conclusion:'success'},{head_repository:{full_name:'fork/site'}}]) assert.equal(notification({workflow_run:{...run,...patch}},'website','example/site','1'),null);
+});
+test('the notification workflow reads the manager origin from a secret, never a variable', async () => {
+  const workflow = await readFile(new URL('../.github/workflows/discord-notifications.yml', import.meta.url), 'utf8');
+  assert.doesNotMatch(workflow, /vars\.DISCORD_EVENTS_URL/, 'a repository variable is printed in clear in the job log');
+  assert.match(workflow, /DISCORD_EVENTS_URL: \$\{\{ secrets\.DISCORD_EVENTS_URL \}\}/);
+  assert.match(workflow, /steps\.config\.outputs\.configured == 'true'/, 'sending steps stay gated on the secret being set');
 });
