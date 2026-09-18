@@ -6,7 +6,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.awt.Image;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -57,7 +56,6 @@ import net.runelite.api.gameval.VarClientID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.RuneScapeProfileChanged;
@@ -111,7 +109,6 @@ public class RuneFolioPlugin extends Plugin
             + "(?:\\s+Your Achievement Diary has been updated\\.)?$",
         Pattern.CASE_INSENSITIVE
     );
-    private static final Set<String> PANEL_SETTING_KEYS = panelSettingKeys();
     private static final String PVP_OPPONENT_PLACEHOLDER = "PvP opponent";
 
     @Inject
@@ -450,20 +447,6 @@ public class RuneFolioPlugin extends Plugin
         }
     }
 
-    private static Set<String> panelSettingKeys()
-    {
-        Set<String> keys = new HashSet<>();
-        for (Method method : RuneFolioConfig.class.getDeclaredMethods())
-        {
-            ConfigItem item = method.getAnnotation(ConfigItem.class);
-            if (item != null)
-            {
-                keys.add(item.keyName());
-            }
-        }
-        return Set.copyOf(keys);
-    }
-
     @Subscribe
     public void onConfigChanged(ConfigChanged event)
     {
@@ -479,9 +462,10 @@ public class RuneFolioPlugin extends Plugin
         {
             refreshNavigationButton();
         }
-        if (PANEL_SETTING_KEYS.contains(event.getKey()))
+        RuneFolioPanel currentPanel = panel;
+        if (currentPanel != null && currentPanel.mirrors(event.getKey()))
         {
-            SwingUtilities.invokeLater(() -> panel.syncSettings(config));
+            SwingUtilities.invokeLater(() -> currentPanel.syncSettings(config));
         }
     }
 

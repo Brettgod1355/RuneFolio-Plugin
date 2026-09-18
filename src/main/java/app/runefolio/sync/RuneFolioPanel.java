@@ -12,8 +12,10 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.BooleanSupplier;
@@ -118,6 +120,7 @@ class RuneFolioPanel extends PluginPanel
     };
     private final JButton gearButton = new JButton("⚙");
     final Map<String, JCheckBox> toggleBoxes = new LinkedHashMap<>();
+    private volatile Set<String> mirroredKeys = Set.of();
     private JSpinner thresholdSpinner;
     private boolean settingsOpen;
     private boolean syncingSettings;
@@ -468,6 +471,16 @@ class RuneFolioPanel extends PluginPanel
         settingsPage.setBackground(ColorScheme.DARK_GRAY_COLOR);
         settingsPage.add(settings, BorderLayout.NORTH);
         body.add(settingsPage, "settings");
+
+        Set<String> keys = new HashSet<>(toggleBoxes.keySet());
+        keys.add("screenshotValuableDropThreshold");
+        mirroredKeys = Set.copyOf(keys);
+    }
+
+    /** Whether a config key is shown on the settings page, so only its changes re-sync the page. */
+    boolean mirrors(String key)
+    {
+        return key != null && mirroredKeys.contains(key);
     }
 
     private void addToggle(JPanel parent, BiConsumer<String, Object> setting, String key, String label,
