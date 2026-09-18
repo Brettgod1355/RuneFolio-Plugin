@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -209,6 +210,25 @@ public class RuneFolioPanelStateTest
             }
         }
         return null;
+    }
+
+    @Test
+    public void informationDialogOmitsTheConnectQuestionAndAlwaysShowsItsScrollbar() throws Exception
+    {
+        SwingUtilities.invokeAndWait(() ->
+        {
+            RuneFolioPanel panel = new RuneFolioPanel(() -> true);
+            JScrollPane information = panel.disclosureText(false);
+            JScrollPane confirmation = panel.disclosureText(true);
+            String informationText = ((JTextArea) information.getViewport().getView()).getText();
+            String confirmationText = ((JTextArea) confirmation.getViewport().getView()).getText();
+            assertFalse(informationText.contains(RuneFolioDataSharing.CONNECT_QUESTION));
+            assertFalse(informationText.endsWith("\n"));
+            assertTrue(confirmationText.endsWith(RuneFolioDataSharing.CONNECT_QUESTION));
+            assertTrue(confirmationText.startsWith(informationText));
+            assertEquals(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, information.getVerticalScrollBarPolicy());
+            assertEquals(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, confirmation.getVerticalScrollBarPolicy());
+        });
     }
 
     @Test

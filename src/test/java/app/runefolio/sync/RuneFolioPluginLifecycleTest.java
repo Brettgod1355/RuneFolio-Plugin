@@ -240,6 +240,53 @@ public class RuneFolioPluginLifecycleTest
     }
 
     @Test
+    public void temporaryCodeLogoutSyncIsSentAfterTheCharacterIsDeactivated() throws Exception
+    {
+        Harness harness = new Harness(false);
+        List<String> sentTypes = new ArrayList<>();
+        List<String> sentTokens = new ArrayList<>();
+        harness.set("okHttpClient", new OkHttpClient.Builder()
+            .addInterceptor(chain ->
+            {
+                okio.Buffer body = new okio.Buffer();
+                chain.request().body().writeTo(body);
+                JsonObject request = new JsonParser().parse(body.readUtf8()).getAsJsonObject();
+                JsonArray accepted = new JsonArray();
+                for (JsonElement event : request.getAsJsonArray("events"))
+                {
+                    sentTypes.add(event.getAsJsonObject().get("type").getAsString());
+                    accepted.add(event.getAsJsonObject().get("id").getAsString());
+                }
+                sentTokens.add(chain.request().header("Authorization"));
+                JsonObject response = new JsonObject();
+                response.add("acceptedEventIds", accepted);
+                return new Response.Builder()
+                    .request(chain.request()).protocol(Protocol.HTTP_1_1).code(200).message("OK")
+                    .body(ResponseBody.create(MediaType.parse("application/json"), response.toString()))
+                    .build();
+            })
+            .build());
+
+        harness.onEdt(harness.plugin::startUp);
+        harness.set("connectionToken", "temporary-code-token");
+        harness.set("connectedCharacterName", "Example");
+        harness.set("lastKnownPlayerName", "Example");
+        harness.set("activeIdentityKey", RuneFolioNameChange.identityKey(123));
+        harness.set("lastKnownSkills", List.of(new RuneFolioApiClient.SkillSnapshot("Attack", 99, 13_034_431)));
+
+        // The client thread runs these back to back on LOGIN_SCREEN; the flush runs later.
+        harness.invoke("requestLogoutSkillSync");
+        harness.invoke("deactivateCurrentCharacter");
+        ((ScheduledExecutorService) harness.get("syncExecutor")).submit(() -> { }).get(10, TimeUnit.SECONDS);
+
+        assertEquals(List.of("skills.snapshot"), sentTypes);
+        assertEquals(List.of("Bearer temporary-code-token"), sentTokens);
+        assertEquals(0, ((RuneFolioSyncQueue) harness.get("syncQueue")).size());
+
+        harness.onEdt(harness.plugin::shutDown);
+    }
+
+    @Test
     public void deliverableBindingsCoverEveryConnectionStillHeld() throws Exception
     {
         Harness harness = new Harness(true);
