@@ -383,7 +383,7 @@ class RuneFolioPanel extends PluginPanel
         addToggle(settings, setting, "showCollectionLogSyncButton", "Collection Log sync button",
             "Show a smart RuneFolio sync button in an unused bottom-right area of the in-game Collection Log", null);
         addToggle(settings, setting, "syncLootDrops", "Sync loot drops",
-            "Automatically send loot recorded by RuneLite's enabled Loot Tracker to your RuneFolio history", RuneFolioDataSharing.LOOT);
+            "Automatically send loot recorded by RuneLite's enabled Loot Tracker to your RuneFolio history. Loot from a defeated player is attributed to their name only when Sync PvP history is enabled", RuneFolioDataSharing.LOOT);
         addToggle(settings, setting, "hideSidePanel", "Hide RuneFolio side panel",
             "Hide the RuneFolio button from the RuneLite side panel without disabling background syncing", null);
         addToggle(settings, setting, "syncBankWealth", "Sync bank and wealth",

@@ -27,7 +27,7 @@ The panel shows **Data sharing information** before you connect, explaining exac
 
 **On by default, with an off switch:**
 
-- Loot drops, recorded through RuneLite's own Loot Tracker
+- Loot drops, recorded through RuneLite's own Loot Tracker (loot from a defeated player is attributed to their name only when PvP history is enabled)
 - Completed boss/raid kills, clue scrolls, and Slayer tasks, including kill time, personal bests, and party size when the game reports them
 - Account unlocks — a large catalog spanning bank space purchases, quest- and diary-gated content, area access, equipment, and more (checklist flags only, not full bank contents)
 
