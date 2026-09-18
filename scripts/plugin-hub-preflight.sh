@@ -4,9 +4,14 @@ set -euo pipefail
 source_dir="$(realpath "${1:?Pass the plugin checkout path}")"
 source_commit="$(git -C "$source_dir" rev-parse HEAD)"
 repository_url="https://github.com/Brettgod1355/RuneFolio-Plugin.git"
+plugin_id="runefolio-sync"
+# Must stay identical to the warning= line of plugins/runefolio-sync in runelite/plugin-hub.
+hub_warning="This plugin submits your IP address, RSN, and account progression (skills, quests, diaries, combat achievements, collection log, loot and, if enabled, bank, PvP and screenshot data) to a 3rd-party server (runefolio.app) not controlled or verified by RuneLite developers."
 test -f plugin-hub/runelite.version
 test -f package.jar
 test -f "$source_dir/runelite-plugin.properties"
+grep -q "internalName = \"$plugin_id\"" "$source_dir/src/main/java/app/runefolio/sync/RuneFolioPlugin.java" \
+  || { echo "Plugin id $plugin_id does not match the PluginDescriptor internalName" >&2; exit 1; }
 
 # Use the already-authorized local checkout; never pass credentials to the packager.
 # The descriptor remains in RuneLite's accepted format, and all build checks remain enabled.
@@ -18,28 +23,32 @@ export GIT_CONFIG_VALUE_1=always
 export GIT_TERMINAL_PROMPT=0
 unset REPO_CREDS REPO_ROOT SIGNING_KEY PACKAGE_COMMIT_RANGE API_FILES_VERSION
 export PACKAGE_IS_PR=true
-export FORCE_BUILD=runefolio
+export FORCE_BUILD="$plugin_id"
 mkdir -p plugin-hub/plugins
-printf 'repository=%s\ncommit=%s\nwarning=%s\n' "$repository_url" "$source_commit" \
-  'Communicates with runefolio.app to upload linked character progress and enabled optional data.' \
-  > plugin-hub/plugins/runefolio
-# The packager reads descriptor commit dates from local Hub history.
-git -C plugin-hub add plugins/runefolio
-git -C plugin-hub -c user.name="RuneFolio CI" -c user.email="ci@runefolio.invalid" \
-  commit --quiet -m "Local preflight descriptor" -- plugins/runefolio
+printf 'repository=%s\ncommit=%s\nwarning=%s\n' "$repository_url" "$source_commit" "$hub_warning" \
+  > "plugin-hub/plugins/$plugin_id"
+printf 'Hub warning: %s\n' "$hub_warning"
+# The packager reads descriptor commit dates from local Hub history, so the file only
+# needs a new commit when it differs from what the Hub checkout already contains.
+git -C plugin-hub add "plugins/$plugin_id"
+if ! git -C plugin-hub diff --cached --quiet -- "plugins/$plugin_id"; then
+  git -C plugin-hub -c user.name="RuneFolio CI" -c user.email="ci@runefolio.invalid" \
+    commit --quiet -m "Local preflight descriptor" -- "plugins/$plugin_id"
+fi
 printf 'Plugin commit: %s\nRuneLite version: ' "$source_commit"
 cat plugin-hub/runelite.version
 printf 'Plugin Hub revision: '
 git -C plugin-hub rev-parse HEAD
 ./prepare.sh
 java -XX:+UseParallelGC -cp package.jar net.runelite.pluginhub.packager.Packager
-python3 - "$source_dir" <<'PY'
+python3 - "$source_dir" "$plugin_id" <<'PY'
 import pathlib
 import sys
 import zipfile
 
 source = pathlib.Path(sys.argv[1])
-with zipfile.ZipFile("/tmp/jars/runefolio.jar") as jar:
+plugin_id = sys.argv[2]
+with zipfile.ZipFile("/tmp/jars/" + plugin_id + ".jar") as jar:
     for name in ("LICENSE", "COPYRIGHT.md", "THIRD_PARTY_NOTICES.md"):
         entry = "META-INF/" + name
         if jar.namelist().count(entry) != 1 or jar.read(entry) != (source / name).read_bytes():
