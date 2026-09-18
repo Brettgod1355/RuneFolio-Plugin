@@ -115,9 +115,11 @@ final class RuneFolioScreenshotQueue implements AutoCloseable
                 task = work;
                 work = null;
             }
+            boolean cancelled;
+            synchronized (RuneFolioScreenshotQueue.this) { cancelled = closed; }
             try
             {
-                if (task != null && !Thread.currentThread().isInterrupted()) task.run();
+                if (task != null && !cancelled) task.run();
             }
             finally
             {

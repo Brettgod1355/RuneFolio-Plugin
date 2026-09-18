@@ -31,7 +31,8 @@ public class RuneFolioScreenshotCaptureTest
     public void capturePersistsBeforeAnyNetworkUploadAndReleasesRawFrameSlot() throws Exception
     {
         java.nio.file.Path root = temporary.newFolder().toPath();
-        RuneFolioScreenshotSpool spool = new RuneFolioScreenshotSpool(root, new com.google.gson.Gson());
+        RuneFolioScreenshotSpool spool = new RuneFolioScreenshotSpool(
+            net.runelite.client.util.Filepath.Unchecked.getRooted(root), new com.google.gson.Gson());
         try (Fixture fixture = new Fixture())
         {
             fixture.set("screenshotSpool", spool);
@@ -60,7 +61,8 @@ public class RuneFolioScreenshotCaptureTest
     {
         for (String category : new String[]{"clue_reward", "raid_chest_reward", "pvp_kill", "loot_key"})
         {
-            RuneFolioScreenshotSpool spool = new RuneFolioScreenshotSpool(temporary.newFolder().toPath(), new com.google.gson.Gson());
+            RuneFolioScreenshotSpool spool = new RuneFolioScreenshotSpool(
+                net.runelite.client.util.Filepath.Unchecked.getRooted(temporary.newFolder().toPath()), new com.google.gson.Gson());
             java.util.UUID id = java.util.UUID.randomUUID();
             try (Fixture fixture = new Fixture())
             {

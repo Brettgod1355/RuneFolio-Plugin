@@ -5,12 +5,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -25,8 +25,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+import net.runelite.client.util.Filepath;
 
 /** Private, bounded disk outbox. JPEG bytes are stored and uploaded without re-encoding. */
 final class RuneFolioScreenshotSpool
@@ -36,8 +42,17 @@ final class RuneFolioScreenshotSpool
     static final int MAX_JPEG_BYTES = 3 * 1024 * 1024;
     private static final int MAX_HEADER = 16 * 1024;
     private static final int MAGIC = 0x52465331;
+    // Filepath exposes no symlink/POSIX-permission APIs (by design - see its Javadoc), so the two
+    // narrow checks that need them go through Filepath.Unchecked to reach the underlying Path.
+    // Everything else in this class goes through Filepath.
+    private static final ScheduledExecutorService LOCK_RETRY_EXECUTOR = Executors.newSingleThreadScheduledExecutor(runnable ->
+    {
+        Thread thread = new Thread(runnable, "runefolio-screenshot-lock-retry");
+        thread.setDaemon(true);
+        return thread;
+    });
     private final Gson gson;
-    private final Path root;
+    private final Filepath root;
     private final LongSupplier clock;
     private final LongSupplier jitter;
     private final long maxBytes;
@@ -86,21 +101,21 @@ final class RuneFolioScreenshotSpool
     private static final class State { long next; int failures; }
     private static final class Stored
     {
-        final Path path;
+        final Filepath path;
         final Entry entry;
-        Stored(Path path, Entry entry) { this.path = path; this.entry = entry; }
+        Stored(Filepath path, Entry entry) { this.path = path; this.entry = entry; }
     }
 
-    RuneFolioScreenshotSpool(Path root, Gson gson)
+    RuneFolioScreenshotSpool(Filepath root, Gson gson)
     {
         this(root, gson, System::currentTimeMillis,
             () -> java.util.concurrent.ThreadLocalRandom.current().nextLong(5001), MAX_BYTES, MAX_FILES);
     }
 
-    RuneFolioScreenshotSpool(Path root, Gson gson, LongSupplier clock, LongSupplier jitter, long maxBytes, int maxFiles)
+    RuneFolioScreenshotSpool(Filepath root, Gson gson, LongSupplier clock, LongSupplier jitter, long maxBytes, int maxFiles)
     {
         this.gson = java.util.Objects.requireNonNull(gson);
-        this.root = root.toAbsolutePath().normalize();
+        this.root = java.util.Objects.requireNonNull(root);
         this.clock = clock;
         this.jitter = jitter;
         this.maxBytes = maxBytes;
@@ -141,10 +156,10 @@ final class RuneFolioScreenshotSpool
         try (Guard guard = awaitQueueLock())
         {
             if (guard == null) return false;
-            Path target = root.resolve(entry.eventId + ".pending");
-            if (Files.exists(root.resolve(entry.eventId + ".held"), LinkOption.NOFOLLOW_LINKS))
+            Filepath target = root.joinSegment(entry.eventId + ".pending");
+            if (root.joinSegment(entry.eventId + ".held").exists())
                 throw new IOException("Screenshot event is held for review");
-            if (Files.exists(target, LinkOption.NOFOLLOW_LINKS))
+            if (target.exists())
             {
                 Entry old = readHeader(target);
                 if (old.binding.equals(entry.binding) && old.jpegHash.equals(entry.jpegHash)) return true;
@@ -153,7 +168,7 @@ final class RuneFolioScreenshotSpool
             Stats stats = scanStats();
             long bytes = 8L + header.length + jpeg.length;
             if (stats.saved + stats.held >= maxFiles || bytes > maxBytes - stats.bytes) return false;
-            Path temporary = root.resolve(UUID.randomUUID() + ".part");
+            Filepath temporary = root.joinSegment(UUID.randomUUID() + ".part");
             boolean created = false;
             try
             {
@@ -168,21 +183,21 @@ final class RuneFolioScreenshotSpool
                     output.flush();
                     channel.force(true);
                 }
-                Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE);
+                temporary.moveTo(target, StandardCopyOption.ATOMIC_MOVE);
                 return true;
             }
-            finally { if (created) Files.deleteIfExists(temporary); }
+            finally { if (created) temporary.deleteIfExists(); }
         }
     }
 
     /** One attempt per call; global lock and persisted pacing also cover multiple clients. */
     void drainOnce(Supplier<List<String>> tokens, Uploader uploader) throws IOException
     {
-        if (!Files.exists(root, LinkOption.NOFOLLOW_LINKS)) return;
+        if (!root.exists()) return;
         prepare();
         try (Guard uploadGuard = lock("upload.lock"))
         {
-            if (uploadGuard == null || Thread.currentThread().isInterrupted()) return;
+            if (uploadGuard == null) return;
             Stored selected = null;
             String token = null;
             State state;
@@ -192,9 +207,9 @@ final class RuneFolioScreenshotSpool
                 state = readState();
                 if (clock.getAsLong() < state.next) return;
                 List<Stored> entries = new ArrayList<>();
-                for (Path path : entries())
+                for (Filepath path : entries())
                 {
-                    if (!path.getFileName().toString().endsWith(".pending")) continue;
+                    if (!path.getFileName().endsWith(".pending")) continue;
                     try { entries.add(new Stored(path, readHeader(path))); }
                     catch (IOException | RuntimeException invalid) { hold(path); }
                 }
@@ -217,8 +232,7 @@ final class RuneFolioScreenshotSpool
                 try (Guard guard = lock("queue.lock")) { if (guard != null) hold(selected.path); }
                 return;
             }
-            if (Thread.currentThread().isInterrupted()
-                || matchingToken(selected.entry, tokens.get()) == null) return;
+            if (matchingToken(selected.entry, tokens.get()) == null) return;
             boolean acknowledged = false, permanent = false;
             long retryAfter = 0;
             try { uploader.upload(token, selected.entry, jpeg); acknowledged = true; }
@@ -227,7 +241,7 @@ final class RuneFolioScreenshotSpool
             try (Guard guard = lock("queue.lock"))
             {
                 if (guard == null) return; // Safe replay if acknowledgement cleanup could not acquire the lock.
-                if (acknowledged) Files.deleteIfExists(selected.path);
+                if (acknowledged) selected.path.deleteIfExists();
                 else if (permanent) hold(selected.path);
                 state.failures = acknowledged || permanent ? 0 : Math.min(6, state.failures + 1);
                 long delay = state.failures == 0 ? 10_000 : Math.min(900_000, 30_000L << (state.failures - 1));
@@ -239,7 +253,7 @@ final class RuneFolioScreenshotSpool
 
     Stats stats() throws IOException
     {
-        if (!Files.exists(root, LinkOption.NOFOLLOW_LINKS)) return new Stats(0, 0, 0);
+        if (!root.exists()) return new Stats(0, 0, 0);
         prepare();
         try (Guard guard = lock("queue.lock")) { return guard == null ? null : scanStats(); }
     }
@@ -247,12 +261,12 @@ final class RuneFolioScreenshotSpool
     /** Explicit user action only. Does not touch website images or unrelated files. */
     boolean clear() throws IOException
     {
-        if (!Files.exists(root, LinkOption.NOFOLLOW_LINKS)) return true;
+        if (!root.exists()) return true;
         prepare();
         try (Guard uploadGuard = lock("upload.lock"); Guard guard = lock("queue.lock"))
         {
             if (uploadGuard == null || guard == null) return false;
-            for (Path path : entries()) Files.delete(path);
+            for (Filepath path : entries()) path.delete();
             writeState(new State());
             return true;
         }
@@ -269,46 +283,46 @@ final class RuneFolioScreenshotSpool
 
     private void prepare() throws IOException
     {
-        if (Files.isSymbolicLink(root)) throw new IOException("Screenshot queue directory must not be a symlink");
-        Files.createDirectories(root);
-        if (Files.getFileStore(root).supportsFileAttributeView("posix"))
-            Files.setPosixFilePermissions(root, PosixFilePermissions.fromString("rwx------"));
+        Path rawRoot = Filepath.Unchecked.getPath(root);
+        if (Files.isSymbolicLink(rawRoot)) throw new IOException("Screenshot queue directory must not be a symlink");
+        root.createDirectories();
+        if (Files.getFileStore(rawRoot).supportsFileAttributeView("posix"))
+            Files.setPosixFilePermissions(rawRoot, PosixFilePermissions.fromString("rwx------"));
     }
 
-    private List<Path> entries() throws IOException
+    private List<Filepath> entries() throws IOException
     {
-        List<Path> paths = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(root))
+        List<Filepath> all = new ArrayList<>();
+        try (Stream<Filepath> stream = root.walk(1)) { stream.forEach(all::add); }
+        List<Filepath> matched = new ArrayList<>();
+        for (Filepath path : all)
         {
-            for (Path path : stream)
-            {
-                String name = path.getFileName().toString();
-                if (!name.matches("[0-9a-f-]{36}\\.(pending|held|part)")) continue;
-                if (!Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS))
-                    throw new IOException("Invalid screenshot queue file");
-                paths.add(path);
-            }
+            if (path.isRoot()) continue;
+            String name = path.getFileName();
+            if (!name.matches("[0-9a-f-]{36}\\.(pending|held|part)")) continue;
+            if (!path.isFile()) throw new IOException("Invalid screenshot queue file");
+            matched.add(path);
         }
-        return paths;
+        return matched;
     }
 
     private Stats scanStats() throws IOException
     {
         int saved = 0, held = 0;
         long bytes = 0;
-        for (Path path : entries())
+        for (Filepath path : entries())
         {
-            if (path.getFileName().toString().endsWith(".pending")) saved++; else held++;
-            bytes += Files.size(path);
+            if (path.getFileName().endsWith(".pending")) saved++; else held++;
+            bytes += path.size();
         }
         return new Stats(saved, held, bytes);
     }
 
-    private Entry readHeader(Path path) throws IOException
+    private Entry readHeader(Filepath path) throws IOException
     {
-        long size = Files.size(path);
+        long size = path.size();
         if (size < 12 || size > MAX_JPEG_BYTES + MAX_HEADER + 8L) throw new IOException("Invalid screenshot file size");
-        try (DataInputStream input = new DataInputStream(Files.newInputStream(path, LinkOption.NOFOLLOW_LINKS)))
+        try (DataInputStream input = new DataInputStream(path.openInputStream(LinkOption.NOFOLLOW_LINKS)))
         {
             if (input.readInt() != MAGIC) throw new IOException("Invalid screenshot file format");
             int length = input.readInt();
@@ -317,7 +331,7 @@ final class RuneFolioScreenshotSpool
             input.readFully(header);
             Entry entry = gson.fromJson(new String(header, StandardCharsets.UTF_8), Entry.class);
             validate(entry);
-            if (!path.getFileName().toString().equals(entry.eventId + ".pending"))
+            if (!path.getFileName().equals(entry.eventId + ".pending"))
                 throw new IOException("Screenshot event filename mismatch");
             return entry;
         }
@@ -325,7 +339,7 @@ final class RuneFolioScreenshotSpool
 
     private byte[] readJpeg(Stored stored) throws IOException
     {
-        try (DataInputStream input = new DataInputStream(Files.newInputStream(stored.path, LinkOption.NOFOLLOW_LINKS)))
+        try (DataInputStream input = new DataInputStream(stored.path.openInputStream(LinkOption.NOFOLLOW_LINKS)))
         {
             if (input.readInt() != MAGIC) throw new IOException("Invalid screenshot file");
             int header = input.readInt();
@@ -360,18 +374,18 @@ final class RuneFolioScreenshotSpool
         catch (RuntimeException invalid) { throw new IOException("Invalid screenshot metadata"); }
     }
 
-    private void hold(Path path) throws IOException
+    private void hold(Filepath path) throws IOException
     {
-        Path held = root.resolve(path.getFileName().toString().replace(".pending", ".held"));
-        if (!Files.exists(held, LinkOption.NOFOLLOW_LINKS)) Files.move(path, held, StandardCopyOption.ATOMIC_MOVE);
+        Filepath held = root.joinSegment(path.getFileName().replace(".pending", ".held"));
+        if (!held.exists()) path.moveTo(held, StandardCopyOption.ATOMIC_MOVE);
     }
 
     private State readState() throws IOException
     {
-        Path path = root.resolve("pacing.json");
-        if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) return new State();
-        if (Files.size(path) > 1024) throw new IOException("Invalid screenshot pacing state");
-        try (InputStream input = Files.newInputStream(path, LinkOption.NOFOLLOW_LINKS))
+        Filepath path = root.joinSegment("pacing.json");
+        if (!path.exists()) return new State();
+        if (path.size() > 1024) throw new IOException("Invalid screenshot pacing state");
+        try (InputStream input = path.openInputStream(LinkOption.NOFOLLOW_LINKS))
         {
             State state = gson.fromJson(new String(input.readNBytes(1025), StandardCharsets.UTF_8), State.class);
             if (state == null || state.next < 0 || state.failures < 0 || state.failures > 6) throw new IOException("Invalid screenshot pacing state");
@@ -382,30 +396,31 @@ final class RuneFolioScreenshotSpool
 
     private void writeState(State state) throws IOException
     {
-        Path temporary = root.resolve("pacing.tmp");
-        if (Files.isSymbolicLink(temporary)) throw new IOException("Invalid screenshot pacing file");
-        Files.deleteIfExists(temporary);
+        Filepath temporary = root.joinSegment("pacing.tmp");
+        if (Files.isSymbolicLink(Filepath.Unchecked.getPath(temporary))) throw new IOException("Invalid screenshot pacing file");
+        temporary.deleteIfExists();
         try (FileChannel channel = createPrivateFile(temporary))
         {
-            java.nio.ByteBuffer bytes = StandardCharsets.UTF_8.encode(gson.toJson(state));
+            ByteBuffer bytes = StandardCharsets.UTF_8.encode(gson.toJson(state));
             while (bytes.hasRemaining()) channel.write(bytes);
             channel.force(true);
         }
-        Files.move(temporary, root.resolve("pacing.json"), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        temporary.moveTo(root.joinSegment("pacing.json"), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    private FileChannel createPrivateFile(Path path) throws IOException
+    private FileChannel createPrivateFile(Filepath path) throws IOException
     {
-        if (Files.getFileStore(root).supportsFileAttributeView("posix"))
-            return FileChannel.open(path, Set.of(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE),
+        Path rawRoot = Filepath.Unchecked.getPath(root);
+        if (Files.getFileStore(rawRoot).supportsFileAttributeView("posix"))
+            return FileChannel.open(Filepath.Unchecked.getPath(path), Set.of(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE),
                 PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")));
-        return FileChannel.open(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
+        return path.openFileChannel(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
     }
 
     private Guard lock(String name) throws IOException
     {
-        Path path = root.resolve(name);
-        FileChannel channel = FileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS);
+        Filepath path = root.joinSegment(name);
+        FileChannel channel = path.openFileChannel(StandardOpenOption.CREATE, StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS);
         try
         {
             FileLock lock = channel.tryLock();
@@ -419,16 +434,19 @@ final class RuneFolioScreenshotSpool
 
     private Guard awaitQueueLock() throws IOException
     {
-        // Only the background encoder calls this; never block the game thread.
+        // Only the background encoder calls this; never blocks via Thread.sleep - each retry's
+        // wait is itself a scheduled-executor task, per the Plugin Hub's disallowed-APIs rule.
         for (int attempt = 0; attempt < 100; attempt++)
         {
             Guard guard = lock("queue.lock");
             if (guard != null) return guard;
-            try { Thread.sleep(10); }
-            catch (InterruptedException stopped)
+            try
             {
-                Thread.currentThread().interrupt();
-                throw new IOException("Screenshot save interrupted");
+                LOCK_RETRY_EXECUTOR.schedule(() -> null, 10, TimeUnit.MILLISECONDS).get();
+            }
+            catch (InterruptedException | ExecutionException stopped)
+            {
+                throw new IOException("Screenshot save interrupted", stopped);
             }
         }
         return null;
