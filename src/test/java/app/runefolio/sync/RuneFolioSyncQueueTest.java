@@ -371,4 +371,42 @@ public class RuneFolioSyncQueueTest
         Assert.assertEquals(1000, restored.size());
         Assert.assertEquals(2, restored.snapshot(1000, BOUND_B, event -> true).size());
     }
+
+    @Test
+    public void evictionNeverRemovesTheEntryBeingAdded()
+    {
+        MemoryStorage storage = new MemoryStorage();
+        RuneFolioSyncQueue queue = queue(storage, () -> Set.of(BOUND_B));
+        for (int i = 0; i < 1000; i++)
+            Assert.assertTrue(queue.enqueue(RuneFolioSyncEvent.collectionLogUnlock("Friend", "Item " + i), BOUND_A));
+
+        // A result finalised after its connection was dropped: its own binding is stale, yet it is
+        // the entry being added, so the room comes from the oldest stranded entry instead.
+        String stale = RuneFolioSyncQueue.binding("already-disconnected");
+        RuneFolioSyncEvent late = RuneFolioSyncEvent.collectionLogUnlock("Friend", "Late");
+        Assert.assertTrue(queue.enqueue(late, stale));
+        Assert.assertEquals(1000, queue.size());
+        Assert.assertEquals(late.getId(), queue.snapshot(10, stale, event -> true).get(0).getId());
+        Assert.assertEquals(999, queue.snapshot(1000, BOUND_A, event -> true).size());
+        Assert.assertTrue(queue.snapshot(1000, BOUND_A, event -> "Item 0".equals(event.toJson().getAsJsonObject("payload").get("itemName").getAsString())).isEmpty());
+    }
+
+    @Test
+    public void snapshotsOnlySupersedeSnapshotsOfTheSameConnection()
+    {
+        MemoryStorage storage = new MemoryStorage();
+        RuneFolioSyncQueue queue = queue(storage);
+        RuneFolioSyncEvent underA = RuneFolioSyncEvent.progressSnapshot(RuneFolioSyncEvent.QUEST_SNAPSHOT_TYPE, "Example", "periodic", new JsonObject());
+        RuneFolioSyncEvent underB = RuneFolioSyncEvent.progressSnapshot(RuneFolioSyncEvent.QUEST_SNAPSHOT_TYPE, "Example", "periodic", new JsonObject());
+        RuneFolioSyncEvent newerUnderA = RuneFolioSyncEvent.progressSnapshot(RuneFolioSyncEvent.QUEST_SNAPSHOT_TYPE, "Example", "manual", new JsonObject());
+        Assert.assertTrue(queue.enqueue(underA, BOUND_A));
+        Assert.assertTrue(queue.enqueue(underB, BOUND_B));
+        Assert.assertEquals(2, queue.size());
+        Assert.assertEquals(underA.getId(), queue.snapshot(10, BOUND_A, event -> true).get(0).getId());
+
+        Assert.assertTrue(queue.enqueue(newerUnderA, BOUND_A));
+        Assert.assertEquals(2, queue.size());
+        Assert.assertEquals(newerUnderA.getId(), queue.snapshot(10, BOUND_A, event -> true).get(0).getId());
+        Assert.assertEquals(underB.getId(), queue.snapshot(10, BOUND_B, event -> true).get(0).getId());
+    }
 }

@@ -144,11 +144,11 @@ final class RuneFolioSyncQueue
             return false;
         }
         Map<String, Entry> candidate = new LinkedHashMap<>(events);
-        candidate.values().removeIf(existing -> entry.event.supersedes(existing.event));
+        candidate.values().removeIf(existing -> binding.equals(existing.binding) && entry.event.supersedes(existing.event));
         candidate.put(entry.event.getId(), entry);
         if (overBudget(candidate))
         {
-            evictUndeliverable(candidate);
+            evictUndeliverable(candidate, entry.event.getId());
         }
         if (overBudget(candidate))
         {
@@ -171,13 +171,14 @@ final class RuneFolioSyncQueue
     }
 
     /** Drops, oldest first, only entries bound to a connection this client no longer holds. */
-    private void evictUndeliverable(Map<String, Entry> candidate)
+    private void evictUndeliverable(Map<String, Entry> candidate, String incomingId)
     {
         Set<String> deliverable = deliverableBindings.get();
         int evicted = 0;
-        for (Iterator<Entry> iterator = candidate.values().iterator(); iterator.hasNext() && overBudget(candidate); )
+        for (Iterator<Map.Entry<String, Entry>> iterator = candidate.entrySet().iterator(); iterator.hasNext() && overBudget(candidate); )
         {
-            if (!deliverable.contains(iterator.next().binding))
+            Map.Entry<String, Entry> existing = iterator.next();
+            if (!existing.getKey().equals(incomingId) && !deliverable.contains(existing.getValue().binding))
             {
                 iterator.remove();
                 evicted++;
