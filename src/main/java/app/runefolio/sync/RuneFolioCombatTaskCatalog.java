@@ -12,6 +12,7 @@ final class RuneFolioCombatTaskCatalog
         3116, 3117, 3118, 3119, 3120, 3121, 3122, 3123, 3124, 3125, 3126,
         3127, 3128, 3387, 3718, 3773, 3774, 4204, 4496, 4721, 5673
     };
+    static final int MAX_TASK_COUNT = COMPLETION_VARPS.length * Integer.SIZE;
     private static final int TASK_COUNT = 655;
 
     private RuneFolioCombatTaskCatalog()
