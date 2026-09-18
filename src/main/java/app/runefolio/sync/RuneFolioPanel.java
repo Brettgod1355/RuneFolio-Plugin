@@ -4,14 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.Insets;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -713,21 +709,7 @@ class RuneFolioPanel extends PluginPanel
 
     void openBrowser(String url)
     {
-        if (!Desktop.isDesktopSupported())
-        {
-            setStatus("Could not open a browser. Open runefolio.app in your browser.");
-            return;
-        }
-
-        try
-        {
-            Desktop.getDesktop().browse(new URI(url));
-        }
-        catch (IOException | URISyntaxException exception)
-        {
-            log.warn("Unable to open RuneFolio.", exception);
-            setStatus("Could not open the browser. Open runefolio.app and try again.");
-        }
+        LinkBrowser.browse(url);
     }
 
     private void setAccountExpanded(boolean expanded)

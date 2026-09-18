@@ -15,7 +15,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +64,9 @@ import net.runelite.client.ui.NavigationButton;
 @PluginDescriptor(
     name = "RuneFolio Sync",
     description = "RuneFolio character connection client",
-    tags = {"runefolio", "progress", "tracker", "loot"}
+    tags = {"runefolio", "progress", "tracker", "loot"},
+    internalName = "runefolio-sync",
+    legacyDataDirectory = "runefolio-screenshot-queue"
 )
 public class RuneFolioPlugin extends Plugin
 {
@@ -144,7 +145,7 @@ public class RuneFolioPlugin extends Plugin
     @Inject
     private okhttp3.OkHttpClient okHttpClient;
 
-    private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
+    private final ScheduledExecutorService connectionExecutor = Executors.newSingleThreadScheduledExecutor();
     private final ScheduledExecutorService syncExecutor = Executors.newSingleThreadScheduledExecutor();
     private final RuneFolioScreenshotQueue screenshotQueue = new RuneFolioScreenshotQueue();
     private RuneFolioScreenshotSpool screenshotSpool;
@@ -206,11 +207,10 @@ public class RuneFolioPlugin extends Plugin
     }
 
     @Override
-    protected void startUp()
+    protected void startUp() throws java.io.IOException
     {
         panel = new RuneFolioPanel();
-        screenshotSpool = new RuneFolioScreenshotSpool(
-            net.runelite.client.RuneLite.RUNELITE_DIR.toPath().resolve("runefolio-screenshot-queue"), gson);
+        screenshotSpool = new RuneFolioScreenshotSpool(getPluginDirectory(), gson);
         navigationButton = NavigationButton.builder()
             .tooltip("RuneFolio Sync")
             .icon(RuneFolioBrand.createIcon(16))
@@ -331,7 +331,6 @@ public class RuneFolioPlugin extends Plugin
         }
         catch (InterruptedException exception)
         {
-            Thread.currentThread().interrupt();
             syncExecutor.shutdownNow();
         }
         log.info("RuneFolio Sync stopped");
@@ -445,58 +444,7 @@ public class RuneFolioPlugin extends Plugin
                     panel.openBrowser(login.getVerificationUrl());
                     panel.setStatus("Approve the connection in your browser. RuneLite is waiting...");
                 });
-
-                for (int attempt = 0; attempt < 300 && !Thread.currentThread().isInterrupted(); attempt++)
-                {
-                    Thread.sleep(2_000);
-                    RuneFolioApiClient.AccountPollResult result = RuneFolioApiClient.pollAccountLogin(
-                        okHttpClient,
-                        login.getRequestId(),
-                        login.getPollToken()
-                    );
-                    if (!result.isApproved())
-                    {
-                        continue;
-                    }
-
-                    accountConnectionToken = result.getConnectionToken();
-                    configManager.setConfiguration(
-                        CONFIG_GROUP,
-                        ACCOUNT_CONNECTION_TOKEN_KEY,
-                        accountConnectionToken
-                    );
-                    connectionToken = null;
-                    connectedCharacterName = null;
-                    activeConnectionConfigKey = null;
-                    activeConnectionIsLegacy = false;
-                    accountIsPro = false;
-
-                    SwingUtilities.invokeLater(() ->
-                    {
-                        panel.setAccountConnecting(false);
-                        panel.setAccountConnected(true);
-                        panel.setProStatus(false);
-                        panel.setStatus("Connected to your RuneFolio account. Log in to a character to sync.");
-                    });
-                    clientThread.invokeLater(() ->
-                    {
-                        if (currentPlayerName() != null)
-                        {
-                            connectionLookupPending = true;
-                        }
-                    });
-                    return;
-                }
-
-                SwingUtilities.invokeLater(() ->
-                {
-                    panel.setAccountConnecting(false);
-                    panel.setStatus("Browser approval expired. Click Log in to RuneFolio to try again.");
-                });
-            }
-            catch (InterruptedException exception)
-            {
-                Thread.currentThread().interrupt();
+                pollAccountLogin(login, 0);
             }
             catch (Exception exception)
             {
@@ -508,6 +456,73 @@ public class RuneFolioPlugin extends Plugin
                 });
             }
         });
+    }
+
+    /** Runs on connectionExecutor; each attempt reschedules itself instead of blocking on sleep. */
+    private void pollAccountLogin(RuneFolioApiClient.AccountLoginRequest login, int attempt)
+    {
+        if (attempt >= 300)
+        {
+            SwingUtilities.invokeLater(() ->
+            {
+                panel.setAccountConnecting(false);
+                panel.setStatus("Browser approval expired. Click Log in to RuneFolio to try again.");
+            });
+            return;
+        }
+
+        connectionExecutor.schedule(() ->
+        {
+            try
+            {
+                RuneFolioApiClient.AccountPollResult result = RuneFolioApiClient.pollAccountLogin(
+                    okHttpClient,
+                    login.getRequestId(),
+                    login.getPollToken()
+                );
+                if (!result.isApproved())
+                {
+                    pollAccountLogin(login, attempt + 1);
+                    return;
+                }
+
+                accountConnectionToken = result.getConnectionToken();
+                configManager.setConfiguration(
+                    CONFIG_GROUP,
+                    ACCOUNT_CONNECTION_TOKEN_KEY,
+                    accountConnectionToken
+                );
+                connectionToken = null;
+                connectedCharacterName = null;
+                activeConnectionConfigKey = null;
+                activeConnectionIsLegacy = false;
+                accountIsPro = false;
+
+                SwingUtilities.invokeLater(() ->
+                {
+                    panel.setAccountConnecting(false);
+                    panel.setAccountConnected(true);
+                    panel.setProStatus(false);
+                    panel.setStatus("Connected to your RuneFolio account. Log in to a character to sync.");
+                });
+                clientThread.invokeLater(() ->
+                {
+                    if (currentPlayerName() != null)
+                    {
+                        connectionLookupPending = true;
+                    }
+                });
+            }
+            catch (Exception exception)
+            {
+                log.warn("RuneFolio account connection failed", exception);
+                SwingUtilities.invokeLater(() ->
+                {
+                    panel.setAccountConnecting(false);
+                    panel.setStatus("Account connection failed: " + safeMessage(exception));
+                });
+            }
+        }, 2, TimeUnit.SECONDS);
     }
 
     private void disconnectRuneFolioAccount()
@@ -2005,7 +2020,6 @@ public class RuneFolioPlugin extends Plugin
         {
             try
             {
-                if (Thread.currentThread().isInterrupted()) return;
                 byte[] jpeg = RuneFolioScreenshotEncoder.encode(frame);
                 if (jpeg.length > SCREENSHOT_MAX_BYTES)
                 {
