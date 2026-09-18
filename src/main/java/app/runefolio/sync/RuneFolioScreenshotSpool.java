@@ -11,12 +11,9 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.LinkOption;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -42,9 +39,6 @@ final class RuneFolioScreenshotSpool
     static final int MAX_JPEG_BYTES = 3 * 1024 * 1024;
     private static final int MAX_HEADER = 16 * 1024;
     private static final int MAGIC = 0x52465331;
-    // Filepath exposes no symlink/POSIX-permission APIs (by design - see its Javadoc), so the two
-    // narrow checks that need them go through Filepath.Unchecked to reach the underlying Path.
-    // Everything else in this class goes through Filepath.
     private static final ScheduledExecutorService LOCK_RETRY_EXECUTOR = Executors.newSingleThreadScheduledExecutor(runnable ->
     {
         Thread thread = new Thread(runnable, "runefolio-screenshot-lock-retry");
@@ -152,7 +146,7 @@ final class RuneFolioScreenshotSpool
         validate(entry);
         byte[] header = gson.toJson(entry).getBytes(StandardCharsets.UTF_8);
         if (header.length > MAX_HEADER) throw new IOException("Screenshot metadata too large");
-        prepare();
+        if (!root.exists()) root.createDirectories();
         try (Guard guard = awaitQueueLock())
         {
             if (guard == null) return false;
@@ -172,7 +166,7 @@ final class RuneFolioScreenshotSpool
             boolean created = false;
             try
             {
-                try (FileChannel channel = createPrivateFile(temporary))
+                try (FileChannel channel = temporary.openFileChannel(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE))
                 {
                     created = true;
                     DataOutputStream output = new DataOutputStream(Channels.newOutputStream(channel));
@@ -194,7 +188,6 @@ final class RuneFolioScreenshotSpool
     void drainOnce(Supplier<List<String>> tokens, Uploader uploader) throws IOException
     {
         if (!root.exists()) return;
-        prepare();
         try (Guard uploadGuard = lock("upload.lock"))
         {
             if (uploadGuard == null) return;
@@ -254,7 +247,6 @@ final class RuneFolioScreenshotSpool
     Stats stats() throws IOException
     {
         if (!root.exists()) return new Stats(0, 0, 0);
-        prepare();
         try (Guard guard = lock("queue.lock")) { return guard == null ? null : scanStats(); }
     }
 
@@ -262,7 +254,6 @@ final class RuneFolioScreenshotSpool
     boolean clear() throws IOException
     {
         if (!root.exists()) return true;
-        prepare();
         try (Guard uploadGuard = lock("upload.lock"); Guard guard = lock("queue.lock"))
         {
             if (uploadGuard == null || guard == null) return false;
@@ -279,15 +270,6 @@ final class RuneFolioScreenshotSpool
         for (String token : tokens)
             if (token != null && !token.isBlank() && entry.binding.equals(fingerprint(token))) return token;
         return null;
-    }
-
-    private void prepare() throws IOException
-    {
-        Path rawRoot = Filepath.Unchecked.getPath(root);
-        if (Files.isSymbolicLink(rawRoot)) throw new IOException("Screenshot queue directory must not be a symlink");
-        root.createDirectories();
-        if (Files.getFileStore(rawRoot).supportsFileAttributeView("posix"))
-            Files.setPosixFilePermissions(rawRoot, PosixFilePermissions.fromString("rwx------"));
     }
 
     private List<Filepath> entries() throws IOException
@@ -397,24 +379,14 @@ final class RuneFolioScreenshotSpool
     private void writeState(State state) throws IOException
     {
         Filepath temporary = root.joinSegment("pacing.tmp");
-        if (Files.isSymbolicLink(Filepath.Unchecked.getPath(temporary))) throw new IOException("Invalid screenshot pacing file");
         temporary.deleteIfExists();
-        try (FileChannel channel = createPrivateFile(temporary))
+        try (FileChannel channel = temporary.openFileChannel(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE))
         {
             ByteBuffer bytes = StandardCharsets.UTF_8.encode(gson.toJson(state));
             while (bytes.hasRemaining()) channel.write(bytes);
             channel.force(true);
         }
         temporary.moveTo(root.joinSegment("pacing.json"), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    private FileChannel createPrivateFile(Filepath path) throws IOException
-    {
-        Path rawRoot = Filepath.Unchecked.getPath(root);
-        if (Files.getFileStore(rawRoot).supportsFileAttributeView("posix"))
-            return FileChannel.open(Filepath.Unchecked.getPath(path), Set.of(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE),
-                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")));
-        return path.openFileChannel(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
     }
 
     private Guard lock(String name) throws IOException
@@ -434,7 +406,7 @@ final class RuneFolioScreenshotSpool
 
     private Guard awaitQueueLock() throws IOException
     {
-        // Only the background encoder calls this; never blocks via Thread.sleep - each retry's
+        // Only the background encoder calls this; never sleeps the thread - each retry's
         // wait is itself a scheduled-executor task, per the Plugin Hub's disallowed-APIs rule.
         for (int attempt = 0; attempt < 100; attempt++)
         {

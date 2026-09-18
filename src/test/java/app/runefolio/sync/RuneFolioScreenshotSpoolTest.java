@@ -282,22 +282,28 @@ public class RuneFolioScreenshotSpoolTest
     }
 
     @Test
-    public void symlinkedQueueCannotWriteOutsideItsDirectory() throws Exception
+    public void saveCreatesMissingQueueDirectoryButReadsDoNot() throws Exception
     {
-        Path parent = temporary.newFolder().toPath(), target = temporary.newFolder().toPath();
-        Path link = parent.resolve("queue");
-        try
-        {
-            Files.createSymbolicLink(link, target);
-        }
-        catch (UnsupportedOperationException | java.nio.file.FileSystemException noSymlinkPrivilege)
-        {
-            // Creating a symlink needs an OS privilege (e.g. Windows Developer Mode) this
-            // environment may not grant; skip rather than fail on an unrelated limitation.
-            org.junit.Assume.assumeNoException(noSymlinkPrivilege);
-        }
-        try { spool(link).save(entry(TOKEN, "Example"), jpeg()); fail("Symlink accepted"); }
-        catch (IOException expected) { }
-        try (java.util.stream.Stream<Path> files = Files.list(target)) { assertEquals(0, files.count()); }
+        Path root = temporary.newFolder().toPath().resolve("missing").resolve("queue");
+        assertEquals(0, spool(root).stats().saved);
+        spool(root).drainOnce(() -> List.of(TOKEN), (token, entry, bytes) -> fail("Nothing queued"));
+        assertTrue(spool(root).clear());
+        assertFalse(Files.exists(root));
+        assertTrue(spool(root).save(entry(TOKEN, "Example"), jpeg()));
+        assertTrue(Files.isDirectory(root));
+        assertEquals(1, spool(root).stats().saved);
+    }
+
+    @Test
+    public void leftoverPacingTempFileIsReplacedNotReused() throws Exception
+    {
+        Path root = temporary.newFolder().toPath();
+        RuneFolioScreenshotSpool spool = spool(root);
+        assertTrue(spool.save(entry(TOKEN, "Example"), jpeg()));
+        Files.writeString(root.resolve("pacing.tmp"), "stale");
+        spool.drainOnce(() -> List.of(TOKEN), (token, entry, bytes) -> { });
+        assertEquals(0, spool.stats().saved);
+        assertFalse(Files.exists(root.resolve("pacing.tmp")));
+        assertFalse(Files.readString(root.resolve("pacing.json")).contains("stale"));
     }
 }

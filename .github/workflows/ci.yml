@@ -21,4 +21,4 @@ jobs:
         with:
           gradle-version: "8.10.2"
       - run: gradle test verifyDistributionNotices
-      - run: bash scripts/check-disallowed-networking.sh
+      - run: bash scripts/check-plugin-hub-disallowed-apis.sh
