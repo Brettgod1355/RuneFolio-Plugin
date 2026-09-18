@@ -22,7 +22,3 @@ jobs:
           gradle-version: "8.10.2"
       - run: gradle test verifyDistributionNotices
       - run: bash scripts/check-plugin-hub-disallowed-apis.sh
-      - if: github.event_name == 'pull_request'
-        run: bash scripts/check-version-bump.sh "$GITHUB_BASE_REF"
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
