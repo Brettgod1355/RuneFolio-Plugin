@@ -17,7 +17,7 @@ final class RuneFolioPvpTracker
         final int tick;
         final JsonObject payload = new JsonObject();
         boolean historyEnabled;
-        String characterName, identityKey;
+        String characterName, identityKey, binding;
         Result(String opponent, int tick, String occurredAt)
         {
             this.tick = tick; this.occurredAt = occurredAt;

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /** Opt-in, synthetic, offline component measurements. Never starts RuneLite. */
@@ -14,12 +15,21 @@ public final class RuneFolioPerformanceBenchmark
 {
     private static final int SAMPLES = 30;
     private static final int WARMUPS = 10;
+    private static final String BINDING = RuneFolioSyncQueue.binding("synthetic-benchmark-connection");
 
     private static final class MemoryStorage implements RuneFolioSyncQueue.Storage
     {
         private String value;
         public String get() { return value; }
         public void set(String value) { this.value = value; }
+    }
+
+    private static JsonObject stored(RuneFolioSyncEvent event)
+    {
+        JsonObject entry = new JsonObject();
+        entry.addProperty("b", BINDING);
+        entry.add("e", event.toJson());
+        return entry;
     }
 
     public static void main(String[] args) throws Exception
@@ -36,7 +46,7 @@ public final class RuneFolioPerformanceBenchmark
         loot.addProperty("synthetic", "x".repeat(3500));
         JsonArray seed = new JsonArray();
         for (int i = 0; i < count; i++)
-            seed.add(RuneFolioSyncEvent.historyEvent("slayer.completion", "Example", loot).toJson());
+            seed.add(stored(RuneFolioSyncEvent.historyEvent("slayer.completion", "Example", loot)));
         String saved = seed.toString();
         long[] reload = new long[SAMPLES], snapshot = new long[SAMPLES], acknowledge = new long[SAMPLES], burst = new long[SAMPLES];
         for (int sample = -WARMUPS; sample < SAMPLES; sample++)
@@ -44,9 +54,9 @@ public final class RuneFolioPerformanceBenchmark
             MemoryStorage storage = new MemoryStorage();
             storage.value = saved;
             long start = System.nanoTime();
-            RuneFolioSyncQueue queue = new RuneFolioSyncQueue(storage);
+            RuneFolioSyncQueue queue = new RuneFolioSyncQueue(storage, () -> Set.of(BINDING));
             long loaded = System.nanoTime();
-            List<RuneFolioSyncEvent> batch = queue.snapshot(50, event -> true);
+            List<RuneFolioSyncEvent> batch = queue.snapshot(50, BINDING, event -> true);
             long snapshotted = System.nanoTime();
             queue.acknowledge(batch.stream().map(RuneFolioSyncEvent::getId).collect(Collectors.toList()));
             long acknowledged = System.nanoTime();
@@ -66,12 +76,12 @@ public final class RuneFolioPerformanceBenchmark
                     entries.add(row);
                 }
                 state.add("syntheticEntries", entries);
-                if (!queue.enqueue(RuneFolioSyncEvent.progressSnapshot(type, "Example", "manual", state)))
+                if (!queue.enqueue(RuneFolioSyncEvent.progressSnapshot(type, "Example", "manual", state), BINDING))
                     throw new AssertionError("Snapshot-shaped event was refused");
             }
             long finished = System.nanoTime();
             int expected = count - Math.min(count, 50) + 4;
-            if (new RuneFolioSyncQueue(storage).size() != expected)
+            if (new RuneFolioSyncQueue(storage, () -> Set.of(BINDING)).size() != expected)
                 throw new AssertionError("Recovery changed queue count");
             if (sample >= 0)
             {

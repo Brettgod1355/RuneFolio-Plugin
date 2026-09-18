@@ -261,7 +261,7 @@ public class RuneFolioPlugin extends Plugin
         panel.configure((key, value) -> configManager.setConfiguration(CONFIG_GROUP, key, value));
         panel.syncSettings(config);
 
-        syncQueue = new RuneFolioSyncQueue(configManager);
+        syncQueue = new RuneFolioSyncQueue(configManager, this::deliverableSyncBindings);
         lastSuccessfulSyncAtMillis = savedLong(LAST_SUCCESSFUL_SYNC_KEY);
         accountConnectionToken = configManager.getConfiguration(CONFIG_GROUP, ACCOUNT_CONNECTION_TOKEN_KEY);
         panel.setAccountConnected(isAccountMode());
@@ -1427,6 +1427,7 @@ public class RuneFolioPlugin extends Plugin
         {
             List<RuneFolioSyncEvent> events = syncQueue.snapshot(
                 SYNC_BATCH_SIZE,
+                RuneFolioSyncQueue.binding(savedToken),
                 event -> characterFilter == null || (filterIdentity != null && filterIdentity.equals(event.getIdentityKey()))
                     || (event.getIdentityKey() == null && namesMatch(characterFilter, event.getCharacterName()))
             );
@@ -1852,6 +1853,7 @@ public class RuneFolioPlugin extends Plugin
             if (result != null) {
                 result.historyEnabled = config.syncPvpHistory() && canCapturePvp();
                 result.characterName = currentPlayerName(); result.identityKey = activeIdentityKey;
+                result.binding = activeSyncBinding();
             }
             if (result != null && config.uploadScreenshots() && config.screenshotPvpKills())
             {
@@ -1874,7 +1876,7 @@ public class RuneFolioPlugin extends Plugin
     {
         if (config.syncPvpHistory() && result.historyEnabled && result.characterName != null && syncQueue != null)
         {
-            if (!syncQueue.enqueue(RuneFolioSyncEvent.pvpResult(result.characterName, result).withIdentityKey(result.identityKey)))
+            if (!syncQueue.enqueue(RuneFolioSyncEvent.pvpResult(result.characterName, result).withIdentityKey(result.identityKey), result.binding))
                 log.warn("RuneFolio PvP result could not fit in the local sync queue");
         }
     }
@@ -2630,7 +2632,37 @@ public class RuneFolioPlugin extends Plugin
         RuneFolioSyncQueue queue = syncQueue;
         if (queue == null) return false;
         if (namesMatch(event.getCharacterName(), lastKnownPlayerName)) event.withIdentityKey(activeIdentityKey);
-        return queue.enqueue(event);
+        return queue.enqueue(event, activeSyncBinding());
+    }
+
+    /** Fingerprint of the connection authorising captures right now; null when nothing is connected. */
+    private String activeSyncBinding()
+    {
+        String token = isAccountMode() ? accountConnectionToken : connectionToken;
+        return token == null || token.isBlank() ? null : RuneFolioSyncQueue.binding(token);
+    }
+
+    /** Every connection this client still holds, so the queue can tell deliverable events from stranded ones. */
+    private Set<String> deliverableSyncBindings()
+    {
+        Set<String> bindings = new HashSet<>();
+        addBinding(bindings, accountConnectionToken);
+        addBinding(bindings, connectionToken);
+        addBinding(bindings, configManager.getConfiguration(CONFIG_GROUP, ACCOUNT_CONNECTION_TOKEN_KEY));
+        addBinding(bindings, configManager.getConfiguration(CONFIG_GROUP, LEGACY_CONNECTION_TOKEN_KEY));
+        for (String prefix : List.of(CHARACTER_CONNECTION_TOKEN_PREFIX, "identityToken."))
+        {
+            for (String key : configManager.getConfigurationKeys(CONFIG_GROUP + "." + prefix))
+            {
+                addBinding(bindings, configManager.getConfiguration(CONFIG_GROUP, key.substring(CONFIG_GROUP.length() + 1)));
+            }
+        }
+        return bindings;
+    }
+
+    private static void addBinding(Set<String> bindings, String token)
+    {
+        if (token != null && !token.isBlank()) bindings.add(RuneFolioSyncQueue.binding(token));
     }
 
     private void forgetTemporaryToken(String token, String configKey, boolean legacyToken, String identityKey)

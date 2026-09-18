@@ -1,6 +1,10 @@
 package app.runefolio.sync;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -10,6 +14,7 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JTextArea;
@@ -189,6 +194,72 @@ public class RuneFolioPluginLifecycleTest
         harness.onEdt(harness.plugin::shutDown);
     }
 
+    @Test
+    public void flushSendsOnlyEventsRecordedUnderTheActiveConnection() throws Exception
+    {
+        Harness harness = new Harness(true);
+        List<String> sentEventIds = new ArrayList<>();
+        harness.set("okHttpClient", new OkHttpClient.Builder()
+            .addInterceptor(chain ->
+            {
+                okio.Buffer body = new okio.Buffer();
+                chain.request().body().writeTo(body);
+                JsonObject request = new JsonParser().parse(body.readUtf8()).getAsJsonObject();
+                JsonArray accepted = new JsonArray();
+                for (JsonElement event : request.getAsJsonArray("events"))
+                {
+                    String id = event.getAsJsonObject().get("id").getAsString();
+                    sentEventIds.add(id);
+                    accepted.add(id);
+                }
+                JsonObject response = new JsonObject();
+                response.add("acceptedEventIds", accepted);
+                return new Response.Builder()
+                    .request(chain.request()).protocol(Protocol.HTTP_1_1).code(200).message("OK")
+                    .body(ResponseBody.create(MediaType.parse("application/json"), response.toString()))
+                    .build();
+            })
+            .build());
+
+        harness.onEdt(harness.plugin::startUp);
+        RuneFolioSyncQueue queue = (RuneFolioSyncQueue) harness.get("syncQueue");
+        RuneFolioSyncEvent owners = RuneFolioSyncEvent.collectionLogUnlock("Owner", "Jar of souls");
+        RuneFolioSyncEvent friends = RuneFolioSyncEvent.collectionLogUnlock("Friend", "Abyssal whip");
+        assertTrue(queue.enqueue(owners, RuneFolioSyncQueue.binding("saved-token")));
+        assertTrue(queue.enqueue(friends, RuneFolioSyncQueue.binding("a-friends-temporary-code-token")));
+        assertEquals(2, queue.size());
+
+        harness.invoke("flushQueue");
+
+        assertEquals(List.of(owners.getId()), sentEventIds);
+        assertEquals(1, queue.size());
+        assertTrue(queue.snapshot(10, RuneFolioSyncQueue.binding("saved-token"), event -> true).isEmpty());
+        assertEquals(friends.getId(), queue.snapshot(10, RuneFolioSyncQueue.binding("a-friends-temporary-code-token"), event -> true).get(0).getId());
+
+        harness.onEdt(harness.plugin::shutDown);
+    }
+
+    @Test
+    public void deliverableBindingsCoverEveryConnectionStillHeld() throws Exception
+    {
+        Harness harness = new Harness(true);
+        harness.configManager.setConfiguration("runefolio", "connectionToken.RXhhbXBsZQ", "character-token");
+        harness.configManager.setConfiguration("runefolio", "identityToken." + "a".repeat(64), "identity-token");
+        harness.configManager.setConfiguration("runefolio", "connectionToken", "legacy-token");
+        harness.onEdt(harness.plugin::startUp);
+
+        @SuppressWarnings("unchecked")
+        Set<String> bindings = (Set<String>) harness.invokeReturning("deliverableSyncBindings");
+        assertEquals(Set.of(
+            RuneFolioSyncQueue.binding("saved-token"),
+            RuneFolioSyncQueue.binding("character-token"),
+            RuneFolioSyncQueue.binding("identity-token"),
+            RuneFolioSyncQueue.binding("legacy-token")), bindings);
+        assertFalse(bindings.contains("saved-token"));
+
+        harness.onEdt(harness.plugin::shutDown);
+    }
+
     static final class LifecyclePlugin extends RuneFolioPlugin
     {
         int navigationAdded;
@@ -332,9 +403,14 @@ public class RuneFolioPluginLifecycleTest
 
         void invoke(String method) throws Exception
         {
+            invokeReturning(method);
+        }
+
+        Object invokeReturning(String method) throws Exception
+        {
             Method target = RuneFolioPlugin.class.getDeclaredMethod(method);
             target.setAccessible(true);
-            target.invoke(plugin);
+            return target.invoke(plugin);
         }
 
         /** The connection executor is single-threaded, so a trailing no-op completes after everything queued before it. */
