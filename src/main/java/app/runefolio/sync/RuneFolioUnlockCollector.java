@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +18,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.Quest;
@@ -25,6 +25,8 @@ import net.runelite.api.QuestState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
@@ -66,7 +68,7 @@ final class RuneFolioUnlockCollector
                     itemUnlocks.computeIfAbsent(item.getAsInt(), ignored -> new ArrayList<>()).add(entry.get("id").getAsString());
             }
         }
-        catch (java.io.IOException exception) { throw new IllegalStateException("Unlock catalog could not be read", exception); }
+        catch (IOException exception) { throw new IllegalStateException("Unlock catalog could not be read", exception); }
     }
 
     void startUp(Predicate<JsonObject> publish) { this.publish = publish; eventBus.register(this); }
@@ -88,12 +90,12 @@ final class RuneFolioUnlockCollector
         if (!supported()) return;
         bindCharacter();
         int id = event.getContainerId();
-        if (id == InventoryID.BANK.getId())
+        if (id == InventoryID.BANK)
         {
-            Widget root = client.getWidget(12, 0);
+            Widget root = client.getWidget(InterfaceID.BANKMAIN, 0);
             if (root == null || root.isHidden()) return;
         }
-        else if (id != InventoryID.INVENTORY.getId() && id != InventoryID.EQUIPMENT.getId()) return;
+        else if (id != InventoryID.INV && id != InventoryID.WORN) return;
         observeItems(event.getItemContainer());
         // Persist brief item sightings immediately, before an item can be consumed or logout occurs.
         if (itemChanged && publish != null)
@@ -136,8 +138,8 @@ final class RuneFolioUnlockCollector
 
     private void capture(boolean force)
     {
-        observeItems(client.getItemContainer(InventoryID.INVENTORY));
-        observeItems(client.getItemContainer(InventoryID.EQUIPMENT));
+        observeItems(client.getItemContainer(InventoryID.INV));
+        observeItems(client.getItemContainer(InventoryID.WORN));
         JsonArray observations = new JsonArray();
         Map<String, QuestState> questStates = new HashMap<>();
         for (JsonElement value : catalog)

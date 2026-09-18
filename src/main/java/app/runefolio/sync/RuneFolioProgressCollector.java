@@ -29,6 +29,7 @@
 package app.runefolio.sync;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
@@ -36,8 +37,8 @@ import java.util.Locale;
 import java.util.Set;
 import net.runelite.api.Client;
 import net.runelite.api.Quest;
-import net.runelite.api.VarPlayer;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.game.ItemManager;
@@ -47,11 +48,8 @@ final class RuneFolioProgressCollector
 {
     private static final int DIARY_COMPLETION_INFO_SCRIPT = 2200;
     private static final String[] DIARY_TIER_NAMES = {"easy", "medium", "hard", "elite"};
-    // RuneLite's generated VarbitID names omit the three legacy Karamja completion
-    // varbits, but the public API still exposes them in net.runelite.api.Varbits.
-    private static final int KARAMJA_DIARY_EASY_COMPLETE = 3578;
-    private static final int KARAMJA_DIARY_MEDIUM_COMPLETE = 3599;
-    private static final int KARAMJA_DIARY_HARD_COMPLETE = 3611;
+    // Tiers with this varbit are derived solely from the task-count script in collectDiaryTierTaskCounts.
+    private static final int DERIVED_FROM_TASK_COUNTS = -1;
 
     private static final Set<Quest> SUPPLEMENTAL_QUESTS = EnumSet.of(
         Quest.ALFRED_GRIMHANDS_BARCRAWL,
@@ -107,9 +105,9 @@ final class RuneFolioProgressCollector
         new DiaryTier("kandarin", "medium", VarbitID.KANDARIN_DIARY_MEDIUM_COMPLETE),
         new DiaryTier("kandarin", "hard", VarbitID.KANDARIN_DIARY_HARD_COMPLETE),
         new DiaryTier("kandarin", "elite", VarbitID.KANDARIN_DIARY_ELITE_COMPLETE),
-        new DiaryTier("karamja", "easy", KARAMJA_DIARY_EASY_COMPLETE),
-        new DiaryTier("karamja", "medium", KARAMJA_DIARY_MEDIUM_COMPLETE),
-        new DiaryTier("karamja", "hard", KARAMJA_DIARY_HARD_COMPLETE),
+        new DiaryTier("karamja", "easy", DERIVED_FROM_TASK_COUNTS),
+        new DiaryTier("karamja", "medium", DERIVED_FROM_TASK_COUNTS),
+        new DiaryTier("karamja", "hard", DERIVED_FROM_TASK_COUNTS),
         new DiaryTier("karamja", "elite", VarbitID.KARAMJA_DIARY_ELITE_COMPLETE),
         new DiaryTier("kourend_kebos", "easy", VarbitID.KOUREND_DIARY_EASY_COMPLETE),
         new DiaryTier("kourend_kebos", "medium", VarbitID.KOUREND_DIARY_MEDIUM_COMPLETE),
@@ -194,7 +192,7 @@ final class RuneFolioProgressCollector
 
         JsonObject state = new JsonObject();
         state.add("quests", quests);
-        state.addProperty("questPoints", client.getVarpValue(VarPlayer.QUEST_POINTS));
+        state.addProperty("questPoints", client.getVarpValue(VarPlayerID.QP));
         state.addProperty("mainQuestCompleted", mainQuestCompleted);
         state.addProperty("mainQuestTotal", mainQuestTotal);
         state.addProperty("supplementalQuestEntries", supplementalQuestCount());
@@ -206,7 +204,7 @@ final class RuneFolioProgressCollector
         Set<String> completedTierKeys = new LinkedHashSet<>();
         for (DiaryTier diaryTier : DIARY_TIERS)
         {
-            if ("karamja".equals(diaryTier.area) && !"elite".equals(diaryTier.tier))
+            if (diaryTier.varbit == DERIVED_FROM_TASK_COUNTS)
             {
                 continue;
             }
@@ -248,7 +246,7 @@ final class RuneFolioProgressCollector
             {
                 continue;
             }
-            for (com.google.gson.JsonElement element : area.getAsJsonArray("tiers"))
+            for (JsonElement element : area.getAsJsonArray("tiers"))
             {
                 JsonObject tier = element.getAsJsonObject();
                 if (tier.get("totalCount").getAsInt() > 0

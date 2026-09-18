@@ -1,19 +1,24 @@
 package app.runefolio.sync;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
@@ -57,9 +62,8 @@ final class RuneFolioBankCollector
     {
         if (!config.syncBankWealth() || !supported()) return;
         int id = event.getContainerId();
-        if (id == InventoryID.BANK.getId()) bankObserved = true;
-        if (id == InventoryID.BANK.getId() || id == InventoryID.INVENTORY.getId()
-            || id == InventoryID.EQUIPMENT.getId()) changedTick = client.getTickCount();
+        if (id == InventoryID.BANK) bankObserved = true;
+        if (id == InventoryID.BANK || id == InventoryID.INV || id == InventoryID.WORN) changedTick = client.getTickCount();
     }
 
     @Subscribe
@@ -69,11 +73,11 @@ final class RuneFolioBankCollector
         if (!supported() || !bankObserved || changedTick < 0
             || client.getTickCount() - changedTick < 2 || client.getTickCount() - lastSentTick < 100) return;
         // Only capture while the ordinary bank is visible, never an unseen cached container.
-        Widget bankRoot = client.getWidget(12, 0);
+        Widget bankRoot = client.getWidget(InterfaceID.BANKMAIN, 0);
         if (bankRoot == null || bankRoot.isHidden()) return;
         ItemContainer bank = client.getItemContainer(InventoryID.BANK);
-        ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
-        ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
+        ItemContainer inventory = client.getItemContainer(InventoryID.INV);
+        ItemContainer equipment = client.getItemContainer(InventoryID.WORN);
         if (bank == null || inventory == null || equipment == null) return;
         if (bank.getItems().length > 1200 || inventory.getItems().length > 28 || equipment.getItems().length > 14) return;
         JsonObject state = new JsonObject();
@@ -83,7 +87,7 @@ final class RuneFolioBankCollector
         long ge = 0, ha = 0;
         for (String container : new String[] {"bank", "inventory", "equipment"})
         {
-            for (com.google.gson.JsonElement value : state.getAsJsonArray(container))
+            for (JsonElement value : state.getAsJsonArray(container))
             {
                 JsonObject item = value.getAsJsonObject();
                 ge = add(ge, item.get("geValue").getAsLong());
@@ -92,7 +96,7 @@ final class RuneFolioBankCollector
         }
         state.addProperty("totalGeValue", ge);
         state.addProperty("totalHaValue", ha);
-        String day = java.time.LocalDate.now(java.time.ZoneOffset.UTC).toString();
+        String day = LocalDate.now(ZoneOffset.UTC).toString();
         if (state.equals(lastSent) && day.equals(lastSentDay)) { changedTick = -1; return; }
         if (publish != null && publish.test(state))
         {
@@ -125,11 +129,10 @@ final class RuneFolioBankCollector
     }
 
     // Currency is counted at face value, not as an item to cast High Alchemy on.
-    // This is RuneFolio's implementation; it does not read the Bank plugin's title or state.
     static int alchemyUnitValue(int itemId, int itemAlchemyValue)
     {
-        if (itemId == net.runelite.api.gameval.ItemID.COINS) return 1;
-        if (itemId == net.runelite.api.gameval.ItemID.PLATINUM) return 1000;
+        if (itemId == ItemID.COINS) return 1;
+        if (itemId == ItemID.PLATINUM) return 1000;
         return Math.max(0, itemAlchemyValue);
     }
 
@@ -150,6 +153,8 @@ final class RuneFolioBankCollector
 
     @Subscribe public void onGameStateChanged(GameStateChanged event)
     {
+        // LOADING is a scene rebuild for the same character; keep the dedup state.
+        if (event.getGameState() == GameState.LOADING) return;
         if (event.getGameState() != GameState.LOGGED_IN) reset();
     }
     @Subscribe public void onRuneScapeProfileChanged(RuneScapeProfileChanged event) { reset(); }

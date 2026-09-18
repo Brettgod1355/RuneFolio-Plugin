@@ -6,6 +6,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.Player;
 import net.runelite.api.WorldType;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.client.eventbus.EventBus;
@@ -48,5 +49,48 @@ public class RuneFolioDiaryTaskTrackerTest
             worlds.clear();tracker.onGameTick(null);tracker.onGameTick(null);Assert.assertEquals(4,calls[0]);
         } finally { tracker.shutDown(); }
         tracker.onGameTick(null); tracker.onGameTick(null); Assert.assertEquals(4,calls[0]);
+    }
+
+    @Test public void sceneLoadsDoNotResyncButLoginScreenDoes()
+    {
+        GameState[] state = {GameState.LOGGED_IN};
+        int[] calls = {0};
+        Player player = (Player) Proxy.newProxyInstance(Player.class.getClassLoader(),new Class[]{Player.class},(p,m,a)->null);
+        Client client = (Client) Proxy.newProxyInstance(Client.class.getClassLoader(),new Class[]{Client.class},(p,m,a)->{
+            switch(m.getName()) {
+                case "getGameState": return state[0];
+                case "getWorldType": return EnumSet.noneOf(WorldType.class);
+                case "getLocalPlayer": return state[0] == GameState.LOGGED_IN ? player : null;
+                default: return null;
+            }
+        });
+        RuneFolioDiaryTaskTracker tracker = new RuneFolioDiaryTaskTracker(client,new EventBus());
+        tracker.startUp(()->{calls[0]++;return true;});
+        try {
+            tracker.onGameTick(null); tracker.onGameTick(null); Assert.assertEquals(1,calls[0]);
+            for (int i = 0; i < 3; i++) {
+                tracker.onGameStateChanged(stateChange(GameState.LOADING));
+                tracker.onGameStateChanged(stateChange(GameState.LOGGED_IN));
+                tracker.onGameTick(null); tracker.onGameTick(null); tracker.onGameTick(null);
+                Assert.assertEquals(1,calls[0]);
+            }
+            // A tick that lands while the scene is still loading must not re-arm a sync either.
+            tracker.onGameStateChanged(stateChange(GameState.LOADING));
+            state[0]=GameState.LOADING; tracker.onGameTick(null);
+            state[0]=GameState.LOGGED_IN; tracker.onGameStateChanged(stateChange(GameState.LOGGED_IN));
+            tracker.onGameTick(null); tracker.onGameTick(null); Assert.assertEquals(1,calls[0]);
+            tracker.onGameStateChanged(stateChange(GameState.LOGIN_SCREEN));
+            state[0]=GameState.LOGIN_SCREEN; tracker.onGameTick(null);
+            state[0]=GameState.LOGGED_IN; tracker.onGameStateChanged(stateChange(GameState.LOGGED_IN));
+            tracker.onGameTick(null); Assert.assertEquals(1,calls[0]);
+            tracker.onGameTick(null); Assert.assertEquals(2,calls[0]);
+        } finally { tracker.shutDown(); }
+    }
+
+    private static GameStateChanged stateChange(GameState state)
+    {
+        GameStateChanged event = new GameStateChanged();
+        event.setGameState(state);
+        return event;
     }
 }

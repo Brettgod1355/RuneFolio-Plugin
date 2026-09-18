@@ -1,6 +1,5 @@
 package app.runefolio.sync;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -150,25 +149,38 @@ final class RuneFolioSyncQueue
             return;
         }
 
+        // The saved queue holds character data, so a corrupt value is never echoed into the log.
         try
         {
-            JsonArray array = new JsonParser().parse(saved).getAsJsonArray();
-            for (JsonElement element : array)
+            JsonElement parsed = new JsonParser().parse(saved);
+            if (!parsed.isJsonArray())
             {
-                try
+                log.warn("Saved RuneFolio sync queue was not a JSON array; discarding it");
+            }
+            else
+            {
+                for (JsonElement element : parsed.getAsJsonArray())
                 {
-                    RuneFolioSyncEvent event = RuneFolioSyncEvent.fromJson(element.getAsJsonObject());
-                    events.put(event.getId(), new Entry(event));
-                }
-                catch (RuntimeException exception)
-                {
-                    log.warn("Skipping an unreadable queued RuneFolio event", exception);
+                    if (!element.isJsonObject())
+                    {
+                        log.warn("Skipping a queued RuneFolio event that is not a JSON object");
+                        continue;
+                    }
+                    try
+                    {
+                        RuneFolioSyncEvent event = RuneFolioSyncEvent.fromJson(element.getAsJsonObject());
+                        events.put(event.getId(), new Entry(event));
+                    }
+                    catch (RuntimeException exception)
+                    {
+                        log.warn("Skipping an unreadable queued RuneFolio event ({})", exception.getClass().getSimpleName());
+                    }
                 }
             }
         }
         catch (RuntimeException exception)
         {
-            log.warn("Unable to read the saved RuneFolio sync queue", exception);
+            log.warn("Unable to read the saved RuneFolio sync queue ({})", exception.getClass().getSimpleName());
         }
         persist(events);
     }

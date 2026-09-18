@@ -192,6 +192,26 @@ public class RuneFolioSyncQueueTest
     }
 
     @Test
+    public void corruptSavedQueueIsDiscardedAndRewrittenWithoutFailing()
+    {
+        MemoryStorage storage = new MemoryStorage();
+        storage.value = "{\"characterName\":\"Example\",\"secret\":\"not-an-array\"}";
+        Assert.assertEquals(0, new RuneFolioSyncQueue(storage).size());
+        Assert.assertEquals("[]", storage.value);
+
+        RuneFolioSyncEvent event = RuneFolioSyncEvent.collectionLogUnlock("Example", "Abyssal whip");
+        storage.value = "[\"string\",42,null," + event.toJson() + ",{\"type\":\"unknown\"}]";
+        RuneFolioSyncQueue queue = new RuneFolioSyncQueue(storage);
+        Assert.assertEquals(1, queue.size());
+        Assert.assertEquals(event.getId(), queue.snapshot(1, queued -> true).get(0).getId());
+        Assert.assertEquals("[" + event.toJson() + "]", storage.value);
+
+        storage.value = "not json at all";
+        Assert.assertEquals(0, new RuneFolioSyncQueue(storage).size());
+        Assert.assertEquals("[]", storage.value);
+    }
+
+    @Test
     public void consecutiveLootDropsNeverReplaceEachOther()
     {
         MemoryStorage storage = new MemoryStorage();

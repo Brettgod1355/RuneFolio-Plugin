@@ -5,12 +5,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -21,7 +24,11 @@ final class RuneFolioApiClient
 {
     private static final String API_BASE = "https://runefolio.app/api";
     private static final int PROTOCOL_VERSION = 1;
-    static final String CLIENT_VERSION = "0.3.51";
+    static final String CLIENT_VERSION = "0.3.52";
+    private static final int MAX_JSON_BYTES = 1024 * 1024;
+    private static final int READ_BUFFER_BYTES = 4096;
+    private static final MediaType JSON = MediaType.parse("application/json");
+    private static final MediaType JPEG = MediaType.parse("image/jpeg");
 
     private RuneFolioApiClient()
     {
@@ -65,8 +72,7 @@ final class RuneFolioApiClient
         String setupUrl = response.has("setupUrl") && !response.get("setupUrl").isJsonNull()
             ? response.get("setupUrl").getAsString()
             : null;
-        boolean pro = response.has("pro") && response.get("pro").getAsBoolean();
-        return new AccountHeartbeatResult(characterConnected, setupUrl, pro);
+        return new AccountHeartbeatResult(characterConnected, setupUrl);
     }
 
     static void disconnectAccount(OkHttpClient client, String connectionToken) throws IOException
@@ -85,8 +91,7 @@ final class RuneFolioApiClient
         JsonObject character = response.getAsJsonObject("character");
         return new ConnectionResult(
             response.get("connectionToken").getAsString(),
-            character.get("name").getAsString(),
-            response.has("pro") && response.get("pro").getAsBoolean()
+            character.get("name").getAsString()
         );
     }
 
@@ -97,8 +102,7 @@ final class RuneFolioApiClient
         addIdentity(body, identityKey, previousName);
         JsonObject response = post(client, "/plugin-links/heartbeat", body, connectionToken);
         JsonObject character = response.getAsJsonObject("character");
-        return new ConnectionResult(connectionToken, character.get("name").getAsString(),
-            response.has("pro") && response.get("pro").getAsBoolean());
+        return new ConnectionResult(connectionToken, character.get("name").getAsString());
     }
 
     private static void addIdentity(JsonObject body, String identityKey, String previousName)
@@ -169,34 +173,23 @@ final class RuneFolioApiClient
         byte[] jpeg
     ) throws IOException
     {
-        String boundary = "RuneFolio-" + UUID.randomUUID();
-        ByteArrayOutputStream body = new ByteArrayOutputStream(jpeg.length + 2048);
-        writeField(body, boundary, "eventId", eventId.toString());
-        writeField(body, boundary, "characterName", characterName);
-        if (identityKey != null) writeField(body, boundary, "identityKey", identityKey);
-        writeField(body, boundary, "category", category);
-        writeField(body, boundary, "caption", caption);
-        writeField(body, boundary, "occurredAt", occurredAt);
-        writeAscii(body, "--" + boundary + "\r\n");
-        writeAscii(body, "Content-Disposition: form-data; name=\"file\"; filename=\"runefolio.jpg\"\r\n");
-        writeAscii(body, "Content-Type: image/jpeg\r\n\r\n");
-        body.write(jpeg);
-        writeAscii(body, "\r\n--" + boundary + "--\r\n");
-
-        RequestBody requestBody = RequestBody.create(
-            MediaType.parse("multipart/form-data; boundary=" + boundary), body.toByteArray());
+        MultipartBody.Builder form = new MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("eventId", eventId.toString())
+            .addFormDataPart("characterName", characterName);
+        if (identityKey != null) form.addFormDataPart("identityKey", identityKey);
+        RequestBody requestBody = form
+            .addFormDataPart("category", category)
+            .addFormDataPart("caption", caption)
+            .addFormDataPart("occurredAt", occurredAt)
+            .addFormDataPart("file", "runefolio.jpg", RequestBody.create(JPEG, jpeg))
+            .build();
         Request request = new Request.Builder()
             .url(API_BASE + "/plugin-screenshots")
             .post(requestBody)
             .header("Accept", "application/json")
             .header("Authorization", "Bearer " + connectionToken)
             .build();
-        OkHttpClient scoped = client.newBuilder()
-            .followRedirects(false)
-            .followSslRedirects(false)
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(20, TimeUnit.SECONDS)
-            .build();
+        OkHttpClient scoped = scopedClient(client, 10, 20);
         try (Response response = scoped.newCall(request).execute())
         {
             if (!response.isSuccessful())
@@ -206,15 +199,6 @@ final class RuneFolioApiClient
             }
             verifyScreenshotAcknowledgement(readJsonResponse(response.body()), eventId);
         }
-    }
-
-    private static void writeField(ByteArrayOutputStream output, String boundary, String name, String value)
-        throws IOException
-    {
-        writeAscii(output, "--" + boundary + "\r\n");
-        writeAscii(output, "Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n");
-        output.write(value.getBytes(StandardCharsets.UTF_8));
-        writeAscii(output, "\r\n");
     }
 
     static void verifyScreenshotAcknowledgement(JsonObject json, UUID eventId) throws IOException
@@ -244,11 +228,6 @@ final class RuneFolioApiClient
         }
     }
 
-    private static void writeAscii(ByteArrayOutputStream output, String value) throws IOException
-    {
-        output.write(value.getBytes(StandardCharsets.US_ASCII));
-    }
-
     private static void addStrings(JsonObject response, String key, List<String> destination)
     {
         if (!response.has(key) || !response.get(key).isJsonArray())
@@ -266,8 +245,7 @@ final class RuneFolioApiClient
 
     private static JsonObject post(OkHttpClient client, String path, JsonObject body, String connectionToken) throws IOException
     {
-        RequestBody requestBody = RequestBody.create(
-            MediaType.parse("application/json"), body.toString().getBytes(StandardCharsets.UTF_8));
+        RequestBody requestBody = RequestBody.create(JSON, body.toString().getBytes(StandardCharsets.UTF_8));
         Request.Builder builder = new Request.Builder()
             .url(API_BASE + path)
             .post(requestBody)
@@ -276,10 +254,7 @@ final class RuneFolioApiClient
         {
             builder.header("Authorization", "Bearer " + connectionToken);
         }
-        OkHttpClient scoped = client.newBuilder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .build();
+        OkHttpClient scoped = scopedClient(client, 10, 10);
 
         try (Response response = scoped.newCall(builder.build()).execute())
         {
@@ -297,9 +272,43 @@ final class RuneFolioApiClient
         }
     }
 
+    /** Every RuneFolio call talks to one fixed origin, so a redirect is never a valid answer. */
+    static OkHttpClient scopedClient(OkHttpClient client, int connectSeconds, int readSeconds)
+    {
+        return client.newBuilder()
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .connectTimeout(connectSeconds, TimeUnit.SECONDS)
+            .readTimeout(readSeconds, TimeUnit.SECONDS)
+            .build();
+    }
+
+    /** Null when the body is larger than {@code maxBytes}; the length header alone is not trusted. */
+    static byte[] readBounded(ResponseBody body, int maxBytes) throws IOException
+    {
+        if (body == null) return new byte[0];
+        if (body.contentLength() > maxBytes) return null;
+        try (InputStream input = body.byteStream(); ByteArrayOutputStream bytes = new ByteArrayOutputStream())
+        {
+            byte[] buffer = new byte[READ_BUFFER_BYTES];
+            int read;
+            while ((read = input.read(buffer)) != -1)
+            {
+                if (bytes.size() + read > maxBytes) return null;
+                bytes.write(buffer, 0, read);
+            }
+            return bytes.toByteArray();
+        }
+    }
+
     private static JsonObject readJsonResponse(ResponseBody body) throws IOException
     {
-        String response = body == null ? "" : body.string();
+        byte[] bytes = readBounded(body, MAX_JSON_BYTES);
+        if (bytes == null) throw new IOException("RuneFolio returned an oversized response.");
+        Charset charset = body != null && body.contentType() != null
+            ? body.contentType().charset(StandardCharsets.UTF_8)
+            : StandardCharsets.UTF_8;
+        String response = new String(bytes, charset);
         try
         {
             return response.isBlank() ? new JsonObject() : new JsonParser().parse(response).getAsJsonObject();
@@ -343,13 +352,11 @@ final class RuneFolioApiClient
     {
         private final String connectionToken;
         private final String characterName;
-        private final boolean pro;
 
-        ConnectionResult(String connectionToken, String characterName, boolean pro)
+        ConnectionResult(String connectionToken, String characterName)
         {
             this.connectionToken = connectionToken;
             this.characterName = characterName;
-            this.pro = pro;
         }
 
         String getConnectionToken()
@@ -361,25 +368,17 @@ final class RuneFolioApiClient
         {
             return characterName;
         }
-
-        boolean isPro()
-        {
-            return pro;
-        }
-
     }
 
     static final class AccountHeartbeatResult
     {
         private final boolean characterConnected;
         private final String setupUrl;
-        private final boolean pro;
 
-        AccountHeartbeatResult(boolean characterConnected, String setupUrl, boolean pro)
+        AccountHeartbeatResult(boolean characterConnected, String setupUrl)
         {
             this.characterConnected = characterConnected;
             this.setupUrl = setupUrl;
-            this.pro = pro;
         }
 
         boolean isCharacterConnected()
@@ -390,11 +389,6 @@ final class RuneFolioApiClient
         String getSetupUrl()
         {
             return setupUrl;
-        }
-
-        boolean isPro()
-        {
-            return pro;
         }
     }
 

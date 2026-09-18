@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 import net.runelite.api.*;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.EventBus;
 import org.junit.Test;
@@ -58,7 +59,7 @@ public class RuneFolioUnlockCollectorTest
         RuneFolioUnlockCollector collector=new RuneFolioUnlockCollector(client,config,new EventBus(),new Gson());
         List<JsonObject> sent=new ArrayList<>();
         collector.startUp(payload->{if(!accept[0]) return false; sent.add(payload.deepCopy());return true;});
-        ItemContainerChanged bank=new ItemContainerChanged(InventoryID.BANK.getId(),container);
+        ItemContainerChanged bank=new ItemContainerChanged(InventoryID.BANK,container);
         try {
             collector.onItemContainerChanged(bank); assertTrue(sent.isEmpty()); enabled[0]=true;
             collector.onItemContainerChanged(bank); assertTrue(sent.isEmpty()); hidden[0]=false;
@@ -143,7 +144,7 @@ public class RuneFolioUnlockCollectorTest
         });
         RuneFolioUnlockCollector collector=new RuneFolioUnlockCollector(client,new RuneFolioConfig(){@Override public boolean syncAccountUnlocks(){return true;}},new EventBus(),new Gson());
         List<JsonObject> sent=new ArrayList<>();collector.startUp(payload->{sent.add(payload);return true;});
-        try {collector.onItemContainerChanged(new ItemContainerChanged(InventoryID.BANK.getId(),container));assertEquals(1,sent.size());assertTrue(sent.get(0).toString().contains("item.dragon_defender"));}
+        try {collector.onItemContainerChanged(new ItemContainerChanged(InventoryID.BANK,container));assertEquals(1,sent.size());assertTrue(sent.get(0).toString().contains("item.dragon_defender"));}
         finally {collector.shutDown();}
     }
 }
