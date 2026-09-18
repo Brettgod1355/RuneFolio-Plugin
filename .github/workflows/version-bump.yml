@@ -1,0 +1,21 @@
+name: Version bump
+
+# Its own workflow so a title edit re-runs only this check, not the full build:
+# the default pull_request types never fire on "edited", and the Discord
+# changelog title is read from the PR title at merge time.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/check-version-bump.sh "$GITHUB_BASE_REF"
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
