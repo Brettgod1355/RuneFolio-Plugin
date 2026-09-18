@@ -706,42 +706,40 @@ public class RuneFolioPlugin extends Plugin
 
         submit(connectionExecutor, () ->
         {
+            Exception failure = null;
             try
             {
                 RuneFolioApiClient.disconnectAccount(okHttpClient, savedToken);
-                if (!running)
-                {
-                    return;
-                }
-                clearAccountConnection();
-                SwingUtilities.invokeLater(() ->
-                {
-                    panel.setAccountConnecting(false);
-                    panel.setAccountConnected(false);
-                    panel.setStatus("RuneFolio account disconnected. Temporary character codes are still available.");
-                });
-                runOnClientThread(() ->
-                {
-                    String playerName = currentPlayerName();
-                    if (playerName != null)
-                    {
-                        connectionLookupPending = true;
-                    }
-                });
             }
             catch (Exception exception)
             {
-                if (!running)
-                {
-                    return;
-                }
-                log.warn("RuneFolio account disconnect failed", exception);
-                SwingUtilities.invokeLater(() ->
-                {
-                    panel.setAccountConnecting(false);
-                    panel.setStatus("Disconnect failed: " + safeMessage(exception));
-                });
+                failure = exception;
+                log.warn("RuneFolio could not be told about the disconnect; clearing the local connection anyway", exception);
             }
+            // Disconnect means "stop syncing from this computer" even when the server is unreachable.
+            clearAccountConnection();
+            if (!running)
+            {
+                return;
+            }
+            String status = failure == null
+                ? "RuneFolio account disconnected. Temporary character codes are still available."
+                : "Disconnected on this computer, but RuneFolio could not be reached (" + safeMessage(failure)
+                    + "). Also revoke this device from the RuneFolio website.";
+            SwingUtilities.invokeLater(() ->
+            {
+                panel.setAccountConnecting(false);
+                panel.setAccountConnected(false);
+                panel.setStatus(status);
+            });
+            runOnClientThread(() ->
+            {
+                String playerName = currentPlayerName();
+                if (playerName != null)
+                {
+                    connectionLookupPending = true;
+                }
+            });
         });
     }
 
