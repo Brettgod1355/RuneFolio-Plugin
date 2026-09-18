@@ -5,11 +5,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -19,6 +22,11 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.Filepath;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -134,6 +142,53 @@ public class RuneFolioPluginLifecycleTest
         assertEquals(clientReadsBefore, harness.clientReads);
     }
 
+    @Test
+    public void disconnectClearsTheLocalConnectionEvenWhenRuneFolioIsUnreachable() throws Exception
+    {
+        Harness harness = new Harness(true);
+        harness.set("okHttpClient", new OkHttpClient.Builder()
+            .addInterceptor(chain -> { throw new IOException("Synthetic outage"); })
+            .build());
+
+        harness.onEdt(harness.plugin::startUp);
+        assertEquals("saved-token", harness.get("accountConnectionToken"));
+
+        harness.onEdt(() -> harness.invoke("disconnectRuneFolioAccount"));
+        harness.awaitConnectionExecutor();
+        harness.onEdt(() -> { });
+
+        assertNull(harness.get("accountConnectionToken"));
+        assertNull(harness.configManager.getConfiguration("runefolio", "accountConnectionToken"));
+        String status = harness.panelStatus();
+        assertTrue(status, status.startsWith("Disconnected on this computer, but RuneFolio could not be reached"));
+        assertTrue(status, status.contains("revoke this device"));
+
+        harness.onEdt(harness.plugin::shutDown);
+    }
+
+    @Test
+    public void disconnectReportsSuccessWhenRuneFolioAcknowledges() throws Exception
+    {
+        Harness harness = new Harness(true);
+        harness.set("okHttpClient", new OkHttpClient.Builder()
+            .addInterceptor(chain -> new Response.Builder()
+                .request(chain.request()).protocol(Protocol.HTTP_1_1).code(200).message("OK")
+                .body(ResponseBody.create(MediaType.parse("application/json"), "{}"))
+                .build())
+            .build());
+
+        harness.onEdt(harness.plugin::startUp);
+        harness.onEdt(() -> harness.invoke("disconnectRuneFolioAccount"));
+        harness.awaitConnectionExecutor();
+        harness.onEdt(() -> { });
+
+        assertNull(harness.get("accountConnectionToken"));
+        assertNull(harness.configManager.getConfiguration("runefolio", "accountConnectionToken"));
+        assertEquals("RuneFolio account disconnected. Temporary character codes are still available.", harness.panelStatus());
+
+        harness.onEdt(harness.plugin::shutDown);
+    }
+
     static final class LifecyclePlugin extends RuneFolioPlugin
     {
         int navigationAdded;
@@ -197,6 +252,7 @@ public class RuneFolioPluginLifecycleTest
     {
         final LifecyclePlugin plugin;
         final QueuedClientThread clientThread = new QueuedClientThread();
+        final ConfigManager configManager;
         /** Game-state and local-player reads: the ones the plugin's own deferred work performs. */
         int clientReads;
 
@@ -220,7 +276,7 @@ public class RuneFolioPluginLifecycleTest
                 });
             EventBus eventBus = new EventBus();
             RuneFolioConfig config = new RuneFolioConfig() { };
-            ConfigManager configManager = configManager(temporary.newFile("runelite.properties"));
+            configManager = configManager(temporary.newFile("runelite.properties"));
             if (accountConnected)
             {
                 configManager.setConfiguration("runefolio", "accountConnectionToken", "saved-token");
@@ -272,6 +328,26 @@ public class RuneFolioPluginLifecycleTest
             Field field = RuneFolioPlugin.class.getDeclaredField(name);
             field.setAccessible(true);
             return field.get(plugin);
+        }
+
+        void invoke(String method) throws Exception
+        {
+            Method target = RuneFolioPlugin.class.getDeclaredMethod(method);
+            target.setAccessible(true);
+            target.invoke(plugin);
+        }
+
+        /** The connection executor is single-threaded, so a trailing no-op completes after everything queued before it. */
+        void awaitConnectionExecutor() throws Exception
+        {
+            ((ScheduledExecutorService) get("connectionExecutor")).submit(() -> { }).get(10, TimeUnit.SECONDS);
+        }
+
+        String panelStatus() throws Exception
+        {
+            Field field = RuneFolioPanel.class.getDeclaredField("statusValue");
+            field.setAccessible(true);
+            return ((JTextArea) field.get(get("panel"))).getText();
         }
 
         void set(String name, Object value) throws Exception
