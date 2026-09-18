@@ -29,7 +29,11 @@ public class RuneFolioDataSharingTest
             clear.doClick();
             assertEquals(1, clears.get());
         });
-        assertTrue(RuneFolioDataSharing.SCREENSHOTS.contains("256 MiB"));
+        String limits = RuneFolioScreenshotSpool.MAX_FILES + " pictures / " + (RuneFolioScreenshotSpool.MAX_BYTES >> 20) + " MiB";
+        assertEquals(limits, RuneFolioDataSharing.SPOOL_LIMITS);
+        assertTrue(RuneFolioDataSharing.SCREENSHOTS.contains(limits));
+        assertTrue(RuneFolioDataSharing.CONNECTION.contains(limits));
+        assertTrue(RuneFolioConfig.class.getMethod("uploadScreenshots").getAnnotation(ConfigItem.class).description().contains(limits));
         assertTrue(RuneFolioDataSharing.SCREENSHOTS.contains("unencrypted"));
     }
 
@@ -47,6 +51,12 @@ public class RuneFolioDataSharingTest
         assertFalse(config.syncBankWealth());
         assertFalse(config.uploadScreenshots());
         assertFalse(config.syncPvpHistory());
+        assertTrue(config.syncAccountUnlocks());
+        assertTrue(RuneFolioDataSharing.CONNECTION.contains("Bank/inventory/equipment snapshots, PvP history and screenshots are optional and off by default."));
+        assertTrue(RuneFolioDataSharing.CONNECTION.contains("Account-unlock observations (supported game flags plus sightings of selected checklist items) are on by default"));
+        assertFalse(RuneFolioDataSharing.CONNECTION.contains("Account-unlock observations, bank/inventory/equipment snapshots, PvP history and screenshots are optional and off by default"));
+        assertTrue(RuneFolioDataSharing.CONNECTION.contains("RuneLite profile cloud sync"));
+        assertTrue(RuneFolioDataSharing.BANK.contains("RuneLite profile cloud sync"));
         // The master uploadScreenshots switch is opt-in; once a user turns it on,
         // every capture sub-category (including these reward screens) is on by default.
         assertTrue(config.screenshotClueRewards());
