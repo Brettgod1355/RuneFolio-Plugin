@@ -379,4 +379,26 @@ public class RuneFolioScreenshotSpoolTest
         assertFalse(Files.exists(root.resolve("pacing.tmp")));
         assertFalse(Files.readString(root.resolve("pacing.json")).contains("stale"));
     }
+
+    @Test
+    public void concurrentSavesWaitForTheQueueInsteadOfDropping() throws Exception
+    {
+        Path root = temporary.newFolder().toPath();
+        RuneFolioScreenshotSpool spool = spool(root);
+        byte[] jpeg = jpeg();
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+        CountDownLatch start = new CountDownLatch(1);
+        List<Future<Boolean>> results = new ArrayList<>();
+        try
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                results.add(pool.submit(() -> { start.await(); return spool.save(entry(TOKEN, "Example"), jpeg); }));
+            }
+            start.countDown();
+            for (Future<Boolean> result : results) assertTrue(result.get(30, TimeUnit.SECONDS));
+        }
+        finally { pool.shutdownNow(); }
+        assertEquals(12, spool.stats().saved);
+    }
 }

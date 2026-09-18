@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -539,7 +540,7 @@ class RuneFolioPanel extends PluginPanel
             setToggle("screenshotLootKeys", config.screenshotLootKeys());
             if (thresholdSpinner != null)
             {
-                thresholdSpinner.setValue(config.screenshotValuableDropThreshold());
+                thresholdSpinner.setValue(Math.max(MIN_VALUABLE_DROP_THRESHOLD, config.screenshotValuableDropThreshold()));
             }
         }
         finally
@@ -687,23 +688,43 @@ class RuneFolioPanel extends PluginPanel
         codeField.setText("");
     }
 
-    boolean openBrowser(String url)
+    static boolean isOpenableLink(String url)
     {
-        try
+        if (url == null || url.isBlank())
         {
-            if (url == null || url.isBlank())
-            {
-                throw new IllegalArgumentException("empty url");
-            }
-            LinkBrowser.browse(url);
-            return true;
-        }
-        catch (IllegalArgumentException e)
-        {
-            log.warn("Refusing to open invalid link {}", url, e);
-            setStatus("RuneFolio returned an invalid link; open runefolio.app manually.");
             return false;
         }
+        try
+        {
+            String scheme = URI.create(url).getScheme();
+            return "http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme);
+        }
+        catch (IllegalArgumentException invalid)
+        {
+            return false;
+        }
+    }
+
+    boolean openBrowser(String url)
+    {
+        if (isOpenableLink(url))
+        {
+            try
+            {
+                LinkBrowser.browse(url);
+                return true;
+            }
+            catch (IllegalArgumentException e)
+            {
+                log.warn("Refusing to open invalid link {}", url, e);
+            }
+        }
+        else
+        {
+            log.warn("Refusing to open invalid link {}", url);
+        }
+        setStatus("RuneFolio returned an invalid link; open runefolio.app manually.");
+        return false;
     }
 
     private void setAccountExpanded(boolean expanded)

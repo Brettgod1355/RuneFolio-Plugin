@@ -580,9 +580,19 @@ public class RuneFolioPlugin extends Plugin
                 {
                     return;
                 }
+                String link = login.getVerificationUrl();
+                if (!RuneFolioPanel.isOpenableLink(link))
+                {
+                    SwingUtilities.invokeLater(() ->
+                    {
+                        panel.openBrowser(link);
+                        panel.setAccountConnecting(false);
+                    });
+                    return;
+                }
                 SwingUtilities.invokeLater(() ->
                 {
-                    if (panel.openBrowser(login.getVerificationUrl()))
+                    if (panel.openBrowser(link))
                     {
                         panel.setStatus("Approve the connection in your browser. RuneLite is waiting...");
                     }

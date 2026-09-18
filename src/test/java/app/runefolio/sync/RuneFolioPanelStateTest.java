@@ -210,4 +210,17 @@ public class RuneFolioPanelStateTest
         }
         return null;
     }
+
+    @Test
+    public void onlyAbsoluteHttpLinksAreOpenable()
+    {
+        assertTrue(RuneFolioPanel.isOpenableLink("https://runefolio.app/plugin-auth/verify?code=abc"));
+        assertTrue(RuneFolioPanel.isOpenableLink("http://localhost:3000/verify"));
+        assertFalse(RuneFolioPanel.isOpenableLink(null));
+        assertFalse(RuneFolioPanel.isOpenableLink(" "));
+        assertFalse(RuneFolioPanel.isOpenableLink("/verify?code=abc"));
+        assertFalse(RuneFolioPanel.isOpenableLink("javascript:alert(1)"));
+        assertFalse(RuneFolioPanel.isOpenableLink("file:///etc/passwd"));
+        assertFalse(RuneFolioPanel.isOpenableLink("https://runefolio.app/verify?code=1 2"));
+    }
 }

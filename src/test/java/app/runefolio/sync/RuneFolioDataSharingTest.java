@@ -53,7 +53,7 @@ public class RuneFolioDataSharingTest
         assertFalse(config.syncPvpHistory());
         assertTrue(config.syncAccountUnlocks());
         assertTrue(RuneFolioDataSharing.CONNECTION.contains("Bank/inventory/equipment snapshots, PvP history and screenshots are optional and off by default."));
-        assertTrue(RuneFolioDataSharing.CONNECTION.contains("Account-unlock observations (supported game flags plus sightings of selected checklist items) are on by default"));
+        assertTrue(RuneFolioDataSharing.CONNECTION.contains("Account-unlock observations are on by default"));
         assertFalse(RuneFolioDataSharing.CONNECTION.contains("Account-unlock observations, bank/inventory/equipment snapshots, PvP history and screenshots are optional and off by default"));
         assertTrue(RuneFolioDataSharing.CONNECTION.contains("RuneLite profile cloud sync"));
         assertTrue(RuneFolioDataSharing.BANK.contains("RuneLite profile cloud sync"));
