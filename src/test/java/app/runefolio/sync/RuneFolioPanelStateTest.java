@@ -137,6 +137,14 @@ public class RuneFolioPanelStateTest
                     assertEquals(item.keyName(), item.description(), box.getToolTipText());
                 }
                 assertEquals(booleanKeys, panel.toggleBoxes.keySet());
+                for (String key : booleanKeys)
+                {
+                    assertTrue(key, panel.mirrors(key));
+                }
+                assertTrue(panel.mirrors("screenshotValuableDropThreshold"));
+                assertFalse(panel.mirrors("accountConnectionToken"));
+                assertFalse(panel.mirrors("syncQueue.v2"));
+                assertFalse(panel.mirrors(null));
 
                 panel.syncSettings(config);
                 for (Method method : RuneFolioConfig.class.getMethods())
