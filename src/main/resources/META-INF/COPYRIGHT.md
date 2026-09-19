@@ -1,6 +1,6 @@
 # Copyright and reuse
 
-Copyright (c) 2026, RuneFolio contributors, for their respective original copyrightable contributions.
+Copyright (c) 2026, Brettgod1355 <github.com/Brettgod1355>. Contributors retain copyright in their respective original contributions.
 
 Project maintainer: [Brettgod1355](https://github.com/Brettgod1355).
 
