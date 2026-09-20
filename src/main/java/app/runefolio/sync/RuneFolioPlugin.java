@@ -2660,6 +2660,13 @@ public class RuneFolioPlugin extends Plugin
         {
             configManager.unsetConfiguration(CONFIG_GROUP, "identityToken." + identityKey);
         }
+        // Events recorded under a token that no longer exists can never be delivered, so they are
+        // dropped now rather than sitting in the pending count until the queue fills up.
+        RuneFolioSyncQueue queue = syncQueue;
+        if (queue != null)
+        {
+            queue.pruneUndeliverable();
+        }
     }
 
     private String previousIdentityName(String key, String fallback)
