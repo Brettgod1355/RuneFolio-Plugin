@@ -1,6 +1,8 @@
 package app.runefolio.sync;
 
 import com.google.gson.JsonArray;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import com.google.gson.JsonObject;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -19,17 +21,34 @@ public final class RuneFolioPerformanceBenchmark
 
     private static final class MemoryStorage implements RuneFolioSyncQueue.Storage
     {
-        private String value;
-        public String get() { return value; }
-        public void set(String value) { this.value = value; }
+        private final Map<String, String> entries = new LinkedHashMap<>();
+
+        @Override
+        public Map<String, String> load()
+        {
+            return new LinkedHashMap<>(entries);
+        }
+
+        @Override
+        public void put(String eventId, String json)
+        {
+            entries.put(eventId, json);
+        }
+
+        @Override
+        public void remove(String eventId)
+        {
+            entries.remove(eventId);
+        }
     }
 
-    private static JsonObject stored(RuneFolioSyncEvent event)
+    private static String stored(RuneFolioSyncEvent event, long sequence)
     {
         JsonObject entry = new JsonObject();
+        entry.addProperty("s", sequence);
         entry.addProperty("b", BINDING);
         entry.add("e", event.toJson());
-        return entry;
+        return entry.toString();
     }
 
     public static void main(String[] args) throws Exception
@@ -44,15 +63,17 @@ public final class RuneFolioPerformanceBenchmark
     {
         JsonObject loot = new JsonObject();
         loot.addProperty("synthetic", "x".repeat(3500));
-        JsonArray seed = new JsonArray();
+        Map<String, String> saved = new LinkedHashMap<>();
         for (int i = 0; i < count; i++)
-            seed.add(stored(RuneFolioSyncEvent.historyEvent("slayer.completion", "Example", loot)));
-        String saved = seed.toString();
+        {
+            RuneFolioSyncEvent event = RuneFolioSyncEvent.historyEvent("slayer.completion", "Example", loot);
+            saved.put(event.getId(), stored(event, i));
+        }
         long[] reload = new long[SAMPLES], snapshot = new long[SAMPLES], acknowledge = new long[SAMPLES], burst = new long[SAMPLES];
         for (int sample = -WARMUPS; sample < SAMPLES; sample++)
         {
             MemoryStorage storage = new MemoryStorage();
-            storage.value = saved;
+            storage.entries.putAll(saved);
             long start = System.nanoTime();
             RuneFolioSyncQueue queue = new RuneFolioSyncQueue(storage, () -> Set.of(BINDING));
             long loaded = System.nanoTime();

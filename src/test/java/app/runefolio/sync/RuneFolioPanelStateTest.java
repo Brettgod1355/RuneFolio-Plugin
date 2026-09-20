@@ -143,7 +143,7 @@ public class RuneFolioPanelStateTest
                 }
                 assertTrue(panel.mirrors("screenshotValuableDropThreshold"));
                 assertFalse(panel.mirrors("accountConnectionToken"));
-                assertFalse(panel.mirrors("syncQueue.v2"));
+                assertFalse(panel.mirrors("syncQueue.v3.00000000-0000-0000-0000-000000000000"));
                 assertFalse(panel.mirrors(null));
 
                 panel.syncSettings(config);
