@@ -2928,7 +2928,7 @@ public class RuneFolioPlugin extends Plugin
         {
             return;
         }
-        int pendingEvents = queue == null ? 0 : queue.size();
+        int pendingEvents = queue == null ? 0 : queue.sizeFor(activeSyncBinding());
         SwingUtilities.invokeLater(() ->
             currentPanel.setSyncState(lastSuccessfulSyncAtMillis, pendingEvents)
         );

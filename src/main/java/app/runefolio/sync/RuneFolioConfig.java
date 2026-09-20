@@ -90,6 +90,17 @@ public interface RuneFolioConfig extends Config
     }
 
     @ConfigItem(
+        keyName = "use12HourClock",
+        name = "12-hour clock",
+        description = "Show the last sync time as 1:30:45 PM instead of 13:30:45",
+        position = 8
+    )
+    default boolean use12HourClock()
+    {
+        return false;
+    }
+
+    @ConfigItem(
         keyName = "uploadScreenshots",
         warning = RuneFolioDataSharing.SCREENSHOTS,
         name = "Upload screenshots",

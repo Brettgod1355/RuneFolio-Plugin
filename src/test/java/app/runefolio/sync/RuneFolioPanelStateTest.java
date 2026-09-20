@@ -3,12 +3,15 @@ package app.runefolio.sync;
 import java.awt.Component;
 import java.awt.Container;
 import java.lang.reflect.Method;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
@@ -250,5 +253,60 @@ public class RuneFolioPanelStateTest
         assertFalse(RuneFolioPanel.isOpenableLink("javascript:alert(1)"));
         assertFalse(RuneFolioPanel.isOpenableLink("file:///etc/passwd"));
         assertFalse(RuneFolioPanel.isOpenableLink("https://runefolio.app/verify?code=1 2"));
+    }
+
+    @Test
+    public void lastSyncFollowsTheClockPreference() throws Exception
+    {
+        SwingUtilities.invokeAndWait(() ->
+        {
+            RuneFolioPanel panel = new RuneFolioPanel(() -> true);
+            panel.configure((key, value) -> { });
+            JLabel lastSync = findLabel(panel, "Never");
+            assertNotNull(lastSync);
+
+            // 13:30:45 local time, expressed so the assertion does not depend on the test machine's zone.
+            long at = ZonedDateTime.of(2026, 1, 2, 13, 30, 45, 0, ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+            panel.syncSettings(new RuneFolioConfig() { });
+            panel.setSyncState(at, 0);
+            assertEquals("24-hour by default", "13:30:45", lastSync.getText());
+
+            panel.syncSettings(new RuneFolioConfig()
+            {
+                @Override
+                public boolean use12HourClock()
+                {
+                    return true;
+                }
+            });
+            assertEquals("switching re-renders the time already shown", "1:30:45 PM", lastSync.getText());
+
+            panel.setSyncState(at, 0);
+            assertEquals("and applies to later updates", "1:30:45 PM", lastSync.getText());
+
+            panel.setSyncState(0, 0);
+            assertEquals("no sync yet is unaffected by the preference", "Never", lastSync.getText());
+        });
+    }
+
+    private static JLabel findLabel(Container root, String text)
+    {
+        for (Component child : root.getComponents())
+        {
+            if (child instanceof JLabel && text.equals(((JLabel) child).getText()))
+            {
+                return (JLabel) child;
+            }
+            if (child instanceof Container)
+            {
+                JLabel result = findLabel((Container) child, text);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 }

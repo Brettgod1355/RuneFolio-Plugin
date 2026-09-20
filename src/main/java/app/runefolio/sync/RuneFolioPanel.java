@@ -14,6 +14,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -58,8 +59,11 @@ class RuneFolioPanel extends PluginPanel
     // PANEL_WIDTH minus this panel's 12px left/right padding. A maximum-size cap, not a
     // guarantee: metric rows (see createMetricRow) still need short enough text to fit.
     private static final int CONTENT_WIDTH = PluginPanel.PANEL_WIDTH - 24;
-    private static final DateTimeFormatter SYNC_TIME_FORMAT =
-        DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
+    // Pinned to ENGLISH so the am/pm marker cannot render as a locale-specific form such as "p. m.".
+    private static final DateTimeFormatter SYNC_TIME_24_HOUR =
+        DateTimeFormatter.ofPattern("HH:mm:ss", Locale.ENGLISH).withZone(ZoneId.systemDefault());
+    private static final DateTimeFormatter SYNC_TIME_12_HOUR =
+        DateTimeFormatter.ofPattern("h:mm:ss a", Locale.ENGLISH).withZone(ZoneId.systemDefault());
     private static final ImageIcon DISCORD_ICON;
     private static final ImageIcon GITHUB_ICON;
 
@@ -121,6 +125,8 @@ class RuneFolioPanel extends PluginPanel
     private final JButton gearButton = new JButton("⚙");
     final Map<String, JCheckBox> toggleBoxes = new LinkedHashMap<>();
     private volatile Set<String> mirroredKeys = Set.of();
+    private long lastSyncAtMillis;
+    private boolean use12HourClock;
     private JSpinner thresholdSpinner;
     private boolean settingsOpen;
     private boolean syncingSettings;
@@ -255,7 +261,10 @@ class RuneFolioPanel extends PluginPanel
         syncActivity.setAlignmentX(LEFT_ALIGNMENT);
         syncActivity.setMaximumSize(new Dimension(CONTENT_WIDTH, 110));
         syncActivity.add(createMetricRow("Last sync", "Last successful sync", lastSyncValue));
-        syncActivity.add(createMetricRow("Pending", "Pending events waiting to sync", pendingEventsValue));
+        syncActivity.add(createMetricRow("Pending",
+            "Events waiting to upload for the character or account you are connected as. "
+            + "Other characters using this RuneLite settings folder keep their own.",
+            pendingEventsValue));
         syncActivity.add(createMetricRow("Screenshots", "Local screenshots saved, waiting to upload", screenshotQueueValue));
         syncActivity.setBorder(BorderFactory.createEmptyBorder(5, 0, 8, 0));
         content.add(syncActivity);
@@ -390,6 +399,8 @@ class RuneFolioPanel extends PluginPanel
             "Automatically send loot recorded by RuneLite's enabled Loot Tracker to your RuneFolio history. Loot from a defeated player is attributed to their name only when Sync PvP history is enabled", RuneFolioDataSharing.LOOT);
         addToggle(settings, setting, "hideSidePanel", "Hide RuneFolio side panel",
             "Hide the RuneFolio button from the RuneLite side panel without disabling background syncing", null);
+        addToggle(settings, setting, "use12HourClock", "12-hour clock",
+            "Show the last sync time as 1:30:45 PM instead of 13:30:45", null);
         addToggle(settings, setting, "syncBankWealth", "Sync bank and wealth",
             "Opt-in: send bank, inventory and equipment items and estimated values while your bank is open. Pending snapshots are saved locally for retries.", RuneFolioDataSharing.BANK);
         addToggle(settings, setting, "syncCompletionHistory", "Sync completion history",
@@ -522,6 +533,10 @@ class RuneFolioPanel extends PluginPanel
 
     void syncSettings(RuneFolioConfig config)
     {
+        // Applied before the settings-page check, so the clock preference still takes effect
+        // when the page has not been built.
+        use12HourClock = config.use12HourClock();
+        renderLastSync();
         if (toggleBoxes.isEmpty())
         {
             return;
@@ -533,6 +548,7 @@ class RuneFolioPanel extends PluginPanel
             setToggle("showCollectionLogSyncButton", config.showCollectionLogSyncButton());
             setToggle("syncLootDrops", config.syncLootDrops());
             setToggle("hideSidePanel", config.hideSidePanel());
+            setToggle("use12HourClock", config.use12HourClock());
             setToggle("syncBankWealth", config.syncBankWealth());
             setToggle("syncCompletionHistory", config.syncCompletionHistory());
             setToggle("syncPvpHistory", config.syncPvpHistory());
@@ -617,12 +633,18 @@ class RuneFolioPanel extends PluginPanel
 
     void setSyncState(long lastSuccessfulSyncAtMillis, int pendingEvents)
     {
-        lastSyncValue.setText(lastSuccessfulSyncAtMillis > 0
-            ? SYNC_TIME_FORMAT.format(Instant.ofEpochMilli(lastSuccessfulSyncAtMillis))
-            : "Never");
+        lastSyncAtMillis = lastSuccessfulSyncAtMillis;
+        renderLastSync();
         pendingEventsValue.setText(Integer.toString(Math.max(0, pendingEvents)));
         revalidate();
         repaint();
+    }
+
+    private void renderLastSync()
+    {
+        lastSyncValue.setText(lastSyncAtMillis > 0
+            ? (use12HourClock ? SYNC_TIME_12_HOUR : SYNC_TIME_24_HOUR).format(Instant.ofEpochMilli(lastSyncAtMillis))
+            : "Never");
     }
 
     void showCharacterSetup()
