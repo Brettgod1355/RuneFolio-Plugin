@@ -5,9 +5,9 @@ source_dir="$(realpath "${1:?Pass the plugin checkout path}")"
 source_commit="$(git -C "$source_dir" rev-parse HEAD)"
 repository_url="https://github.com/Brettgod1355/RuneFolio-Plugin.git"
 plugin_id="runefolio-sync"
-# Local stand-in for the warning= line Hub maintainers add for plugins that talk to
-# third-party servers; keep it identical to the merged plugins/runefolio-sync descriptor once one exists.
-hub_warning="This plugin submits your IP address, RSN, and account progression (skills, quests, diaries, combat achievements, collection log, loot and, if enabled, bank, PvP and screenshot data) to a 3rd-party server (runefolio.app) not controlled or verified by RuneLite developers."
+# The warning= line as riktenx set it on the plugin-hub submission (plugins/runefolio-sync,
+# commit d3a9453). Keep it identical to that descriptor; the Hub's wording wins over ours.
+hub_warning="This plugin submits your IP address, and may submit various account data, to a 3rd-party server not controlled or verified by Runelite developers."
 test -f plugin-hub/runelite.version
 test -f package.jar
 test -f "$source_dir/runelite-plugin.properties"
