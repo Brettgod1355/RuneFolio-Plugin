@@ -24,7 +24,7 @@ final class RuneFolioApiClient
 {
     private static final String API_BASE = "https://runefolio.app/api";
     private static final int PROTOCOL_VERSION = 1;
-    static final String CLIENT_VERSION = "0.3.60";
+    static final String CLIENT_VERSION = "0.3.61";
     private static final int MAX_JSON_BYTES = 1024 * 1024;
     private static final int READ_BUFFER_BYTES = 4096;
     private static final MediaType JSON = MediaType.parse("application/json");

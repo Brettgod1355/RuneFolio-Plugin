@@ -12,6 +12,11 @@ permissions:
 
 jobs:
   version-bump:
+    # "edited" also fires on an already-merged PR, where the base branch necessarily
+    # contains the version already, so the check would fail with "not newer than main"
+    # -- a tautology no merged PR can pass. GitHub shows the newest run per check name,
+    # so that leaves a permanent red X on merged PRs that means nothing.
+    if: github.event.pull_request.merged == false
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
