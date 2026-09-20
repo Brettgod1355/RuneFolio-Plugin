@@ -33,7 +33,7 @@ dependencies {
 }
 
 group = "app.runefolio"
-version = "0.3.59"
+version = "0.3.60"
 
 tasks.register("verifyDistributionNotices") {
     dependsOn tasks.named("jar")

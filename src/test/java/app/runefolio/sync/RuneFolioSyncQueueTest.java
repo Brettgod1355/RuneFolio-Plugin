@@ -636,4 +636,20 @@ public class RuneFolioSyncQueueTest
         // The superseded entry's key is gone, not merely overwritten in memory.
         Assert.assertFalse(storage.entries.containsKey(underA.getId()));
     }
+
+    @Test
+    public void pendingCountIsScopedToOneConnection()
+    {
+        MemoryStorage storage = new MemoryStorage();
+        RuneFolioSyncQueue queue = queue(storage);
+        Assert.assertTrue(queue.enqueue(RuneFolioSyncEvent.collectionLogUnlock("Example", "A one"), BOUND_A));
+        Assert.assertTrue(queue.enqueue(RuneFolioSyncEvent.collectionLogUnlock("Example", "A two"), BOUND_A));
+        Assert.assertTrue(queue.enqueue(RuneFolioSyncEvent.collectionLogUnlock("Example", "B one"), BOUND_B));
+
+        Assert.assertEquals("whole queue", 3, queue.size());
+        Assert.assertEquals("only A's events", 2, queue.sizeFor(BOUND_A));
+        Assert.assertEquals("only B's events", 1, queue.sizeFor(BOUND_B));
+        Assert.assertEquals("a connection with nothing queued", 0, queue.sizeFor(RuneFolioSyncQueue.binding("other")));
+        Assert.assertEquals("no connection falls back to the whole queue", 3, queue.sizeFor(null));
+    }
 }

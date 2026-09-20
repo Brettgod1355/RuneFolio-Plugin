@@ -353,6 +353,29 @@ final class RuneFolioSyncQueue
         return events.size();
     }
 
+    /**
+     * How many queued events the given connection could actually send. The queue is shared by every
+     * character in this RuneLite profile, so the whole-queue size makes one character look like it
+     * is holding another's backlog. A null binding means no connection is held, where the whole
+     * queue is the honest answer.
+     */
+    synchronized int sizeFor(String binding)
+    {
+        if (binding == null)
+        {
+            return events.size();
+        }
+        int count = 0;
+        for (Entry entry : events.values())
+        {
+            if (binding.equals(entry.binding))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private void load()
     {
         discardLegacyQueue();
