@@ -31,3 +31,8 @@ test('the notification workflow reads the manager origin from a secret, never a 
   assert.match(workflow, /DISCORD_EVENTS_URL: \$\{\{ secrets\.DISCORD_EVENTS_URL \}\}/);
   assert.match(workflow, /steps\.config\.outputs\.configured == 'true'/, 'sending steps stay gated on the secret being set');
 });
+test('the version-bump check does not re-run on an already-merged pull request', async () => {
+  const workflow = await readFile(new URL('../.github/workflows/version-bump.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /types: \[opened, edited, synchronize, reopened\]/, 'a title edit must still re-run the check while the PR is open');
+  assert.match(workflow, /if: github\.event\.pull_request\.merged == false/, 'editing a merged PR would otherwise leave a permanent red X that no merged PR can clear');
+});
