@@ -50,6 +50,7 @@ import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.ScriptID;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.WorldType;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarClientID;
@@ -1805,6 +1806,30 @@ public class RuneFolioPlugin extends Plugin
         return Math.max(0, combatLevel);
     }
 
+    /**
+     * A finishing blow only counts as a PvP kill where the loser could actually drop loot:
+     * inside the Wilderness, or anywhere on a PvP world.
+     *
+     * Clan Wars, Castle Wars, Soul Wars, the Fight Pits and Emir's Arena are all safe - the
+     * loser keeps everything - so a kill there is a minigame score, not account progress, and
+     * recording it would inflate the PvP history with fights that produced nothing. Emir's
+     * Arena and Last Man Standing have their own world types and are already excluded by
+     * RuneFolioWorldPolicy; this covers the same activities played on a normal world, which
+     * that check cannot see.
+     *
+     * Deliberately a location rule rather than a list of minigame regions: it needs no
+     * maintenance when a new safe activity is added, and it fails closed - an unrecognised
+     * safe area is skipped rather than recorded.
+     */
+    static boolean pvpKillCanDropLoot(Set<WorldType> worldTypes, int insideWilderness)
+    {
+        if (worldTypes != null && (worldTypes.contains(WorldType.PVP) || worldTypes.contains(WorldType.HIGH_RISK)))
+        {
+            return true;
+        }
+        return insideWilderness == 1;
+    }
+
     @Subscribe
     public void onHitsplatApplied(HitsplatApplied event)
     {
@@ -1828,6 +1853,9 @@ public class RuneFolioPlugin extends Plugin
             if (tick < hit.getValue() || tick - hit.getValue() > 1) { hits.remove(); continue; }
             if (!hit.getKey().isDead()) continue;
             hits.remove(); pvpDeaths.put(hit.getKey(), tick);
+            // Recorded in pvpDeaths above regardless, so a safe-area kill still suppresses a
+            // repeat record for the same target; it simply produces no result or screenshot.
+            if (!pvpKillCanDropLoot(client.getWorldType(), client.getVarbitValue(VarbitID.INSIDE_WILDERNESS))) continue;
             String name = hit.getKey().getName();
             RuneFolioPvpTracker.Result result = pvpTracker.death(name == null ? null : Text.toJagexName(name), tick, Instant.now().toString());
             if (result != null) {
